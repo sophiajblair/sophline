@@ -1,3 +1,23 @@
+/*
+ * OUTSIDE ANNOTATION FONT SLOT
+ * Replace these src files (with a properly licensed webfont) or change only
+ * --annotation-font below. Phone UI deliberately does not use this family.
+ */
+@font-face {
+  font-family: "Annotation Pixel";
+  src: url("/fonts/silkscreen-400-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Annotation Pixel";
+  src: url("/fonts/silkscreen-700-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
   font-family: "Arial Narrow", "Avenir Next Condensed", "Inter", system-ui, sans-serif;
   color: #f6f3ec;
@@ -9,6 +29,7 @@
   --pink: #ff87ca;
   --orange: #ff7148;
   --blue: #7ee8fa;
+  --annotation-font: "Annotation Pixel", ui-monospace, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -179,19 +200,22 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--acid); outline-
   box-shadow: 14px 18px 0 var(--scene-color, #7157ff), 0 30px 100px #000;
   position: relative;
   animation: annotation-in .38s cubic-bezier(.2,.8,.2,1);
+  font-family: var(--annotation-font);
+  font-size: 12px;
+  line-height: 1.65;
 }
 @keyframes annotation-in { from { opacity: 0; transform: translateX(25px) rotate(1deg); } }
 .annotation-close { position: absolute; top: 14px; right: 18px; border: 0; background: transparent; font-size: 26px; line-height: 1; color: #777; }
 .annotation-eyebrow { margin: 0 0 12px; color: #6f6573; text-transform: uppercase; font-size: 10px; letter-spacing: .14em; font-weight: 900; }
-.annotation h2 { max-width: 350px; margin: 0 0 16px; font-family: Georgia, serif; font-weight: 400; font-size: clamp(28px, 3vw, 45px); line-height: .98; letter-spacing: -.055em; }
-.annotation > p:not(.annotation-eyebrow) { font-size: 14px; line-height: 1.55; }
+.annotation h2 { max-width: 350px; margin: 0 0 18px; font-family: var(--annotation-font); font-weight: 700; font-size: clamp(22px, 2.4vw, 32px); line-height: 1.18; letter-spacing: -.04em; }
+.annotation > p:not(.annotation-eyebrow) { font-size: 11px; line-height: 1.7; }
 .annotation-detail { border-left: 2px solid #a799a5; padding-left: 14px; color: #5c535d; }
 .accuracy { padding: 12px; background: #fff0bb; border-radius: 10px; color: #4b3c10; font-size: 11px !important; }
 .receipts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
 .receipts > span { width: 100%; text-transform: uppercase; font-size: 8px; font-weight: 900; letter-spacing: .14em; color: #857b85; }
 .receipts a { color: #19161d; border: 1px solid #bdb3ba; text-decoration: none; padding: 5px 8px; border-radius: 99px; font-size: 9px; font-weight: 700; }
 .receipts a:hover { background: #17151b; color: white; }
-.side-whisper { width: min(25vw, 260px); font-family: Georgia, serif; color: rgba(255,255,255,.35); font-size: 17px; font-style: italic; line-height: 1.4; }
+.side-whisper { width: min(25vw, 260px); font-family: var(--annotation-font); color: rgba(255,255,255,.42); font-size: 12px; line-height: 1.7; }
 
 .why {
   position: absolute;
@@ -469,7 +493,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--acid); outline-
   }
   @keyframes sheet-in { from { transform: translateY(100%); } }
   .annotation::before { content: ""; display: block; width: 40px; height: 4px; margin: -16px auto 17px; border-radius: 5px; background: #c4bdc3; }
-  .annotation h2 { font-size: 34px; }
+  .annotation h2 { font-size: 25px; line-height: 1.22; }
   .scene-menu { top: 47px; right: 8px; max-height: calc(100svh - 60px); overflow-y: auto; }
 }
 

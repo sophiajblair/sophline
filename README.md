@@ -56,6 +56,14 @@ Recommended delivery:
 
 Only add clips Hannah owns or has explicit rights and performer consent to use. Do not use platform downloads, creator footage, real app interfaces, real product branding, passers-by or identifiable addresses.
 
+## Annotation typeface
+
+The outside context annotations use **Silkscreen**, created by the Silkscreen Project Authors (original design by Jason Kottke), under the [SIL Open Font License 1.1](public/fonts/OFL-Silkscreen.txt). The WOFF2 files are self-hosted; the site makes no font requests to Google.
+
+Volter (Goldfish) is not bundled. Its DaFont page provides no explicit licence text, and the available font file is reported as embedding-restricted. Do not self-host it without written web-embedding permission from the rights holder.
+
+There is one replacement slot at the top of `src/styles.css`: the `Annotation Pixel` `@font-face` declarations and `--annotation-font` variable. To use a properly licensed Volter webfont later, place its WOFF2 file in `public/fonts/`, change the `src` URL in that slot, and retain the new licence and credit beside it. The phone UI intentionally uses the normal system font.
+
 ## Deploy
 
 ### GitHub Pages
