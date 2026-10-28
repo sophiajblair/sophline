@@ -44,7 +44,7 @@ const annotations: Record<string, Annotation> = {
     eyebrow: "this is a fake · synthetic demo",
     title: "that wasn’t mum.",
     body: "the voice can be built from a few seconds of someone talking in a video they posted. the story is the tell: urgent, secret, send it now.",
-    detail: "a made-up word beats a perfect voice. agree one offline, and also hang up and call back on a number you already trust. many family-emergency scams use no AI at all.",
+    detail: "a made-up word beats a perfect voice. text your family to choose one today; don’t type the word itself in the chat. and call back on a number you already trust. jennifer destefano warned this tech “will erode our sense of ‘familiar’”: the voice you trust most can now be the easiest one to fake.",
     accuracy: "‘as little as three seconds’ is a Starling Bank and McAfee claim, not independent field testing. Starling’s 28% is people who think they were targeted. safe words reduce risk; they do not remove it.",
     sourceIds: ["starling", "starlingsp", "ic3psa", "ftcfam", "ftcai", "destefano", "crvoice", "himum"],
   },
