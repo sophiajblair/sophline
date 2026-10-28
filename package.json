@@ -7,10 +7,13 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "admin:mock": "tsx scripts/admin-mock-server.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
     "@vitejs/plugin-react": "latest",
+    "diff": "^9.0.0",
     "motion": "^14.7.1",
     "react": "latest",
     "react-dom": "latest",
@@ -19,12 +22,14 @@
   },
   "devDependencies": {
     "@eslint/js": "latest",
+    "@types/node": "^26.6.5",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "eslint": "latest",
     "eslint-plugin-react-hooks": "latest",
     "eslint-plugin-react-refresh": "latest",
     "globals": "latest",
+    "tsx": "^4.23.15",
     "typescript-eslint": "latest"
   }
 }
