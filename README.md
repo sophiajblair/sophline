@@ -23,12 +23,15 @@ npm run preview
 
 ## Interaction
 
-- Use the on-screen controls, the scene menu, or the footer arrows.
-- On a keyboard, `←` and `→` move between scenes and `Escape` closes an annotation.
-- Every factual scene has a pulsing “why am i seeing this?” button and source links.
-- Streamer mode replaces family names with generic labels.
-- The voice-clone scene uses captions and an abstract waveform only. It contains no cloned or recorded voice.
-- Reduced-motion preferences disable non-essential animation. All interactions are available without hover.
+There are no next buttons or scene menu. The story moves forward when you tap things on the phone itself.
+
+- The phone wakes on its own when the first notification arrives. Tap a notification to open it, or unlock and roam the home screen freely.
+- Notifications arrive on a timeline in `src/content/timeline.ts`. Each event waits for something you have already seen (a reply, a tapped explanation, the call ending) and also has a time fallback, so nobody gets stuck. Unread items show as badges, and idle visitors get a nudge.
+- Tapping a meaningful element (an ad, a sender address, a map pin, a message) opens a cited explanation beside the phone, with a pointer line to that element. On narrow screens it floats over the phone instead. The phone itself never moves, scales or tilts.
+- The voice-clone call arrives as a full-screen incoming call with a content note. Declining skips it and leaves a voicemail transcript. It uses captions and an abstract waveform only: no cloned or recorded voice. Add `?caller=brother` or `?caller=mum` to the URL to choose the variant; otherwise one is picked at random per visit.
+- `Escape` closes an explanation, or goes back to the home screen. Everything is a real button or link, so the whole journey works from the keyboard.
+- Streamer mode (top right, or in the phone’s settings app) replaces family names with generic labels.
+- Reduced-motion preferences replace the springs and zooms with simple fades.
 
 ## Add the videos
 
@@ -56,13 +59,17 @@ Recommended delivery:
 
 Only add clips Hannah owns or has explicit rights and performer consent to use. Do not use platform downloads, creator footage, real app interfaces, real product branding, passers-by or identifiable addresses.
 
-## Annotation typeface
+## Typefaces
 
 The outside context annotations use **Silkscreen**, created by the Silkscreen Project Authors (original design by Jason Kottke), under the [SIL Open Font License 1.1](public/fonts/OFL-Silkscreen.txt). The WOFF2 files are self-hosted; the site makes no font requests to Google.
 
 Volter (Goldfish) is not bundled. Its DaFont page provides no explicit licence text, and the available font file is reported as embedding-restricted. Do not self-host it without written web-embedding permission from the rights holder.
 
-There is one replacement slot at the top of `src/styles.css`: the `Annotation Pixel` `@font-face` declarations and `--annotation-font` variable. To use a properly licensed Volter webfont later, place its WOFF2 file in `public/fonts/`, change the `src` URL in that slot, and retain the new licence and credit beside it. The phone UI intentionally uses the normal system font.
+There is one replacement slot at the top of `src/styles.css`: the `Annotation Pixel` `@font-face` declarations and `--annotation-font` variable. To use a properly licensed Volter webfont later, place its WOFF2 file in `public/fonts/`, change the `src` URL in that slot, and retain the new licence and credit beside it.
+
+Inside the phone, short UI text (app bars, labels, buttons, the clock) uses **Pixelify Sans** by The Pixelify Sans Project Authors, under the [SIL Open Font License 1.1](public/fonts/OFL-PixelifySans.txt), self-hosted from `public/fonts/`. Longer in-phone copy such as messages, emails and captions stays in the system font for readability.
+
+The phone frame, icons and eye motif are hand-built SVG pixel art in `src/phone/` and `src/pixel/`; no image assets are used.
 
 ## Deploy
 
