@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { sourceById, sources } from "./content/sources";
+import { videoById } from "./content/videos";
 
 type Annotation = {
   eyebrow: string;
@@ -104,7 +105,6 @@ const sceneOrder = [
   "sources",
 ] as const;
 
-type SceneId = (typeof sceneOrder)[number];
 type CallChoice = "sent" | "safe" | "callback" | "declined" | null;
 
 function Receipts({ ids }: { ids: string[] }) {
@@ -119,6 +119,35 @@ function Receipts({ ids }: { ids: string[] }) {
           </a>
         ) : null;
       })}
+    </div>
+  );
+}
+
+function VideoSlot({ id, className = "" }: { id: string; className?: string }) {
+  const [ready, setReady] = useState(false);
+  const slot = videoById[id];
+  if (!slot) return null;
+  return (
+    <div className={`video-slot ${className} ${ready ? "is-ready" : ""}`} data-video-id={id}>
+      <video
+        muted
+        autoPlay
+        loop
+        playsInline
+        preload="metadata"
+        onCanPlay={() => setReady(true)}
+        onError={() => setReady(false)}
+        aria-label={slot.label}
+      >
+        <source src={`${import.meta.env.BASE_URL}${slot.webmPath}`} type="video/webm" />
+        <source src={`${import.meta.env.BASE_URL}${slot.filePath}`} type="video/mp4" />
+      </video>
+      {!ready && <div className="video-placeholder">
+        <span>TODO · video coming soon</span>
+        <strong>{slot.label}</strong>
+        <small>{slot.aspectRatio} · {slot.suggestedLength}</small>
+        <code>{slot.filePath}</code>
+      </div>}
     </div>
   );
 }
@@ -207,9 +236,9 @@ function LockScene({ start }: { start: () => void }) {
 function FeedScene({ reveal, next }: { reveal: () => void; next: () => void }) {
   const [card, setCard] = useState(0);
   const feed = [
-    { icon: "🐈‍⬛", title: "cat performs a tiny opera", bg: "violet" },
-    { icon: "🌊", title: "kitchen floods with blue jelly", bg: "aqua" },
-    { icon: "🧠", title: "ceo wakes up at 3:44am (apparently)", bg: "orange" },
+    { slot: "feed-cat-opera", title: "cat performs a tiny opera", bg: "violet" },
+    { slot: "feed-flooded-kitchen", title: "kitchen floods with blue jelly", bg: "aqua" },
+    { slot: "feed-motivational-ceo", title: "ceo wakes up at 3:44am (apparently)", bg: "orange" },
   ];
   const item = feed[card];
   return (
@@ -217,7 +246,7 @@ function FeedScene({ reveal, next }: { reveal: () => void; next: () => void }) {
       <div className="feed-head"><strong>just for u</strong><span>following</span></div>
       <div className="video-faux">
         <div className="ai-label">probably made by a machine</div>
-        <div className="mega-emoji">{item.icon}</div>
+        <VideoSlot key={item.slot} id={item.slot} className="feed-video-slot" />
         <h2>{item.title}</h2>
         <p>@content_farm_404 · #oddlyspecific</p>
         <div className="social-rail"><span>♡<small>42.8k</small></span><span>◌<small>812</small></span><span>↗<small>share</small></span></div>
@@ -237,6 +266,7 @@ function DoorbellScene({ reveal }: { reveal: () => void }) {
     <div className="scene doorbell-scene">
       <div className="app-bar"><span className="app-dot mint">◉</span><strong>threshold</strong><span>•••</span></div>
       <div className="camera-view">
+        <VideoSlot id="doorbell-porch" className="doorbell-video-slot" />
         <div className="porch-wall" />
         <div className="door" />
         <div className="person"><span>●</span><i /></div>
@@ -347,7 +377,7 @@ function BenScene({ reveal }: { reveal: () => void }) {
     <div className="scene ben-scene">
       <div className="ad-tile">
         <span className="ad-pill">AI AD · probably</span>
-        <div className="gadget">✦<i>99</i></div>
+        <VideoSlot id="ai-gadget-ad" className="ad-video-slot" />
         <h2>THE EVERYTHING GADGET</h2>
         <p>peels. glows. definitely changes your life.</p>
         <button onClick={reveal}>buy now???</button>
@@ -487,10 +517,13 @@ export default function App() {
   const mainRef = useRef<HTMLDivElement>(null);
   const seen = Math.max(0, sceneIndex);
   const interests = useMemo(() => ["cats", "privacy", streamer ? "redacted" : "toothpaste"], [streamer]);
-
-  useEffect(() => {
+  const goTo = (index: number) => {
     setAnnotationOpen(false);
     setMenuOpen(false);
+    setSceneIndex(Math.max(0, Math.min(index, sceneOrder.length - 1)));
+  };
+
+  useEffect(() => {
     mainRef.current?.focus();
   }, [scene]);
 
@@ -507,7 +540,7 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [annotationOpen, sceneIndex]);
 
-  const next = () => setSceneIndex(i => Math.min(i + 1, sceneOrder.length - 1));
+  const next = () => goTo(sceneIndex + 1);
   const reveal = () => setAnnotationOpen(true);
   const renderScene = () => {
     switch (scene) {
@@ -523,7 +556,7 @@ export default function App() {
       case "location": return <LocationScene reveal={reveal} />;
       case "deepfake": return <DeepfakeScene reveal={reveal} />;
       case "wrapped": return <WrappedScene reveal={reveal} interests={interests} />;
-      case "fight": return <FightScene openSources={() => setSceneIndex(sceneOrder.indexOf("sources"))} />;
+      case "fight": return <FightScene openSources={() => goTo(sceneOrder.indexOf("sources"))} />;
       case "sources": return <SourcesScene />;
     }
   };
@@ -532,13 +565,13 @@ export default function App() {
   return (
     <main className={`site scene-${scene}`} ref={mainRef} tabIndex={-1}>
       <header className="site-header">
-        <a href="#" onClick={(event) => { event.preventDefault(); setSceneIndex(0); }}>for you, forever</a>
+        <a href="#" onClick={(event) => { event.preventDefault(); goTo(0); }}>for you, forever</a>
         <div>
           <button className={streamer ? "active" : ""} onClick={() => setStreamer(!streamer)} aria-pressed={streamer}>streamer mode {streamer ? "on" : "off"}</button>
           <button onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen}>scenes {menuOpen ? "×" : "☰"}</button>
         </div>
       </header>
-      {menuOpen && <nav className="scene-menu" aria-label="scene list">{sceneOrder.map((id, index) => <button className={id === scene ? "active" : ""} onClick={() => setSceneIndex(index)} key={id}><span>{String(index).padStart(2, "0")}</span>{id}</button>)}</nav>}
+      {menuOpen && <nav className="scene-menu" aria-label="scene list">{sceneOrder.map((id, index) => <button className={id === scene ? "active" : ""} onClick={() => goTo(index)} key={id}><span>{String(index).padStart(2, "0")}</span>{id}</button>)}</nav>}
       <div className="experience">
         <div className="phone-wrap">
           <PhoneFrame count={seen}>{renderScene()}</PhoneFrame>
@@ -547,7 +580,7 @@ export default function App() {
         {!annotationOpen && scene !== "lock" && <div className="side-whisper">(tap the pulsing dot. read the boring bit.)</div>}
       </div>
       <footer className="nav-footer">
-        <button onClick={() => setSceneIndex(i => Math.max(0, i - 1))} disabled={sceneIndex === 0}>← back</button>
+        <button onClick={() => goTo(sceneIndex - 1)} disabled={sceneIndex === 0}>← back</button>
         <div className="progress" aria-label={`scene ${sceneIndex + 1} of ${sceneOrder.length}`}><i style={{ width: `${((sceneIndex + 1) / sceneOrder.length) * 100}%` }} /></div>
         <button onClick={next} disabled={sceneIndex === sceneOrder.length - 1}>next →</button>
       </footer>

@@ -214,6 +214,14 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--acid); outline-
 @keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(255,54,94,0); } 100% { box-shadow: 0 0 0 0 rgba(255,54,94,0); } }
 .primary { border: 0; border-radius: 99px; background: #15141a; color: white; padding: 10px 16px; font-weight: 800; font-size: 10px; }
 .primary.light { background: white; color: #111; }
+.video-slot { position: relative; overflow: hidden; background: #242228; }
+.video-slot video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+.video-slot.is-ready video { opacity: 1; }
+.video-placeholder { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 14px; text-align: center; color: white; background: repeating-linear-gradient(135deg, #25222b 0 12px, #302d36 12px 24px); border: 1px dashed rgba(255,255,255,.55); }
+.video-placeholder span { color: var(--acid); font-size: 7px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.video-placeholder strong { max-width: 180px; font-family: Georgia, serif; font-size: 16px; font-weight: 400; }
+.video-placeholder small { font-size: 7px; color: #bbb5c0; }
+.video-placeholder code { max-width: 100%; color: #8d8792; font-size: 6px; overflow-wrap: anywhere; }
 
 /* lock */
 .lock-scene { color: white; text-align: center; background: radial-gradient(circle at 50% 28%, #8b6aff, #392674 34%, #171324 72%); padding-top: 57px; }
@@ -235,10 +243,9 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--acid); outline-
 .feed-head span { opacity: .55; }
 .video-faux { position: absolute; inset: 80px 14px 95px; }
 .ai-label { display: inline-block; border: 1px solid rgba(255,255,255,.4); background: rgba(0,0,0,.2); padding: 4px 7px; border-radius: 99px; font-size: 7px; }
-.mega-emoji { font-size: 110px; text-align: center; margin-top: 70px; filter: drop-shadow(0 12px 14px rgba(0,0,0,.25)); animation: float 2.5s ease-in-out infinite; }
-@keyframes float { 50% { transform: translateY(-7px) rotate(2deg); } }
-.video-faux h2 { max-width: 230px; margin: 50px 0 4px; font-size: 18px; line-height: 1; text-shadow: 0 2px 7px #000; }
-.video-faux p { font-size: 8px; }
+.feed-video-slot { position: absolute; inset: 30px 25px 90px; border-radius: 12px; box-shadow: 0 18px 40px rgba(0,0,0,.25); }
+.video-faux h2 { position: absolute; left: 0; bottom: 48px; max-width: 230px; margin: 0 0 4px; font-size: 18px; line-height: 1; text-shadow: 0 2px 7px #000; }
+.video-faux > p { position: absolute; left: 0; bottom: 25px; margin: 0; font-size: 8px; }
 .social-rail { position: absolute; right: 0; bottom: 20px; display: grid; gap: 18px; font-size: 24px; text-align: center; }
 .social-rail small { display: block; font-size: 6px; }
 .interest-chip { position: absolute; top: 96px; right: 15px; background: var(--acid); color: #161616; font-size: 7px; font-weight: 900; padding: 6px 8px; transform: rotate(2deg); }
@@ -249,12 +256,14 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--acid); outline-
 .app-bar { display: flex; align-items: center; justify-content: space-between; height: 38px; padding: 0 3px; font-size: 10px; }
 .app-dot { width: 22px; height: 22px; border-radius: 7px; background: #1c1d20; color: #54eda9; display: grid; place-items: center; }
 .camera-view { position: relative; height: 310px; overflow: hidden; border-radius: 13px; background: #71807d; box-shadow: inset 0 0 45px rgba(0,0,0,.28); }
+.doorbell-video-slot { position: absolute; inset: 0; z-index: 5; }
+.doorbell-video-slot .video-placeholder strong { font-size: 15px; }
 .porch-wall { position: absolute; inset: 0 45% 0 0; background: repeating-linear-gradient(0deg, #a1a8a2 0 24px, #737c76 25px 27px); }
 .door { position: absolute; width: 32%; height: 74%; left: 12%; bottom: 0; background: #363b38; border: 7px solid #555d59; }
 .person { position: absolute; bottom: 30px; right: 65px; width: 55px; height: 145px; }
 .person span { display: block; margin: auto; width: 31px; height: 31px; border-radius: 50%; background: #252728; color: transparent; }
 .person i { display: block; margin: -2px auto; width: 48px; height: 112px; border-radius: 20px 20px 8px 8px; background: #45433d; transform: skew(3deg); }
-.timestamp { position: absolute; top: 10px; left: 10px; color: white; font: 7px monospace; }
+.timestamp { position: absolute; z-index: 7; top: 10px; left: 10px; color: white; font: 7px monospace; }
 .scanline { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,.04) 3px 4px); }
 .alert-card { margin: 12px 4px 8px; display: flex; justify-content: space-between; align-items: center; font-size: 9px; }
 .alert-card span { color: #69706a; font-size: 7px; }
@@ -336,8 +345,9 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--acid); outline-
 .ben-scene { background: #ffe344; padding: 55px 17px 18px; }
 .ad-tile { position: relative; height: 405px; padding: 15px; background: #ff6da9; border: 3px solid #111; box-shadow: 8px 8px 0 #111; text-align: center; overflow: hidden; }
 .ad-pill { display: inline-block; padding: 4px 7px; border: 1px solid; border-radius: 99px; font-size: 7px; }
-.gadget { margin: 40px auto 20px; width: 145px; height: 145px; border: 5px solid #111; border-radius: 32% 68% 55% 45%; background: linear-gradient(135deg, #a7ff42, #52b9ff); display: grid; place-items: center; font-size: 70px; transform: rotate(-8deg); }
-.gadget i { position: absolute; font-size: 11px; color: white; font-style: normal; background: #111; border-radius: 50%; padding: 7px; }
+.ad-video-slot { width: 145px; height: 195px; margin: 18px auto 12px; border: 3px solid #111; transform: rotate(-2deg); box-shadow: 4px 4px 0 #111; }
+.ad-video-slot .video-placeholder { padding: 7px; }
+.ad-video-slot .video-placeholder strong { font-size: 12px; }
 .ad-tile h2 { font-size: 31px; line-height: .82; letter-spacing: -.08em; margin: 0; }
 .ad-tile p { font-size: 8px; }
 .ad-tile button { border: 3px solid #111; background: white; box-shadow: 3px 3px 0 #111; padding: 7px 18px; font-size: 9px; font-weight: 900; }

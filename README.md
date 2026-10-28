@@ -30,13 +30,39 @@ npm run preview
 - The voice-clone scene uses captions and an abstract waveform only. It contains no cloned or recorded voice.
 - Reduced-motion preferences disable non-essential animation. All interactions are available without hover.
 
+## Add the videos
+
+No third-party video is bundled, downloaded or embedded. Every moving-image surface is a clearly labelled placeholder until Hannah supplies a clip she has the rights to use.
+
+The single manifest is [`src/content/videos.ts`](src/content/videos.ts). It records each slot’s scene, brief, length, aspect ratio and stable file paths. Export either MP4 or WebM with one of these exact basenames and drop it into `public/videos/`:
+
+| Basename | Needed content | Length / ratio |
+| --- | --- | --- |
+| `feed-cat-opera` | obviously synthetic cat opera | 6–10s, 9:16 |
+| `feed-flooded-kitchen` | impossible flooded/jelly kitchen | 6–10s, 9:16 |
+| `feed-motivational-ceo` | fictional synthetic hustle guru | 6–10s, 9:16 |
+| `doorbell-porch` | staged porch with consenting performer, or empty | 5–8s, 16:9 |
+| `ai-gadget-ad` | original ad for the fictional Everything Gadget | 6–10s, 9:16 |
+
+For example, `public/videos/feed-cat-opera.mp4` replaces that poster automatically. No code or manifest flag needs changing. If both formats are present, the browser prefers WebM.
+
+Recommended delivery:
+
+- H.264 MP4 (`yuv420p`, no audio) and/or VP9 WebM
+- muted-autoplay friendly, with no essential spoken information
+- 1080×1920 for vertical slots; 1280×720 for the porch slot
+- seamless loop, ideally under 2 MB per clip and no more than 4 MB
+- captions burned in when needed, with enough safe area for the overlaid UI
+
+Only add clips Hannah owns or has explicit rights and performer consent to use. Do not use platform downloads, creator footage, real app interfaces, real product branding, passers-by or identifiable addresses.
+
 ## Deploy
 
 ### GitHub Pages
 
 The included workflow in `.github/workflows/deploy-pages.yml` builds and publishes `dist/` on pushes to `main`. In the repository settings, set **Pages → Source** to **GitHub Actions**.
 
-`vite.config.ts` automatically uses `/sophline/` as the base path in GitHub Actions.
+`vite.config.ts` uses `/sophline/` as the base path for the repository Pages URL.
 
 ### Vercel
 
