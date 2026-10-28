@@ -66,18 +66,14 @@ There is one replacement slot at the top of `src/styles.css`: the `Annotation Pi
 
 ## Deploy
 
-### GitHub Pages
+Production is [https://sophline.online](https://sophline.online), served by Vercel. Every push to `main` deploys automatically, and the Vercel status shows on each commit.
 
-The included workflow in `.github/workflows/deploy-pages.yml` builds and publishes `dist/` on pushes to `main`. In the repository settings, set **Pages → Source** to **GitHub Actions**.
-
-`vite.config.ts` uses `/` because the Pages site is served from the custom root domain `https://sophline.online`. `public/CNAME` preserves that domain in each deployment.
-
-### Vercel
-
-Import the repository and keep the detected Vite defaults:
+The Vercel project uses the detected Vite defaults:
 
 - Build command: `npm run build`
 - Output directory: `dist`
+
+`vite.config.ts` uses `base: "/"` because the site is served from the domain root. Keep it at `/` unless the site moves to a subpath.
 
 ## Content notes
 
