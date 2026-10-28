@@ -508,6 +508,25 @@ function SourcesScene() {
   );
 }
 
+// The phone is laid out at 360×760 and scaled, so scene internals keep their proportions.
+function getPhoneScale() {
+  const chrome = window.innerHeight <= 760 ? 45 + 42 : 62 + 56;
+  const breathingRoom = 140;
+  const byHeight = (window.innerHeight - chrome - breathingRoom) / 760;
+  const byWidth = (window.innerWidth * 0.4) / 360;
+  return Math.max(0.5, Math.min(0.92, byHeight, byWidth));
+}
+
+function usePhoneScale() {
+  const [scale, setScale] = useState(getPhoneScale);
+  useEffect(() => {
+    const onResize = () => setScale(getPhoneScale());
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return scale;
+}
+
 export default function App() {
   const [sceneIndex, setSceneIndex] = useState(0);
   const [annotationOpen, setAnnotationOpen] = useState(false);
@@ -515,6 +534,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const scene = sceneOrder[sceneIndex];
   const mainRef = useRef<HTMLDivElement>(null);
+  const phoneScale = usePhoneScale();
   const seen = Math.max(0, sceneIndex);
   const interests = useMemo(() => ["cats", "privacy", streamer ? "redacted" : "toothpaste"], [streamer]);
   const goTo = (index: number) => {
@@ -572,7 +592,7 @@ export default function App() {
         </div>
       </header>
       {menuOpen && <nav className="scene-menu" aria-label="scene list">{sceneOrder.map((id, index) => <button className={id === scene ? "active" : ""} onClick={() => goTo(index)} key={id}><span>{String(index).padStart(2, "0")}</span>{id}</button>)}</nav>}
-      <div className="experience">
+      <div className="experience" style={{ "--phone-scale": phoneScale } as React.CSSProperties}>
         <div className="phone-wrap">
           <PhoneFrame count={seen}>{renderScene()}</PhoneFrame>
         </div>

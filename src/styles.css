@@ -40,7 +40,7 @@ button { cursor: pointer; }
 button:focus-visible, a:focus-visible { outline: 3px solid var(--acid); outline-offset: 3px; }
 
 .site {
-  min-height: 100svh;
+  height: 100svh;
   background:
     radial-gradient(circle at 14% 22%, color-mix(in srgb, var(--scene-color, #7157ff) 25%, transparent), transparent 30rem),
     radial-gradient(circle at 82% 75%, rgba(255, 135, 202, .12), transparent 28rem),
@@ -97,11 +97,18 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--acid); outline-
   padding: 18px 34px;
   position: relative;
 }
-.phone-wrap { position: relative; flex: 0 0 auto; }
+.phone-wrap {
+  position: relative;
+  flex: 0 0 auto;
+  width: calc(360px * var(--phone-scale, .8));
+  height: calc(760px * var(--phone-scale, .8));
+}
 .phone {
   position: relative;
-  width: min(41.5vw, 376px);
-  aspect-ratio: 360 / 760;
+  width: 360px;
+  height: 760px;
+  transform: scale(var(--phone-scale, .8));
+  transform-origin: top left;
   isolation: isolate;
   filter: saturate(.95);
 }
@@ -191,7 +198,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--acid); outline-
 
 .annotation {
   width: min(36vw, 440px);
-  max-height: min(74vh, 650px);
+  max-height: calc(760px * var(--phone-scale, .8));
   overflow-y: auto;
   color: #17151b;
   background: var(--paper);
@@ -473,8 +480,8 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--acid); outline-
   .site-header > a { font-size: 11px; }
   .site-header button { font-size: 8px; padding: 5px 7px; color: white; background: rgba(0,0,0,.35); }
   .experience { padding: 0; min-height: 0; display: block; }
-  .phone-wrap { height: 100%; }
-  .phone { width: min(100vw, calc(100svh * .4737)); height: min(100svh, calc(100vw * 2.111)); margin: auto; }
+  .phone-wrap { width: 100%; height: 100%; }
+  .phone { width: 100vw; height: 100svh; margin: auto; transform: none; }
   .phone-svg { display: none; }
   .phone-screen { inset: 0; border-radius: 0; }
   .glass-shine { display: none; }
@@ -500,8 +507,6 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--acid); outline-
 @media (max-height: 760px) and (min-width: 721px) {
   .site-header { height: 45px; }
   .nav-footer { height: 42px; }
-  .experience { padding: 8px 20px; }
-  .phone { height: calc(100vh - 105px); width: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
