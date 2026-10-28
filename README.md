@@ -70,7 +70,7 @@ There is one replacement slot at the top of `src/styles.css`: the `Annotation Pi
 
 The included workflow in `.github/workflows/deploy-pages.yml` builds and publishes `dist/` on pushes to `main`. In the repository settings, set **Pages → Source** to **GitHub Actions**.
 
-`vite.config.ts` uses `/sophline/` as the base path for the repository Pages URL.
+`vite.config.ts` uses `/` because the Pages site is served from the custom root domain `https://sophline.online`. `public/CNAME` preserves that domain in each deployment.
 
 ### Vercel
 
