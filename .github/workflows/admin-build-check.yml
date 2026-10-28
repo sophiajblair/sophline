@@ -1,0 +1,24 @@
+name: admin build check
+
+# Changes made from /admin land on an admin/preview-* branch first. The admin page only
+# fast-forwards main to that commit after this workflow passes.
+on:
+  push:
+    branches: ["admin/preview-*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
