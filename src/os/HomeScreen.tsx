@@ -10,10 +10,13 @@ type Props = {
   badges: Partial<Record<AppId, number>>;
   watched: number;
   nudge: number;
+  /** the app the story wants opened next; the rest are dimmed but still tappable */
+  next?: AppId;
+  hint: string;
   onOpen: (app: AppId, el: HTMLElement) => void;
 };
 
-export function HomeScreen({ badges, watched, nudge, onOpen }: Props) {
+export function HomeScreen({ badges, watched, nudge, next, hint, onOpen }: Props) {
   const unread = Object.values(badges).reduce((sum, n) => sum + (n ?? 0), 0);
   return (
     <motion.div className="home" initial={{ opacity: 0, scale: 1.06 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
@@ -26,16 +29,18 @@ export function HomeScreen({ badges, watched, nudge, onOpen }: Props) {
               {watched}
             </motion.strong>
           </AnimatePresence>
-          <span>{unread ? `${unread} unread · tap something` : "it’s quiet. for now."}</span>
+          <span>{unread ? `${unread} unread` : "it’s quiet. for now."}</span>
         </div>
       </div>
       <ul className="icon-grid">
         {order.map((app, index) => {
           const meta = appMeta[app];
           const count = badges[app] ?? 0;
+          const state = !next ? "" : app === next ? " is-next" : " is-dim";
           return (
             <motion.li
               key={app}
+              className={state.trim() || undefined}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.025, type: "spring", stiffness: 420, damping: 30 }}
@@ -43,7 +48,7 @@ export function HomeScreen({ badges, watched, nudge, onOpen }: Props) {
               <motion.button
                 key={count ? `${app}-${nudge}` : app}
                 className="app-icon"
-                aria-label={`${meta.label}${count ? `, ${count} new` : ""}`}
+                aria-label={`${meta.label}${count ? `, ${count} new` : ""}${app === next ? ", open this next" : ""}`}
                 onClick={(event) => onOpen(app, event.currentTarget)}
                 whileTap={{ scale: 0.88 }}
                 animate={count && nudge ? { rotate: [0, -6, 6, -4, 4, 0] } : undefined}
@@ -52,6 +57,11 @@ export function HomeScreen({ badges, watched, nudge, onOpen }: Props) {
                 <span className="icon-tile" style={{ background: meta.tile }}>
                   <Pixels map={glyphs[app]} colors={{ "#": meta.glyph, o: meta.accent }} px={4} />
                 </span>
+                {app === next && (
+                  <span className="next-tag" aria-hidden="true">
+                    next
+                  </span>
+                )}
                 <span className="icon-label">{meta.label}</span>
                 <AnimatePresence>
                   {count > 0 && (
@@ -72,7 +82,7 @@ export function HomeScreen({ badges, watched, nudge, onOpen }: Props) {
           );
         })}
       </ul>
-      <p className="home-hint">{unread ? "something wants your attention ↑" : "go on. poke around."}</p>
+      <p className={`home-hint${next ? " is-next" : ""}`}>{hint}</p>
     </motion.div>
   );
 }

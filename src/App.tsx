@@ -17,7 +17,9 @@ import { You } from "./apps/You";
 import { Banners } from "./os/Banners";
 import { CallOverlay } from "./os/CallOverlay";
 import { OSContext, type CallOutcome, type Note, type OSApi } from "./os/context";
+import { guide } from "./os/guide";
 import { HomeScreen } from "./os/HomeScreen";
+import { Intro } from "./os/Intro";
 import { LockScreen, WatchingEye } from "./os/LockScreen";
 import { StatusBar } from "./os/StatusBar";
 import { TipLayer, type Tip } from "./os/TipLayer";
@@ -97,6 +99,7 @@ export default function App() {
   const [nudge, setNudge] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [announcement, setAnnouncement] = useState("");
+  const [visitTips, setVisitTips] = useState(0);
 
   const screenRef = useRef<HTMLDivElement>(null);
   const appLayerRef = useRef<HTMLDivElement>(null);
@@ -132,7 +135,7 @@ export default function App() {
       const now = elapsed();
       setMinutes(Math.floor(now / 20000));
       const { screen, fired, flags, beats, calling, notes } = live.current;
-      if (calling) return;
+      if (calling || screen === "off") return;
       const story: Story = {
         beats,
         fired,
@@ -163,7 +166,7 @@ export default function App() {
         return;
       }
       const unread = notes.some((note) => !note.read);
-      if (unread && screen !== "off" && now - Math.max(lastInput.current, lastFire.current) > IDLE_NUDGE) {
+      if (unread && now - Math.max(lastInput.current, lastFire.current) > IDLE_NUDGE) {
         lastInput.current = now;
         setNudge((n) => n + 1);
         setGlow((n) => n + 1);
@@ -200,6 +203,7 @@ export default function App() {
       }
       addFlag("awake");
       setTip(null);
+      setVisitTips(0);
       setTarget(nextTarget);
       setScreen(app);
       setNotes((prev) => (prev.some((n) => n.app === app && !n.read) ? prev.map((n) => (n.app === app ? { ...n, read: true } : n)) : prev));
@@ -248,6 +252,7 @@ export default function App() {
     tip: (id, el) => {
       tipCount.current += 1;
       setTip({ id, el, n: tipCount.current });
+      setVisitTips((n) => n + 1);
       setBeats((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
     },
     open,
@@ -269,6 +274,8 @@ export default function App() {
   const badges: Partial<Record<AppId, number>> = {};
   for (const note of notes) if (!note.read) badges[note.app] = (badges[note.app] ?? 0) + 1;
   const unread = notes.some((note) => !note.read);
+  const next = notes.find((note) => !note.read)?.app;
+  const hint = guide({ screen, calling, tipOpen: tip !== null, unread, next, visitTips, finished: fired.has("settings") && !unread });
   const alert = calling || unread;
   const night = flags.has("night");
   const time = clock(minutes, night);
@@ -305,7 +312,10 @@ export default function App() {
             nothing leaves this browser · no analytics · no cookies
           </p>
           <p className="ambient ambient-right" aria-hidden="true">
-            tap things · esc = home · {beats.size}/11 noticed
+            esc = home · {beats.size}/11 noticed
+          </p>
+          <p className="guide-line" aria-live="polite">
+            <span aria-hidden="true">▸</span> {hint}
           </p>
 
           <div
@@ -316,14 +326,12 @@ export default function App() {
           >
             <PixelPhone ref={screenRef} alert={alert} night={night}>
               {screen === "off" ? (
-                <button className="screen-off" onClick={() => setScreen("lock")} aria-label="wake the phone">
-                  <span>· · ·</span>
-                </button>
+                <Intro streamer={streamer} onStart={() => setScreen("lock")} />
               ) : (
                 <>
                   <StatusBar time={time} watched={beats.size} />
                   <div className="screen-body">
-                    {screen !== "lock" && <HomeScreen badges={badges} watched={beats.size} nudge={nudge} onOpen={(app, el) => open(app, undefined, el)} />}
+                    {screen !== "lock" && <HomeScreen badges={badges} watched={beats.size} nudge={nudge} next={next} hint={hint} onOpen={(app, el) => open(app, undefined, el)} />}
                     <AnimatePresence>
                       {ActiveApp && (
                         <motion.div

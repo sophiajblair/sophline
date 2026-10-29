@@ -71,13 +71,10 @@ export function LockScreen({ time, notes, onOpen, onUnlock }: Props) {
           })}
         </AnimatePresence>
       </ol>
-      <p className="content-note">
-        content note: this phone later shows scams, a distressed synthetic voice, an AI companion and a deepfake warning. everything can be declined or skipped.
-      </p>
+      <p className="lock-hint">{unread.length ? "tap a notification to open it ↑" : "it’ll buzz in a second…"}</p>
       <button className="unlock" onClick={onUnlock}>
         <span aria-hidden="true">▲</span> tap to unlock
       </button>
-      <p className="local-note">nothing leaves this browser. no analytics. no cookies.</p>
     </motion.div>
   );
 }

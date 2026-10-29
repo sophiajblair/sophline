@@ -31,9 +31,8 @@ export function Banners({ banners, onOpen, onDismiss }: Props) {
             >
               <button className="note is-banner" onClick={(event) => onOpen(note.app, note.target, event.currentTarget)}>
                 <span className="note-app" style={{ color: meta.glyph }}>
-                  ■ {meta.label} · now
+                  ■ {meta.label} · <strong>{note.title}</strong>
                 </span>
-                <strong>{note.title}</strong>
                 <span>{note.body}</span>
               </button>
             </motion.li>

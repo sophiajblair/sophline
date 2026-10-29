@@ -170,13 +170,19 @@ export function TipLayer({ tip, phoneRef, onClose }: Props) {
             <p className="tip-eyebrow">{annotation.eyebrow}</p>
             <h2>{annotation.title}</h2>
             <p>{annotation.body}</p>
-            {annotation.detail && <p className="tip-detail">{annotation.detail}</p>}
-            {annotation.accuracy && (
-              <p className="tip-accuracy">
-                <strong>accuracy note:</strong> {annotation.accuracy}
-              </p>
+            {(annotation.detail || annotation.accuracy) && (
+              <details className="tip-more">
+                <summary>{annotation.accuracy ? "more + accuracy note" : "more"}</summary>
+                {annotation.detail && <p className="tip-detail">{annotation.detail}</p>}
+                {annotation.accuracy && (
+                  <p className="tip-accuracy">
+                    <strong>accuracy note:</strong> {annotation.accuracy}
+                  </p>
+                )}
+              </details>
             )}
             <Receipts ids={annotation.sourceIds} />
+            <p className="tip-next">done? × to close.</p>
           </motion.aside>
         )}
       </AnimatePresence>
