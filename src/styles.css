@@ -560,8 +560,8 @@ svg[shape-rendering="crispEdges"],
   margin: 18px 0 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px 6px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px 8px;
 }
 .app-icon {
   position: relative;
@@ -573,8 +573,8 @@ svg[shape-rendering="crispEdges"],
 .icon-tile {
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
+  width: 72px;
+  height: 72px;
   border: 2px solid var(--outline);
   box-shadow:
     inset -3px -3px 0 rgba(0, 0, 0, 0.35),
@@ -586,13 +586,13 @@ svg[shape-rendering="crispEdges"],
   filter: brightness(1.25);
 }
 .icon-label {
-  font-size: 12px;
+  font-size: 13px;
   color: #aab3bc;
 }
 .badge {
   position: absolute;
-  top: -6px;
-  right: 2px;
+  top: -8px;
+  right: calc(50% - 44px);
   min-width: 20px;
   height: 20px;
   padding: 0 5px;

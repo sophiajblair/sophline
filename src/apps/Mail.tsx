@@ -3,9 +3,54 @@ import { AnimatePresence, motion } from "motion/react";
 import { useOS } from "../os/context";
 import { AppShell } from "../os/ui";
 
-type MailId = "parcel" | "screentime" | "digest";
+type MailId = "parcel" | "work" | "screentime" | "digest";
 
 const flags = ["lookalike sender", "tiny fee", "urgent timer", "link you didn’t expect", "knows what you bought"];
+
+const workFlags = ["lookalike sender", "asks for your password", "deadline today", "link you didn’t expect", "sounds like your workplace"];
+
+function WorkMail() {
+  const os = useOS();
+  const [clicked, setClicked] = useState(false);
+  return (
+    <article className="mail-view">
+      <button className="mail-from" onClick={(event) => os.tip("phishing", event.currentTarget)}>
+        <span className="avatar is-warn">IT</span>
+        <span>
+          <strong>IT Service Desk</strong>
+          <small>servicedesk@n0rthgate-it.co</small>
+        </span>
+      </button>
+      <h2>your password expires today</h2>
+      <p>
+        Hi {os.name("Sam", "there")}, your work account password expires at <b>17:00 today</b>. Sign in below to keep access to email, payroll and
+        shared files. Accounts not updated will be <b>locked</b>.
+      </p>
+      <motion.button
+        className="mail-cta"
+        whileTap={{ scale: 0.96 }}
+        onClick={(event) => {
+          setClicked(true);
+          os.tip("phishing", event.currentTarget);
+        }}
+      >
+        keep my password
+      </motion.button>
+      <AnimatePresence>
+        {clicked && (
+          <motion.div className="red-flags" initial="hidden" animate="shown" variants={{ shown: { transition: { staggerChildren: 0.18 } } }}>
+            {workFlags.map((flag) => (
+              <motion.span key={flag} variants={{ hidden: { opacity: 0, scale: 0.6 }, shown: { opacity: 1, scale: 1 } }}>
+                {flag}
+              </motion.span>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <p className="fake-stamp">training fake · this button goes nowhere · no data collected</p>
+    </article>
+  );
+}
 
 function ParcelMail() {
   const os = useOS();
@@ -53,7 +98,9 @@ function ParcelMail() {
 export function Mail() {
   const os = useOS();
   const hasParcel = os.fired.has("mail");
-  const [open, setOpen] = useState<MailId | null>(os.target === "parcel" && hasParcel ? "parcel" : null);
+  const hasWork = os.fired.has("work");
+  const initial: MailId | null = os.target === "parcel" && hasParcel ? "parcel" : os.target === "work" && hasWork ? "work" : null;
+  const [open, setOpen] = useState<MailId | null>(initial);
   if (open) {
     return (
       <AppShell app="mail" title="mail" tone="light">
@@ -62,6 +109,8 @@ export function Mail() {
         </button>
         {open === "parcel" ? (
           <ParcelMail />
+        ) : open === "work" ? (
+          <WorkMail />
         ) : open === "screentime" ? (
           <article className="mail-view">
             <h2>your weekly report</h2>
@@ -80,6 +129,17 @@ export function Mail() {
   return (
     <AppShell app="mail" title="inbox" tone="light">
       <ul className="list is-light">
+        {hasWork && (
+          <motion.li initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+            <button className="is-unread" onClick={() => setOpen("work")}>
+              <span className="avatar is-warn">IT</span>
+              <span>
+                <strong>IT Service Desk</strong>
+                <small>your password expires today · action needed</small>
+              </span>
+            </button>
+          </motion.li>
+        )}
         {hasParcel && (
           <motion.li initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
             <button className="is-unread" onClick={() => setOpen("parcel")}>

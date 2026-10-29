@@ -50,7 +50,7 @@ export const annotations: Record<TipId, Annotation> = {
   phishing: {
     eyebrow: "this is a fake",
     title: "the typos are gone.",
-    body: "ai can make social engineering cleaner and more specific. the made-up delivery button here cannot submit anything; the story, urgency and sender address are the red flags.",
+    body: "ai can make social engineering cleaner and more specific. the made-up buttons here cannot submit anything; the story, urgency and sender address are the red flags.",
     detail: "the FBI numbers are US complaint data. an AI mention does not prove AI caused a loss.",
     sourceIds: ["ic3", "ncsc", "govphish"],
   },

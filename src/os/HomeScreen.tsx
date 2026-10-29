@@ -55,7 +55,7 @@ export function HomeScreen({ badges, watched, nudge, next, hint, onOpen }: Props
                 transition={{ duration: 0.5 }}
               >
                 <span className="icon-tile" style={{ background: meta.tile }}>
-                  <Pixels map={glyphs[app]} colors={{ "#": meta.glyph, o: meta.accent }} px={4} />
+                  <Pixels map={glyphs[app]} colors={{ "#": meta.glyph, o: meta.accent }} px={6} />
                 </span>
                 {app === next && (
                   <span className="next-tag" aria-hidden="true">

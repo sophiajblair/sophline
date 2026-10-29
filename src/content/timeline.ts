@@ -82,9 +82,15 @@ export const timeline: TimelineEvent[] = [
     call: true,
   },
   {
-    id: "circle",
-    delay: 6,
+    id: "work",
+    delay: 3,
     when: (s) => s.flags.has("callDone"),
+    notify: { app: "mail", title: "IT Service Desk", body: "your work password expires today · action needed", target: "work" },
+  },
+  {
+    id: "circle",
+    delay: 15,
+    when: (s) => s.fired.has("work"),
     notify: { app: "circle", title: "family circle", body: "your kid left school · moving" },
   },
   {
