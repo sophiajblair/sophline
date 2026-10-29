@@ -6,6 +6,8 @@ export type Note = { id: string; app: AppId; title: string; body: string; target
 
 export type CallOutcome = "sent" | "safe" | "callback" | "ended" | "declined";
 
+export type PhoneTheme = "dark" | "light" | "pink" | "blue";
+
 export type OSApi = {
   tip: (id: TipId, el: HTMLElement | null) => void;
   open: (app: AppId, target?: string, from?: HTMLElement | null) => void;
@@ -21,6 +23,11 @@ export type OSApi = {
   addInterest: (interest: string) => void;
   caller: "mum" | "brother";
   callOutcome: CallOutcome | null;
+  theme: PhoneTheme;
+  setTheme: (theme: PhoneTheme) => void;
+  /** The phone owner's first name, shown instead of sam. */
+  owner: string;
+  setOwner: (name: string) => void;
   /** Visible name, or a generic label in streamer mode. */
   name: (real: string, generic: string) => string;
 };

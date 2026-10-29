@@ -1133,6 +1133,42 @@ svg[shape-rendering="crispEdges"],
 .video-slot.paste-video {
   background: #0a1112;
 }
+.post-answer {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 9px 10px;
+  font-family: var(--body-font);
+  font-size: 12px;
+  line-height: 1.4;
+  background: rgba(11, 15, 21, 0.94);
+  border: 2px solid var(--sick);
+  box-shadow: 3px 3px 0 #000;
+}
+.post-answer strong {
+  font-family: var(--phone-font);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--sick);
+}
+.post-answer small {
+  font-family: var(--phone-font);
+  font-size: 10px;
+  color: var(--fog);
+  text-transform: uppercase;
+}
+.post-answer ul {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding-left: 14px;
+}
+.post-answer p {
+  margin: 2px 0 0;
+  color: #aab3bc;
+}
 .post-guess {
   position: relative;
   z-index: 2;
@@ -2320,6 +2356,132 @@ svg[shape-rendering="crispEdges"],
 .wrapped-links .pixel-button {
   margin-top: 0;
   font-size: 12px;
+}
+.customise {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 2px dashed var(--line);
+}
+.theme-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.theme-swatch {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 6px 2px;
+  font-size: 11px;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  box-shadow: 2px 2px 0 #000;
+}
+.theme-swatch.is-on {
+  border-color: var(--sick);
+  color: var(--sick);
+}
+.theme-swatch i {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--outline);
+}
+.swatch-dark i {
+  background: #0b0f15;
+}
+.swatch-light i {
+  background: #ffffff;
+}
+.swatch-pink i {
+  background: #ffb3cf;
+}
+.swatch-blue i {
+  background: #9cc0ff;
+}
+.name-field {
+  display: grid;
+  gap: 4px;
+}
+.name-field small {
+  font-size: 10px;
+  color: var(--fog);
+  text-transform: uppercase;
+}
+.name-field input {
+  padding: 8px 10px;
+  font-family: var(--phone-font);
+  font-size: 14px;
+  color: var(--bone);
+  background: var(--ink);
+  border: 2px solid var(--line);
+  border-radius: 0;
+  box-shadow: 2px 2px 0 #000;
+}
+.name-field input:focus-visible {
+  outline: 2px solid var(--sick);
+  outline-offset: 0;
+}
+
+/* ---------- phone themes (picked in you) ---------- */
+.world.theme-light .phone-screen {
+  --ink: #f4f2ec;
+  --panel: #ffffff;
+  --panel-2: #e6e1d6;
+  --line: #b9b3a4;
+  --fog: #505a66;
+  --bone: #111418;
+  --sick: #4a6a0c;
+  --warn: #c41f1f;
+}
+.world.theme-pink .phone-screen {
+  --ink: #ffe3ee;
+  --panel: #fff4f8;
+  --panel-2: #ffd0e2;
+  --line: #e59bb9;
+  --fog: #7a3d57;
+  --bone: #2b0f1c;
+  --sick: #a3125a;
+  --warn: #c41f1f;
+}
+.world.theme-blue .phone-screen {
+  --ink: #dfeaff;
+  --panel: #f2f7ff;
+  --panel-2: #c9dbff;
+  --line: #8fb0e6;
+  --fog: #3d5478;
+  --bone: #0d1a33;
+  --sick: #1f4fbf;
+  --warn: #c41f1f;
+}
+.world.is-themed .phone-screen.is-night {
+  background: var(--ink);
+}
+.world.is-themed .statusbar {
+  background: linear-gradient(var(--ink) 40%, rgba(255, 255, 255, 0));
+}
+.world.is-themed .status-icons rect[fill="#d8d3c2"] {
+  fill: var(--bone);
+}
+.world.is-themed .lock-time {
+  text-shadow: 3px 3px 0 var(--line);
+}
+.world.is-themed :is(.note:not(.is-banner) > span:last-child, .icon-label, .porch-result p, .guide-list p, .composer-fake) {
+  color: var(--fog);
+}
+.world.is-themed
+  .phone-screen
+  :is(.intro, .call, .note.is-banner, .app-loop .app-body, .app-mira .app-body, .app.is-light, .porch-video, .porch-hud, .porch-detect, .voicemail, .circle-map) {
+  --ink: #0b0f15;
+  --panel: #121821;
+  --panel-2: #18202b;
+  --line: #2a3646;
+  --fog: #6f8091;
+  --bone: #d8d3c2;
+  --sick: #c4dc5a;
+  --warn: #ff3d3d;
+  color: var(--bone);
 }
 
 /* settings + receipts */

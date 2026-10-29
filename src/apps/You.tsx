@@ -1,9 +1,18 @@
+import { useState } from "react";
 import { motion } from "motion/react";
-import { useOS } from "../os/context";
+import { useOS, type PhoneTheme } from "../os/context";
 import { AppShell } from "../os/ui";
+
+const themes: { id: PhoneTheme; label: string }[] = [
+  { id: "dark", label: "dark" },
+  { id: "light", label: "light" },
+  { id: "pink", label: "pink" },
+  { id: "blue", label: "blue" },
+];
 
 export function You() {
   const os = useOS();
+  const [ownerName, setOwnerName] = useState(os.owner);
   const interests = os.interests.length ? os.interests.join(" · ") : "nothing yet (we guessed cats anyway)";
   const night = os.flags.has("night") || os.beats.has("companion");
   const persuadable = os.flags.has("adSeen") ? "mint packaging" : "things that look urgent";
@@ -58,6 +67,37 @@ export function You() {
             all receipts →
           </button>
         </div>
+        <section className="customise" aria-label="customise this phone">
+          <p className="wrapped-kicker">make it yours (it still isn’t)</p>
+          <div className="theme-picker" role="group" aria-label="phone colour">
+            {themes.map((t) => (
+              <button
+                key={t.id}
+                className={`theme-swatch swatch-${t.id}${os.theme === t.id ? " is-on" : ""}`}
+                aria-pressed={os.theme === t.id}
+                onClick={() => os.setTheme(t.id)}
+              >
+                <i aria-hidden="true" />
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <label className="name-field">
+            <small>whose phone is this?</small>
+            <input
+              type="text"
+              value={ownerName}
+              maxLength={16}
+              autoComplete="off"
+              spellCheck={false}
+              onChange={(event) => {
+                setOwnerName(event.target.value);
+                os.setOwner(event.target.value);
+              }}
+            />
+          </label>
+          {os.streamer && <p className="joke-label">streamer mode is on, so the name stays hidden.</p>}
+        </section>
       </div>
     </AppShell>
   );

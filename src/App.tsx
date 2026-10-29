@@ -16,7 +16,7 @@ import { Settings } from "./apps/Settings";
 import { You } from "./apps/You";
 import { Banners } from "./os/Banners";
 import { CallOverlay } from "./os/CallOverlay";
-import { OSContext, type CallOutcome, type Note, type OSApi } from "./os/context";
+import { OSContext, type CallOutcome, type Note, type OSApi, type PhoneTheme } from "./os/context";
 import { guide } from "./os/guide";
 import { HomeScreen } from "./os/HomeScreen";
 import { Intro } from "./os/Intro";
@@ -100,6 +100,8 @@ export default function App() {
   const [minutes, setMinutes] = useState(0);
   const [announcement, setAnnouncement] = useState("");
   const [visitTips, setVisitTips] = useState(0);
+  const [theme, setTheme] = useState<PhoneTheme>("dark");
+  const [owner, setOwner] = useState("sam");
 
   const screenRef = useRef<HTMLDivElement>(null);
   const appLayerRef = useRef<HTMLDivElement>(null);
@@ -152,7 +154,7 @@ export default function App() {
           continue;
         }
         if (!eligible.current.has(event.id)) eligible.current.set(event.id, now);
-        const ready = now - (eligible.current.get(event.id) ?? now) >= event.delay * 1000;
+        const ready = story.settled || now - (eligible.current.get(event.id) ?? now) >= event.delay * 1000;
         if (!ready || now - lastFire.current < MIN_GAP) continue;
         lastFire.current = now;
         live.current = { ...live.current, fired: new Map(fired).set(event.id, now) };
@@ -270,6 +272,10 @@ export default function App() {
     addInterest: (interest) => setInterests((prev) => (prev.includes(interest) ? prev : [...prev, interest])),
     caller,
     callOutcome,
+    theme,
+    setTheme,
+    owner: owner.trim() || "sam",
+    setOwner,
     name: (real, generic) => (streamer ? generic : real),
   };
 
@@ -287,7 +293,7 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <OSContext.Provider value={os}>
-        <div className={`world${alert ? " is-alert" : ""}${night ? " is-night" : ""}`}>
+        <div className={`world${alert ? " is-alert" : ""}${night ? " is-night" : ""}${theme === "dark" ? "" : ` is-themed theme-${theme}`}`}>
           <div className="world-eyes" aria-hidden="true">
             <span className="w-eye e1">
               <WatchingEye px={4} alert={alert} />

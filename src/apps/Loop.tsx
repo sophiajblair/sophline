@@ -115,6 +115,19 @@ function GadgetPost() {
 
 const guesses = ["it listened", "it read the text", "something else i did", "nobody knows"];
 
+const verdicts: Record<string, string> = {
+  "it listened": "probably not. no one has proved phones do it, and it didn’t need to.",
+  "it read the text": "it couldn’t. personal chats like this are end-to-end encrypted. loop never saw the words.",
+  "something else i did": "closest. it doesn’t need the text when it has everything around it.",
+  "nobody knows": "fair. you can’t audit it. but it had options.",
+};
+
+const routes = [
+  "a shop you’ve used uploaded its customer list. your email or number matched.",
+  "it guessed from your activity: what you watch, tap and linger on.",
+  "you linked accounts, so your activity got combined.",
+];
+
 function ToothpastePost() {
   const os = useOS();
   const adRef = useRef<HTMLDivElement>(null);
@@ -130,10 +143,24 @@ function ToothpastePost() {
         <strong>the paste that knows you</strong>
         <small>{os.name("for people who just ran out", "for people like you")}</small>
       </div>
-      <motion.button className="buy-button" whileTap={{ scale: 0.94 }} onClick={() => setAsking(true)}>
-        shop now
-      </motion.button>
-      {guess && <p className="post-guess">you guessed “{guess}”. honest answer: nobody can tell you.</p>}
+      {guess ? (
+        <div className="post-answer" aria-live="polite">
+          <strong>
+            you guessed “{guess}”. {verdicts[guess]}
+          </strong>
+          <small>what it could have used instead</small>
+          <ul>
+            {routes.map((route) => (
+              <li key={route}>{route}</li>
+            ))}
+          </ul>
+          <p>the chat stayed private. everything around it didn’t. which one was it? nobody outside the ad system can tell you.</p>
+        </div>
+      ) : (
+        <motion.button className="buy-button" whileTap={{ scale: 0.94 }} onClick={() => setAsking(true)}>
+          shop now
+        </motion.button>
+      )}
       <AnimatePresence>
         {asking && !guess && (
           <motion.div
