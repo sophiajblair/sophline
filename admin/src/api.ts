@@ -34,7 +34,18 @@ export type Proposal = {
   files: ProposedFile[];
 };
 
-export type Stage = { state: "pending" | "success" | "failure" | "missing"; url: string | null; detail: string; errors?: string[]; commitUrl?: string };
+export type Stage = {
+  state: "pending" | "success" | "failure" | "missing";
+  url: string | null;
+  detail: string;
+  errors?: string[];
+  commitUrl?: string;
+  /** the commit is already on main (someone approved it, maybe from another tab) */
+  published?: boolean;
+};
+
+/** An open admin/preview-* branch, rebuilt by the server with a fresh token. */
+export type Preview = Proposal & { prompt: string; check: Stage; stale: boolean; date: string };
 
 export type HistoryItem = { sha: string; title: string; date: string; url: string; kind: "admin" | "undo"; reverted: boolean };
 
@@ -54,13 +65,25 @@ export const setCsrf = (token: string | undefined) => {
   csrf = token ?? "";
 };
 
+/** Must match ADMIN_PROTOCOL in api/_lib/actions.ts. */
+const ADMIN_PROTOCOL = "3";
+const GET_TIMEOUT_MS = 25_000;
+
 export async function api<T>(action: string, body?: unknown, query = ""): Promise<T> {
-  const response = await fetch(`/api/admin/${action}${query}`, {
-    method: body === undefined ? "GET" : "POST",
-    credentials: "same-origin",
-    headers: body === undefined ? {} : { "content-type": "application/json", "x-csrf-token": csrf },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  const get = body === undefined;
+  let response: Response;
+  try {
+    response = await fetch(`/api/admin/${action}${query}`, {
+      method: get ? "GET" : "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: { "x-admin-protocol": ADMIN_PROTOCOL, ...(get ? {} : { "content-type": "application/json", "x-csrf-token": csrf }) },
+      body: get ? undefined : JSON.stringify(body),
+      signal: get ? AbortSignal.timeout(GET_TIMEOUT_MS) : undefined,
+    });
+  } catch {
+    throw new ApiError(0, "network", "couldn't reach the server.");
+  }
   const data = await response.json().catch(() => ({ error: "bad_response", message: `the server returned ${response.status}.` }));
   if (!response.ok) throw new ApiError(response.status, data.error ?? "error", data.message ?? "request failed.", data.errors ?? []);
   return data as T;

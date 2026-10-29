@@ -89,6 +89,9 @@ const runId = (sha: string) => {
   return id;
 };
 
+/** A check that never finishes, for the timeout path. */
+const stalls = (sha: string) => changedFiles(sha).some((file) => file.content.includes("STALL_CHECK"));
+
 /** A stand-in for lint + tsc + vite build: BREAK_BUILD markers, and a prop passed to LockScreen that its Props don't declare. */
 function checkErrors(sha: string): string[] {
   const tree = trees.get(commits.get(sha)!.tree)!;
@@ -141,6 +144,15 @@ const github = createServer(async (req, res) => {
   const input = req.method === "GET" || req.method === "DELETE" ? {} : JSON.parse((await body(req)) || "{}");
   let m: RegExpMatchArray | null;
 
+  if ((m = path.match(/^\/git\/matching-refs\/heads\/(.*)$/))) {
+    const prefix = decodeURIComponent(m[1]);
+    return send(res, 200, [...refs].filter(([name]) => name.startsWith(prefix)).map(([name, sha]) => ({ ref: `refs/heads/${name}`, object: { sha } })));
+  }
+  if ((m = path.match(/^\/compare\/([0-9a-f]+)\.\.\.(.+)$/))) {
+    const head = refs.get(decodeURIComponent(m[2])) ?? m[2];
+    if (!commits.has(m[1]) || !commits.has(head)) return send(res, 404, { message: "Not Found" });
+    return send(res, 200, { status: m[1] === head ? "identical" : isAncestor(m[1], head) ? "ahead" : isAncestor(head, m[1]) ? "behind" : "diverged" });
+  }
   if ((m = path.match(/^\/git\/refs?\/heads\/(.+)$/))) {
     const name = decodeURIComponent(m[1]);
     if (req.method === "GET") return refs.has(name) ? send(res, 200, { object: { sha: refs.get(name) } }) : send(res, 404, { message: "Not Found" });
@@ -216,8 +228,8 @@ const github = createServer(async (req, res) => {
       id: runId(sha),
       name: "admin build check",
       html_url: `https://github.com/hannahblair/sophline/actions/runs/${runId(sha)}`,
-      status: age < 2500 ? "queued" : age < 6000 ? "in_progress" : "completed",
-      conclusion: age < 6000 ? null : checkErrors(sha).length ? "failure" : "success",
+      status: age < 2500 ? "queued" : age < 6000 || stalls(sha) ? "in_progress" : "completed",
+      conclusion: age < 6000 || stalls(sha) ? null : checkErrors(sha).length ? "failure" : "success",
     };
     return send(res, 200, { workflow_runs: [run] });
   }
@@ -297,6 +309,14 @@ function replyFor(request: string, files: string): MockReply {
           content: "",
         },
       ],
+    };
+  }
+  if (/stall/i.test(request)) {
+    return {
+      summary: "a change whose build check never finishes (test).",
+      commit_message: "Change with a stalled check",
+      notes: "",
+      changes: [{ path: "src/content/annotations.ts", action: "edit", edits: [{ find: 'title: "you never said you liked that.', replace: '/* STALL_CHECK */ title: "you never said you liked that.' }], content: "" }],
     };
   }
   const breaking = /break/i.test(request);

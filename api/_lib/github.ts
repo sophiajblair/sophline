@@ -14,6 +14,7 @@ async function gh<T>(method: string, path: string, body?: unknown, { allow404 = 
       ...(body ? { "content-type": "application/json" } : {}),
     },
     body: body ? JSON.stringify(body) : undefined,
+    cache: "no-store",
   });
   if (allow404 && response.status === 404) return null as T;
   if (!response.ok) {
@@ -93,6 +94,17 @@ export async function deleteBranch(branch: string) {
   // GitHub answers 422, not 404, for a ref that is already gone.
   if (!(await branchSha(branch))) return;
   await gh("DELETE", `/git/refs/heads/${branch}`, undefined, { allow404: true });
+}
+
+export async function listBranches(prefix: string): Promise<{ name: string; sha: string }[]> {
+  const refs = await gh<{ ref: string; object: { sha: string } }[]>("GET", `/git/matching-refs/heads/${prefix}`);
+  return refs.map((ref) => ({ name: ref.ref.replace(/^refs\/heads\//, ""), sha: ref.object.sha }));
+}
+
+/** Whether `sha` is already part of `branch` (it is the tip or one of its ancestors). */
+export async function branchContains(branch: string, sha: string): Promise<boolean> {
+  const result = await gh<{ status: string } | null>("GET", `/compare/${sha}...${branch}?per_page=1`, undefined, { allow404: true });
+  return result?.status === "ahead" || result?.status === "identical";
 }
 
 export type ListedCommit = { sha: string; message: string; date: string; url: string };

@@ -2,6 +2,7 @@ import { askClaude, type ClaudeContext, type RepoFile } from "./claude.js";
 import { buildCheck, deployStatus } from "./deploy.js";
 import { env, missing } from "./env.js";
 import {
+  branchContains,
   branchSha,
   changedPaths,
   commitUrl,
@@ -14,6 +15,7 @@ import {
   getCommit,
   getTree,
   headSha,
+  listBranches,
   listCommits,
   type TreeEntry,
 } from "./github.js";
@@ -38,6 +40,8 @@ const SHA = /^[0-9a-f]{40}$/;
 const PREVIEW = /^admin\/preview-[0-9a-f]{7}$/;
 const MAX_CONTEXT_BYTES = 600_000;
 const MAX_FIXES = 2;
+/** Bumped whenever the admin page and these endpoints change shape, so a tab left open across a deploy is told to reload. */
+const ADMIN_PROTOCOL = "3";
 
 async function session(request: Request) {
   const authGaps = missing("auth");
@@ -132,6 +136,23 @@ function commitMessageFor(p: { commitMessage: string; summary: string; prompt: s
   const quoted = p.prompt.slice(0, 1500).split("\n").map((line) => `> ${line}`).join("\n");
   const fixes = p.fixes.length ? `\n\nBuild fixes by Claude after the check failed:\n${p.fixes.map((f) => `- ${f}`).join("\n")}` : "";
   return `${p.commitMessage}\n\n${p.summary}${fixes}\n\nRequested in /admin:\n${quoted}`;
+}
+
+/** The inverse of commitMessageFor, to rebuild a proposal from a preview commit. */
+function parseCommitMessage(message: string) {
+  const [head, requested = ""] = message.split("\n\nRequested in /admin:\n");
+  const prompt = requested
+    .split("\n")
+    .map((line) => line.replace(/^> ?/, ""))
+    .join("\n")
+    .trim();
+  const [titleAndSummary, fixText = ""] = head.split("\n\nBuild fixes by Claude after the check failed:\n");
+  const [title, ...rest] = titleAndSummary.split("\n\n");
+  const fixes = fixText
+    .split("\n")
+    .filter((line) => line.startsWith("- "))
+    .map((line) => line.slice(2));
+  return { commitMessage: title.trim(), summary: rest.join("\n\n").trim(), prompt, fixes };
 }
 
 /** Commit the change on top of main as an admin/preview-* branch; the build check Action runs on it. */
@@ -251,7 +272,10 @@ async function status(request: Request) {
   const sha = url.searchParams.get("sha") ?? "";
   const stage = url.searchParams.get("stage");
   if (!SHA.test(sha)) throw new HttpError(400, "bad_request", "invalid commit.");
-  if (stage === "check") return json({ stage, ...(await buildCheck(sha)) });
+  if (stage === "check") {
+    const [check, published] = await Promise.all([buildCheck(sha), branchContains(env.branch, sha)]);
+    return json({ stage, ...check, published });
+  }
   if (stage === "deploy") return json({ stage, ...(await deployStatus(sha)), commitUrl: commitUrl(sha) });
   throw new HttpError(400, "bad_request", "unknown stage.");
 }
@@ -262,7 +286,10 @@ async function approve(request: Request) {
   assertConfigured("changes");
   const { token, skipCheck } = await readJson<{ token?: unknown; skipCheck?: boolean }>(request);
   const { sha, branch } = readProposal(token);
-  if ((await branchSha(branch)) !== sha) throw new HttpError(409, "stale", "this preview no longer exists. propose the change again.");
+  if ((await branchSha(branch)) !== sha) {
+    if (await branchContains(env.branch, sha)) return json({ sha, commitUrl: commitUrl(sha), already: true });
+    throw new HttpError(409, "stale", "this preview no longer exists. propose the change again.");
+  }
   const commit = await getCommit(sha);
   if (!commit.message.startsWith("admin:") || commit.parents.length !== 1) throw new HttpError(400, "bad_request", "not an admin preview commit.");
   const [tree, parentTree] = await Promise.all([getTree(commit.tree), getCommit(commit.parents[0]).then((p) => getTree(p.tree))]);
@@ -287,6 +314,35 @@ async function discard(request: Request) {
   if (!branch || !PREVIEW.test(branch)) throw new HttpError(400, "bad_request", "invalid preview branch.");
   await deleteBranch(branch);
   return json({ ok: true });
+}
+
+/** Rebuild a signed proposal from a preview branch, so a reloaded or stuck page can pick it up again. */
+async function openPreview(branch: string, sha: string, head: string) {
+  const commit = await getCommit(sha);
+  if (!commit.message.startsWith("admin:") || commit.parents.length !== 1) return null;
+  const [tree, parentTree] = await Promise.all([getTree(commit.tree), getCommit(commit.parents[0]).then((p) => getTree(p.tree))]);
+  const paths = changedPaths(parentTree, tree);
+  if (!paths.length || paths.some((path) => !isEditable(path))) return null;
+  const text = (files: Map<string, TreeEntry>, path: string) => {
+    const entry = files.get(path);
+    return entry ? getBlobText(entry.sha) : Promise.resolve(null);
+  };
+  const changed = await Promise.all(paths.map(async (path) => ({ path, before: await text(parentTree, path), after: await text(tree, path) })));
+  const parsed = parseCommitMessage(commit.message);
+  const data: ProposalData = { baseSha: commit.parents[0], prompt: parsed.prompt || parsed.commitMessage, summary: parsed.summary, commitMessage: parsed.commitMessage, sha, branch, fixes: parsed.fixes };
+  const check = await buildCheck(sha);
+  return { ...proposalResponse({ ...data, notes: "", model: env.model, changed, token: signProposal(data) }), prompt: data.prompt, check, stale: commit.parents[0] !== head, date: commit.date };
+}
+
+/** Preview branches that are still open, with their build check, newest first. */
+async function previews(request: Request) {
+  requireSession(request, { mutating: false });
+  assertConfigured("changes");
+  const [branches, head] = await Promise.all([listBranches("admin/preview-"), headSha()]);
+  const open = branches.filter((b) => PREVIEW.test(b.name) && b.name === `admin/preview-${b.sha.slice(0, 7)}`).slice(0, 5);
+  const items = (await Promise.all(open.map((b) => openPreview(b.name, b.sha, head)))).filter((item) => item !== null);
+  items.sort((a, b) => b.date.localeCompare(a.date));
+  return json({ items });
 }
 
 type HistoryItem = { sha: string; title: string; date: string; url: string; kind: "admin" | "undo"; reverted: boolean };
@@ -347,6 +403,7 @@ const routes: Record<string, { GET?: (r: Request) => Promise<Response>; POST?: (
   propose: { POST: propose },
   fix: { POST: fix },
   status: { GET: status },
+  previews: { GET: previews },
   approve: { POST: approve },
   discard: { POST: discard },
   history: { GET: history },
@@ -356,6 +413,9 @@ const routes: Record<string, { GET?: (r: Request) => Promise<Response>; POST?: (
 export async function handle(request: Request): Promise<Response> {
   try {
     const action = new URL(request.url).pathname.replace(/\/+$/, "").split("/").pop() ?? "";
+    if (request.headers.get("x-admin-protocol") !== ADMIN_PROTOCOL) {
+      throw new HttpError(409, "client_outdated", "this /admin page is out of date because the site was updated. reload the page.");
+    }
     const route = routes[action];
     if (!route) throw new HttpError(404, "not_found", "unknown admin action.");
     const handler = route[request.method as "GET" | "POST"];

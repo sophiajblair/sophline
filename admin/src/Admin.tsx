@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ApiError, api, setCsrf, type HistoryItem, type Proposal, type SessionInfo, type Stage } from "./api";
+import { ApiError, api, setCsrf, type HistoryItem, type Preview, type Proposal, type SessionInfo, type Stage } from "./api";
 
 type Phase = "idle" | "thinking" | "checking" | "fixing" | "review" | "committing" | "deploying" | "live" | "failed";
 
@@ -13,13 +13,17 @@ type Pipeline = {
   detail?: string;
   link?: string | null;
   commitUrl?: string;
-  noCheck?: boolean;
+  /** the check gave no result within CHECK_LIMIT_MS; polling stops until "check again" */
+  timedOut?: boolean;
+  lastState?: Stage["state"];
   /** build errors (or apply errors) to show; on a failed check these are the compiler and lint lines */
   errors?: string[];
   errorsTitle?: string;
 };
 
 const STORE = "sophline-admin-pipeline";
+const POLL_MS = 4000;
+const CHECK_LIMIT_MS = 4 * 60_000;
 const steps: { phase: Phase; label: string }[] = [
   { phase: "thinking", label: "thinking" },
   { phase: "checking", label: "build check" },
@@ -35,7 +39,7 @@ const idle = (): Pipeline => ({ phase: "idle", prompt: "", since: Date.now() });
 function loadPipeline(): Pipeline {
   try {
     const saved = JSON.parse(sessionStorage.getItem(STORE) ?? "null") as Pipeline | null;
-    if (saved && (saved.phase === "checking" || saved.phase === "fixing" || saved.phase === "deploying" || saved.phase === "review")) {
+    if (saved && saved.sha && (saved.phase === "checking" || saved.phase === "fixing" || saved.phase === "deploying" || saved.phase === "review")) {
       return saved.phase === "fixing" ? { ...saved, phase: "checking" } : saved;
     }
   } catch {
@@ -123,13 +127,23 @@ function Stepper({ phase }: { phase: Phase }) {
   );
 }
 
-function Elapsed({ since }: { since: number }) {
+const clock = (ms: number) => {
+  const seconds = Math.max(0, Math.round(ms / 1000));
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+};
+
+function Elapsed({ since, limit }: { since: number; limit?: number }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
   }, []);
-  return <span className="elapsed">{Math.max(0, Math.round((now - since) / 1000))}s</span>;
+  return (
+    <span className="elapsed">
+      {clock(now - since)}
+      {limit ? ` / ${clock(limit)}` : ""}
+    </span>
+  );
 }
 
 function History({ refreshKey, busy, onUndone }: { refreshKey: number; busy: boolean; onUndone: (url: string) => void }) {
@@ -198,10 +212,22 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
   const [historyKey, setHistoryKey] = useState(0);
   const [polls, setPolls] = useState(0);
 
+  const latest = useRef(pipeline);
   const setPipeline = useCallback((next: Pipeline) => {
+    latest.current = next;
     sessionStorage.setItem(STORE, JSON.stringify(next));
     setPipelineState(next);
   }, []);
+  /** a poll answer only counts if the page is still on the same commit and phase, and nothing newer has landed */
+  const pollSeq = useRef(0);
+  const appliedSeq = useRef(0);
+  const stillCurrent = (p: Pipeline, seq: number) => {
+    if (seq < appliedSeq.current || latest.current.sha !== p.sha || latest.current.phase !== p.phase) return false;
+    appliedSeq.current = seq;
+    return true;
+  };
+  const [previews, setPreviews] = useState<Preview[] | null>(null);
+  const [previewsKey, setPreviewsKey] = useState(0);
 
   const fixing = useRef(false);
 
@@ -229,7 +255,8 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
       errors: proposal.fixedErrors,
       errorsTitle: proposal.fixedErrors?.length ? "errors claude just fixed" : undefined,
       link: null,
-      noCheck: false,
+      timedOut: false,
+      lastState: undefined,
     };
   };
 
@@ -264,19 +291,27 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
   );
 
   useEffect(() => {
-    if (pipeline.phase !== "checking" && pipeline.phase !== "deploying") return;
-    const timer = setTimeout(() => setPolls((n) => n + 1), 4000);
+    const active = (pipeline.phase === "checking" && !pipeline.timedOut) || pipeline.phase === "deploying";
+    if (!active) return;
+    const timer = setTimeout(() => setPolls((n) => n + 1), POLL_MS);
     return () => clearTimeout(timer);
   }, [pipeline, polls]);
 
   useEffect(() => {
     if (!polls) return;
     const p = pipeline;
-    if (p.phase === "checking" && p.sha && p.branch) {
+    const seq = ++pollSeq.current;
+    const transient = (err: unknown) => !(err instanceof ApiError) || err.status === 0 || err.status >= 500;
+    if (p.phase === "checking" && p.sha && !p.timedOut) {
+      const over = Date.now() - p.since > CHECK_LIMIT_MS;
       api<Stage>("status", undefined, `?stage=check&sha=${p.sha}`)
         .then(async (stage) => {
-          if (stage.state === "success") {
-            setPipeline({ ...p, phase: "review", link: stage.url, errors: undefined, detail: "the build check passed. review the diff, then approve or discard." });
+          if (!stillCurrent(p, seq)) return;
+          if (stage.published) {
+            setPipeline({ ...p, phase: "deploying", since: Date.now(), branch: undefined, errors: undefined, link: null, detail: "this change is already on main. waiting for Vercel…" });
+            setHistoryKey((k) => k + 1);
+          } else if (stage.state === "success") {
+            setPipeline({ ...p, phase: "review", link: stage.url, errors: undefined, timedOut: false, detail: "the build check passed. review the diff, then approve or discard." });
           } else if (stage.state === "failure") {
             const errors = stage.errors?.length ? stage.errors : [stage.detail];
             const used = p.proposal?.attempt ?? 0;
@@ -291,26 +326,81 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
               errorsTitle: "build check errors",
               detail: `the build check still failed after ${used} automatic fix${used === 1 ? "" : "es"}. nothing was published; the live site is unchanged.`,
             });
+          } else if (over) {
+            setPipeline({ ...p, timedOut: true, lastState: stage.state, link: stage.url, detail: `still no result after ${clock(CHECK_LIMIT_MS)} (${stage.detail}). nothing was published.` });
           } else {
-            const stalled = stage.state === "missing" && Date.now() - p.since > 4 * 60_000;
             const used = p.proposal?.attempt ?? 0;
             const fixed = used ? `claude fixed the build (fix ${used} of ${p.proposal?.maxFixes ?? 2}). ` : "";
-            setPipeline({ ...p, detail: `${fixed}${stage.detail} the diff below can't be approved until it passes.`, link: stage.url, noCheck: stalled });
+            setPipeline({ ...p, lastState: stage.state, link: stage.url, detail: `${fixed}${stage.detail} the diff below can't be approved until it passes.` });
           }
         })
-        .catch((err) => fail(p, err));
+        .catch((err) => {
+          if (!stillCurrent(p, seq)) return;
+          if (!transient(err)) return fail(p, err);
+          if (over) setPipeline({ ...p, timedOut: true, detail: `couldn't get the build check result after ${clock(CHECK_LIMIT_MS)} (${message(err)}). nothing was published.` });
+          else setPipeline({ ...p, detail: `${message(err)} retrying…` });
+        });
     } else if (p.phase === "deploying" && p.sha) {
       api<Stage>("status", undefined, `?stage=deploy&sha=${p.sha}`)
         .then((stage) => {
+          if (!stillCurrent(p, seq)) return;
           if (stage.state === "success") setPipeline({ ...p, phase: "live", detail: "the change is live on sophline.online.", link: stage.url });
           else if (stage.state === "failure") setPipeline({ ...p, phase: "failed", detail: `${stage.detail} you can undo the change below.`, link: stage.url });
           else setPipeline({ ...p, detail: stage.detail, link: stage.url });
         })
-        .catch((err) => fail(p, err));
+        .catch((err) => {
+          if (!stillCurrent(p, seq)) return;
+          if (!transient(err)) return fail(p, err);
+          setPipeline({ ...p, detail: `${message(err)} retrying…` });
+        });
     }
     // Polling is driven by `polls`; pipeline is read as of that tick.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [polls]);
+
+  // Open preview branches: lets a reloaded page (or one left open across a deploy) pick up a change whose check already finished.
+  useEffect(() => {
+    let live = true;
+    api<{ items: Preview[] }>("previews")
+      .then(({ items }) => {
+        if (!live) return;
+        setPreviews(items);
+        const p = latest.current;
+        const mine = items.find((item) => item.sha === p.sha);
+        if (mine && (p.phase === "checking" || p.phase === "review")) setPipeline({ ...p, proposal: mine });
+      })
+      .catch(() => live && setPreviews([]));
+    return () => {
+      live = false;
+    };
+  }, [previewsKey, setPipeline]);
+
+  const checkAgain = () => {
+    setPipeline({ ...pipeline, timedOut: false, since: Date.now(), detail: "checking again…" });
+    setPolls((n) => n + 1);
+  };
+
+  const resume = (item: Preview, since: number) => {
+    const base: Pipeline = {
+      phase: "checking",
+      prompt: item.prompt,
+      proposal: item,
+      sha: item.sha,
+      branch: item.branch,
+      commitUrl: item.commitUrl,
+      since,
+      link: item.check.url,
+    };
+    setPrompt(item.prompt);
+    if (item.check.state === "success") setPipeline({ ...base, phase: "review", detail: "the build check passed. review the diff, then approve or discard." });
+    else setPipeline({ ...base, detail: item.check.detail });
+    setPolls((n) => n + 1);
+  };
+
+  const discardPreview = async (item: Preview) => {
+    await api("discard", { branch: item.branch }).catch(() => undefined);
+    setPreviewsKey((k) => k + 1);
+  };
 
   const propose = async () => {
     const start: Pipeline = { phase: "thinking", prompt, since: Date.now(), detail: "Claude is reading the site and writing the change…" };
@@ -334,7 +424,7 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
     setPipeline({ ...p, phase: "committing", since: Date.now(), detail: "publishing to main…", errors: undefined });
     try {
       const result = await api<{ sha: string; commitUrl: string }>("approve", { token: p.proposal.token, skipCheck });
-      setPipeline({ ...p, phase: "deploying", since: Date.now(), sha: result.sha, branch: undefined, detail: "committed to main. waiting for Vercel…", commitUrl: result.commitUrl, link: null, noCheck: false, errors: undefined });
+      setPipeline({ ...p, phase: "deploying", since: Date.now(), sha: result.sha, branch: undefined, detail: "committed to main. waiting for Vercel…", commitUrl: result.commitUrl, link: null, timedOut: false, errors: undefined });
       setHistoryKey((k) => k + 1);
       setPolls((n) => n + 1);
     } catch (err) {
@@ -345,7 +435,9 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
   const reset = async () => {
     if (pipeline.branch && pipeline.phase !== "live" && pipeline.phase !== "deploying") await api("discard", { branch: pipeline.branch }).catch(() => undefined);
     sessionStorage.removeItem(STORE);
-    setPipelineState(idle());
+    latest.current = idle();
+    setPipelineState(latest.current);
+    setPreviewsKey((k) => k + 1);
   };
 
   const busy = pipeline.phase !== "idle" && pipeline.phase !== "live" && pipeline.phase !== "failed";
@@ -373,6 +465,57 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
           <span className="muted">claude proposes; nothing changes until you approve.</span>
         </div>
       </section>
+
+      {!busy && previews && previews.some((item) => item.sha !== pipeline.sha) && (
+        <section className="panel" aria-labelledby="waiting-title">
+          <h2 id="waiting-title">waiting for you</h2>
+          <p className="muted">changes claude already committed to a preview branch. nothing here is live yet.</p>
+          <ul className="previews">
+            {previews
+              .filter((item) => item.sha !== pipeline.sha)
+              .map((item) => (
+                <li key={item.sha}>
+                  <p>
+                    <strong>{item.commitMessage.replace(/^admin:\s*/, "")}</strong>{" "}
+                    <time dateTime={item.date}>{new Date(item.date).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}</time>
+                  </p>
+                  <p className={item.check.state === "failure" ? "error" : "muted"}>
+                    {item.check.state === "success" ? "build check passed." : item.check.detail}
+                    {item.stale && " needs a re-run: another change went live after this one was made, so publishing it would undo that change. re-run the request to redo it on top of the live site."}
+                  </p>
+                  <details>
+                    <summary>
+                      diff · {item.files.map((file) => file.path).join(", ")}
+                    </summary>
+                    {item.files.map((file) => (
+                      <Diff key={file.path} text={file.diff} />
+                    ))}
+                  </details>
+                  <div className="row">
+                    {!item.stale && (
+                      <button className="btn primary" onClick={() => resume(item, Date.now())}>
+                        {item.check.state === "success" ? "review & approve" : "resume"}
+                      </button>
+                    )}
+                    {item.stale && (
+                      <button className="btn primary" onClick={() => setPrompt(item.prompt)}>
+                        re-run this request
+                      </button>
+                    )}
+                    {item.check.url && (
+                      <a className="btn" href={item.check.url} target="_blank" rel="noreferrer">
+                        check on GitHub ↗
+                      </a>
+                    )}
+                    <button className="btn" onClick={() => discardPreview(item)}>
+                      discard
+                    </button>
+                  </div>
+                </li>
+              ))}
+          </ul>
+        </section>
+      )}
 
       {pipeline.phase !== "idle" && (
         <section className="panel" aria-labelledby="status-title" aria-live="polite">
@@ -411,12 +554,27 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
               </a>
             )}
           </p>
-          {pipeline.noCheck && pipeline.phase === "checking" && (
-            <div className="row">
-              <span className="muted">no build check started after 4 minutes. GitHub Actions may be disabled.</span>
-              <button className="btn" onClick={() => publish(true)}>
-                publish without check
+          {(pipeline.phase === "checking" || pipeline.phase === "fixing") && !pipeline.timedOut && (
+            <p className="muted check-clock">
+              build check running: <Elapsed since={pipeline.since} limit={CHECK_LIMIT_MS} />
+            </p>
+          )}
+          {pipeline.timedOut && pipeline.phase === "checking" && (
+            <div className="row timed-out">
+              <button className="btn primary" onClick={checkAgain}>
+                check again
               </button>
+              {pipeline.link && (
+                <a className="btn" href={pipeline.link} target="_blank" rel="noreferrer">
+                  view the check on GitHub ↗
+                </a>
+              )}
+              {pipeline.lastState === "missing" && (
+                <button className="btn" onClick={() => publish(true)}>
+                  publish without check
+                </button>
+              )}
+              <span className="muted">{pipeline.lastState === "missing" ? "no check started. GitHub Actions may be disabled." : "the diff below is unchanged; check again whenever you like."}</span>
             </div>
           )}
           {proposal?.token && (pipeline.phase === "checking" || pipeline.phase === "fixing" || pipeline.phase === "review") && (
