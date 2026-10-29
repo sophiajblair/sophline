@@ -124,9 +124,9 @@ function ToothpastePost() {
     <section className="post post-toothpaste" aria-label="sponsored: mint toothpaste">
       <span className="post-ai is-ad">SPONSORED</span>
       <div ref={adRef} className="paste-ad">
-        <div className="paste-tube" aria-hidden="true">
-          <b>mint.</b>
-        </div>
+        <VideoSlot id="toothpaste-ad" className="post-video paste-video" />
+      </div>
+      <div className="post-meta">
         <strong>the paste that knows you</strong>
         <small>{os.name("for people who just ran out", "for people like you")}</small>
       </div>

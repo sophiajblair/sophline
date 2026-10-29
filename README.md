@@ -35,7 +35,7 @@ There are no next buttons or scene menu. The story moves forward when you tap th
 
 ## Add the videos
 
-No third-party video is bundled, downloaded or embedded. Every moving-image surface is a clearly labelled placeholder until Hannah supplies a clip she has the rights to use.
+Every clip is supplied by Hannah; nothing is downloaded or embedded from elsewhere. Each moving-image surface is a clearly labelled placeholder until its clip arrives.
 
 The single manifest is [`src/content/videos.ts`](src/content/videos.ts). It records each slot’s scene, brief, length, aspect ratio and stable file paths. Export either MP4 or WebM with one of these exact basenames and drop it into `public/videos/`:
 
@@ -46,8 +46,11 @@ The single manifest is [`src/content/videos.ts`](src/content/videos.ts). It reco
 | `feed-motivational-ceo` | fictional synthetic hustle guru | 6–10s, 9:16 |
 | `doorbell-porch` | staged porch with consenting performer, or empty | 5–8s, 16:9 |
 | `ai-gadget-ad` | original ad for the fictional Everything Gadget | 6–10s, 9:16 |
+| `toothpaste-ad` | **supplied** (`toothpaste-ad.mp4` + `toothpaste-ad-poster.jpg`): the sponsored ad after “we need toothpaste” | 8s, 9:16 |
 
-For example, `public/videos/feed-cat-opera.mp4` replaces that poster automatically. No code or manifest flag needs changing. If both formats are present, the browser prefers WebM.
+For example, `public/videos/feed-cat-opera.mp4` replaces that poster automatically. No code or manifest flag needs changing. If both formats are present, the browser prefers WebM. Adding a `posterPath` to a slot in the manifest removes its TODO label and shows that frame until the clip plays.
+
+Every slot autoplays muted on a loop. With the system’s reduced-motion setting on, it stays on its first frame (or poster) and shows a “tap to play” button instead.
 
 Recommended delivery:
 

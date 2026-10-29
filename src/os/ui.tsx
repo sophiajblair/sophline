@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { sourceById } from "../content/sources";
 import { videoById } from "../content/videos";
 import type { AppId } from "../content/timeline";
@@ -24,27 +24,54 @@ export function Receipts({ ids, compact }: { ids: string[]; compact?: boolean })
 /**
  * Hannah supplies every clip. Until a matching file exists in public/videos/,
  * the slot shows its pixel poster (children) with a labelled TODO tag.
+ * With reduced motion the clip waits on its first frame until tapped.
  */
 export function VideoSlot({ id, className = "", children }: { id: string; className?: string; children?: React.ReactNode }) {
   const [ready, setReady] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const reduceMotion = useReducedMotion();
+  useEffect(() => {
+    if (reduceMotion) videoRef.current?.pause();
+  }, [reduceMotion]);
   const slot = videoById[id];
   if (!slot) return null;
+  const base = import.meta.env.BASE_URL;
+  const supplied = Boolean(slot.posterPath);
   return (
-    <div className={`video-slot ${className}${ready ? " is-ready" : ""}`} data-video-id={id}>
+    <div className={`video-slot ${className}${ready ? " is-ready" : ""}${supplied ? " is-supplied" : ""}`} data-video-id={id}>
       <video
+        ref={videoRef}
         muted
-        autoPlay
+        autoPlay={!reduceMotion}
         loop
         playsInline
         preload="metadata"
+        poster={slot.posterPath && `${base}${slot.posterPath}`}
         onCanPlay={() => setReady(true)}
         onError={() => setReady(false)}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
         aria-label={slot.label}
       >
-        <source src={`${import.meta.env.BASE_URL}${slot.webmPath}`} type="video/webm" />
-        <source src={`${import.meta.env.BASE_URL}${slot.filePath}`} type="video/mp4" />
+        {slot.webmPath && <source src={`${base}${slot.webmPath}`} type="video/webm" />}
+        <source src={`${base}${slot.filePath}`} type="video/mp4" />
       </video>
-      {!ready && (
+      {reduceMotion && (ready || supplied) && (
+        <button
+          className={`video-play${playing ? " is-playing" : ""}`}
+          aria-label={playing ? `pause ${slot.label}` : `play ${slot.label}`}
+          onClick={() => {
+            const video = videoRef.current;
+            if (!video) return;
+            if (video.paused) void video.play().catch(() => {});
+            else video.pause();
+          }}
+        >
+          <span aria-hidden="true">{playing ? "❚❚" : "▶ tap to play"}</span>
+        </button>
+      )}
+      {!ready && !supplied && (
         <div className="video-placeholder">
           <div className="video-poster" aria-hidden="true">{children}</div>
           <div className="video-todo">

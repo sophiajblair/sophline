@@ -6,7 +6,9 @@ export type VideoSlot = {
   suggestedLength: string;
   aspectRatio: "9:16" | "16:9";
   filePath: string;
-  webmPath: string;
+  webmPath?: string;
+  /** Set once Hannah has supplied the clip: the slot then shows this frame instead of the TODO label. */
+  posterPath?: string;
 };
 
 /**
@@ -14,6 +16,16 @@ export type VideoSlot = {
  * public/videos/ appears automatically; missing files render a labelled poster.
  */
 export const videos: VideoSlot[] = [
+  {
+    id: "toothpaste-ad",
+    scene: "Toothpaste ad",
+    label: "toothpaste ad",
+    intendedContent: "The sponsored toothpaste ad that appears in the feed after the ‘we need toothpaste’ message. Supplied by Hannah.",
+    suggestedLength: "8 seconds, seamless loop",
+    aspectRatio: "9:16",
+    filePath: "videos/toothpaste-ad.mp4",
+    posterPath: "videos/toothpaste-ad-poster.jpg",
+  },
   {
     id: "feed-cat-opera",
     scene: "AI slop feed",

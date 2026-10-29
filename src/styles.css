@@ -865,7 +865,6 @@ svg[shape-rendering="crispEdges"],
 }
 .post-toothpaste {
   background: linear-gradient(160deg, #12262a, #0a1112);
-  justify-content: center;
   padding-right: 14px;
 }
 .post-end {
@@ -965,30 +964,22 @@ svg[shape-rendering="crispEdges"],
   animation: nudge-up 1.4s infinite;
 }
 .paste-ad {
-  display: grid;
-  gap: 6px;
-  justify-items: center;
-  text-align: center;
+  position: absolute;
+  inset: 0;
 }
-.paste-tube {
-  width: 170px;
-  height: 64px;
-  display: grid;
-  place-items: center;
-  background: repeating-linear-gradient(90deg, #e9f6f2 0 18px, #bfe7dc 18px 22px);
-  border: 3px solid var(--outline);
-  clip-path: polygon(0 0, 88% 0, 100% 30%, 100% 70%, 88% 100%, 0 100%);
-  color: #0f6b5a;
-  font-size: 26px;
+.paste-ad::after {
+  content: "";
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(transparent, rgba(5, 7, 10, 0.92));
+  pointer-events: none;
 }
-.paste-ad strong {
-  font-size: 18px;
-}
-.paste-ad small {
-  font-family: var(--body-font);
-  color: var(--fog);
+.video-slot.paste-video {
+  background: #0a1112;
 }
 .post-guess {
+  position: relative;
+  z-index: 2;
   font-family: var(--body-font);
   font-size: 12px;
   color: var(--sick);
@@ -1033,8 +1024,30 @@ svg[shape-rendering="crispEdges"],
   height: 100%;
   object-fit: cover;
 }
-.video-slot:not(.is-ready) video {
+.video-slot:not(.is-ready, .is-supplied) video {
   opacity: 0;
+}
+.video-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--sick);
+  border: 2px solid var(--outline);
+  box-shadow: 3px 3px 0 #000;
+}
+.video-play.is-playing {
+  top: 12px;
+  left: auto;
+  right: 10px;
+  transform: none;
+  padding: 4px 7px;
+  font-size: 10px;
+  opacity: 0.8;
 }
 .video-placeholder {
   position: absolute;
