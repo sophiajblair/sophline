@@ -82,6 +82,45 @@ const changedFiles = (sha: string) => {
   return [...tree].filter(([path, blob]) => parent.get(path) !== blob).map(([path, blob]) => ({ path, content: blobs.get(blob) ?? "" }));
 };
 
+const shaForRun = new Map<number, string>();
+const runId = (sha: string) => {
+  const id = parseInt(sha.slice(0, 7), 16) * 2;
+  shaForRun.set(id, sha);
+  return id;
+};
+
+/** A stand-in for lint + tsc + vite build: BREAK_BUILD markers, and a prop passed to LockScreen that its Props don't declare. */
+function checkErrors(sha: string): string[] {
+  const tree = trees.get(commits.get(sha)!.tree)!;
+  const text = (path: string) => blobs.get(tree.get(path) ?? "") ?? "";
+  const errors: string[] = [];
+  for (const file of changedFiles(sha)) {
+    file.content.split("\n").forEach((line, i) => {
+      const col = line.indexOf("BREAK_BUILD");
+      if (col !== -1) errors.push(`${file.path}(${i + 1},${col + 1}): error TS2304: Cannot find name 'BREAK_BUILD'.`);
+    });
+  }
+  const app = text("src/App.tsx").split("\n");
+  const usage = app.findIndex((line) => line.includes("<LockScreen") && line.includes("hintTone="));
+  if (usage !== -1 && !text("src/os/LockScreen.tsx").includes("hintTone?: ")) {
+    const col = app[usage].indexOf("<LockScreen") + 2;
+    errors.push(
+      `src/App.tsx(${usage + 1},${col}): error TS2322: Type '{ time: string; notes: Note[]; onOpen: (app: AppId, t: string | undefined, el: HTMLElement) => void; onUnlock: () => void; hintTone: string; }' is not assignable to type 'IntrinsicAttributes & Props'. — Property 'hintTone' does not exist on type 'IntrinsicAttributes & Props'.`,
+    );
+  }
+  return errors;
+}
+
+function checkLog(errors: string[]) {
+  const stamp = () => new Date().toISOString().replace("Z", "0000Z");
+  const lines = ["##[group]Run node scripts/admin-check.mjs", "##[endgroup]", "", "\u001b[1madmin check\u001b[0m"];
+  if (errors.length) {
+    lines.push("::group::admin check errors", ...errors.map((e) => `ADMIN_CHECK_ERROR ${e.replace(/^(.+?)\((\d+),(\d+)\): error /, "$1:$2:$3 ")}`), "::endgroup::");
+    lines.push(`${errors.length} errors: lint ok, typecheck failed, build ok.`, "##[error]Process completed with exit code 1.");
+  } else lines.push("admin check passed: lint, typecheck and build.");
+  return lines.map((line) => `${stamp()} ${line}`).join("\n");
+}
+
 async function body(req: IncomingMessage): Promise<string> {
   const chunks: Buffer[] = [];
   for await (const chunk of req) chunks.push(chunk as Buffer);
@@ -173,14 +212,25 @@ const github = createServer(async (req, res) => {
     const at = pushedAt.get(sha);
     if (!at) return send(res, 200, { workflow_runs: [] });
     const age = Date.now() - at;
-    const broken = changedFiles(sha).some((f) => f.content.includes("BREAK_BUILD"));
     const run = {
+      id: runId(sha),
       name: "admin build check",
-      html_url: `https://github.com/hannahblair/sophline/actions/runs/mock-${sha.slice(0, 7)}`,
+      html_url: `https://github.com/hannahblair/sophline/actions/runs/${runId(sha)}`,
       status: age < 2500 ? "queued" : age < 6000 ? "in_progress" : "completed",
-      conclusion: age < 6000 ? null : broken ? "failure" : "success",
+      conclusion: age < 6000 ? null : checkErrors(sha).length ? "failure" : "success",
     };
     return send(res, 200, { workflow_runs: [run] });
+  }
+  if ((m = path.match(/^\/actions\/runs\/(\d+)\/jobs$/))) {
+    const sha = shaForRun.get(Number(m[1]));
+    if (!sha) return send(res, 404, { message: "Not Found" });
+    return send(res, 200, { jobs: [{ id: Number(m[1]) + 1, name: "build", status: "completed", conclusion: checkErrors(sha).length ? "failure" : "success" }] });
+  }
+  if ((m = path.match(/^\/actions\/jobs\/(\d+)\/logs$/))) {
+    const sha = shaForRun.get(Number(m[1]) - 1);
+    if (!sha) return send(res, 404, { message: "Not Found" });
+    res.writeHead(200, { "content-type": "text/plain" });
+    return res.end(checkLog(checkErrors(sha)));
   }
   if ((m = path.match(/^\/commits\/([0-9a-f]{40})\/status$/))) {
     const at = promotedAt.get(m[1]);
@@ -195,7 +245,7 @@ const github = createServer(async (req, res) => {
 // ---------- fake Anthropic ----------
 type MockReply = { summary: string; commit_message: string; notes: string; changes: unknown[] };
 
-function replyFor(request: string): MockReply {
+function replyFor(request: string, files: string): MockReply {
   if (/nothing/i.test(request)) return { summary: "no change needed.", commit_message: "no-op", notes: "nothing to change for that request.", changes: [] };
   if (/package\.json/i.test(request)) {
     return {
@@ -220,7 +270,46 @@ function replyFor(request: string): MockReply {
       ],
     };
   }
+  const fixing = request.includes("The build check (eslint, tsc -b, vite build) failed with:");
+  // "hint": the first reply passes a prop LockScreen doesn't declare (like the real TS2322); the fix adds it to Props.
+  if (/hint/i.test(request)) {
+    if (!fixing) {
+      return {
+        summary: "gives the lock screen hint a calm tone.",
+        commit_message: "Give the lock screen hint a calm tone",
+        notes: "",
+        changes: [{ path: "src/App.tsx", action: "edit", edits: [{ find: "<LockScreen time={time}", replace: '<LockScreen hintTone="calm" time={time}' }], content: "" }],
+      };
+    }
+    return {
+      summary: "declares hintTone in LockScreen's Props and uses it on the hint.",
+      commit_message: "Declare hintTone on LockScreen",
+      notes: "",
+      changes: [
+        {
+          path: "src/os/LockScreen.tsx",
+          action: "edit",
+          edits: [
+            { find: "  onUnlock: () => void;\n};", replace: "  onUnlock: () => void;\n  hintTone?: string;\n};" },
+            { find: "({ time, notes, onOpen, onUnlock }: Props)", replace: "({ time, notes, onOpen, onUnlock, hintTone }: Props)" },
+            { find: '<p className="lock-hint">', replace: '<p className="lock-hint" data-tone={hintTone}>' },
+          ],
+          content: "",
+        },
+      ],
+    };
+  }
   const breaking = /break/i.test(request);
+  // "break" stays broken: every fix attempt swaps the marker for another one.
+  const marker = fixing ? files.match(/\/\* BREAK_BUILD[^*]*\*\//)?.[0] : undefined;
+  if (breaking && marker) {
+    return {
+      summary: "tries to fix the broken line (mock: still broken).",
+      commit_message: "Try to fix the broken line",
+      notes: "",
+      changes: [{ path: "src/content/annotations.ts", action: "edit", edits: [{ find: marker, replace: `/* BREAK_BUILD again ${Date.now()} */` }], content: "" }],
+    };
+  }
   return {
     summary: breaking ? "adds a line that fails the build (test)." : "sharpens the feed tooltip title.",
     commit_message: breaking ? "Add a deliberately broken line" : "Sharpen the feed tooltip title",
@@ -252,7 +341,7 @@ const anthropic = createServer(async (req, res) => {
   console.log(
     `[mock anthropic] model=${request.model} files=${fileCount} hasPackageJson=${filesBlock.includes('path="package.json"')} schema=${request.output_config?.format?.type} system=${String(request.system).slice(0, 40)}…`,
   );
-  const text = JSON.stringify(replyFor(ask));
+  const text = JSON.stringify(replyFor(ask, filesBlock));
   await new Promise((resolve) => setTimeout(resolve, 1500));
   const message = { id: "msg_mock", type: "message", role: "assistant", model: request.model, content: [] as unknown[], stop_reason: null, stop_sequence: null, usage: { input_tokens: 100, output_tokens: 1 } };
   if (!request.stream) {
