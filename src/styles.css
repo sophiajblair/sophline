@@ -1338,7 +1338,7 @@ svg[shape-rendering="crispEdges"],
 }
 .porch-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 6px;
   margin-top: 8px;
 }
@@ -1365,6 +1365,51 @@ svg[shape-rendering="crispEdges"],
   color: var(--ink);
   background: var(--sick);
   padding: 0 6px;
+}
+.porch-toggle b.is-off {
+  color: var(--fog);
+  background: var(--line);
+}
+.porch-ask {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 11px;
+  color: var(--fog);
+  text-transform: uppercase;
+}
+.porch-result {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: var(--panel-2);
+  border: 2px solid var(--line);
+  box-shadow: 3px 3px 0 #000;
+}
+.porch-result.is-won {
+  border-color: var(--sick);
+}
+.porch-result.is-lost {
+  border-color: var(--warn);
+}
+.porch-result.is-won strong {
+  color: var(--sick);
+}
+.porch-result.is-lost strong {
+  color: var(--warn);
+}
+.porch-result p {
+  margin: 0;
+  font-family: var(--body-font);
+  font-size: 12px;
+  line-height: 1.4;
+  color: #aab3bc;
+}
+.porch-retry {
+  justify-self: start;
+  font-size: 12px;
+  color: var(--fog);
+  text-decoration: underline;
 }
 
 /* mail */
@@ -2027,6 +2072,60 @@ svg[shape-rendering="crispEdges"],
   font-family: var(--body-font);
   font-size: 12px;
   color: var(--fog);
+}
+.map-check {
+  margin-top: 6px;
+  padding: 8px;
+  text-align: left;
+  font-size: 13px;
+  color: var(--sick);
+  border: 2px dashed var(--sick);
+}
+.viewer-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.viewer-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--ink);
+  border: 2px solid var(--line);
+}
+.viewer-list li.is-stranger {
+  border-color: var(--warn);
+}
+.viewer-list b {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--bone);
+}
+.viewer-list em {
+  display: block;
+  font-style: normal;
+  font-family: var(--body-font);
+  font-size: 11px;
+  color: var(--fog);
+}
+.viewer-list button {
+  flex: none;
+  padding: 4px 7px;
+  font-size: 11px;
+  color: #fff;
+  background: var(--warn);
+  border: 2px solid var(--outline);
+  box-shadow: 2px 2px 0 #000;
+}
+.map-status {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--sick);
 }
 
 /* photos + deepfake */

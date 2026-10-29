@@ -47,8 +47,8 @@ export function CallOverlay({ onDone }: Props) {
   const result: Record<Exclude<CallOutcome, "declined">, { icon: string; title: string; copy: string }> = {
     sent: { icon: "−£", title: `you just “lost” ${amount}`, copy: "pretend money. real lesson. nothing was sent." },
     safe: { icon: "✓", title: "you beat it.", copy: "you asked for the family word. the voice stumbled, and the call dropped." },
-    callback: { icon: "☎", title: `${brother ? os.name("ollie", "they") : os.name("mum", "they")} is fine.`, copy: brother ? "he answers on the sofa, confused. his phone was in his pocket the whole time." : "she answers in the kitchen, confused and fine. she never called." },
-    ended: { icon: "×", title: "you hung up.", copy: "good instinct. now check on them another way, on a number you already trust." },
+    callback: { icon: "☎", title: `${brother ? os.name("ollie", "they") : os.name("mum", "they")} is fine.`, copy: brother ? "you ring his usual number. he answers on the sofa, confused. his phone was in his pocket the whole time. the real him wouldn’t mind you checking." : "you ring her usual number. she answers in the kitchen, confused and fine. she never called. the real her wouldn’t mind you checking." },
+    ended: { icon: "?", title: "it dodged the question.", copy: `“there’s no time for this, just send it.” the real ${brother ? os.name("ollie", "sibling") : os.name("mum", "parent")} would’ve answered. a copy pushes harder instead. now ring the number you already have.` },
   };
 
   return (
@@ -127,8 +127,8 @@ export function CallOverlay({ onDone }: Props) {
               <motion.div className="choice-buttons" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                 <button onClick={() => setPhase("sent")}>send {amount}</button>
                 <button onClick={() => setPhase("safe")}>ask for the family word</button>
-                <button onClick={() => setPhase("callback")}>hang up + call back</button>
-                <button onClick={() => setPhase("ended")}>end call</button>
+                <button onClick={() => setPhase("ended")}>ask something only {brother ? "he’d" : "she’d"} know</button>
+                <button onClick={() => setPhase("callback")}>“i’ll ring you straight back” on {brother ? "his" : "her"} usual number</button>
               </motion.div>
             )}
           </AnimatePresence>

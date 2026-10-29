@@ -10,7 +10,7 @@ export function You() {
   const voice =
     os.callOutcome === "sent"
       ? "would send money to a familiar voice"
-      : os.callOutcome === "safe" || os.callOutcome === "callback"
+      : os.callOutcome === "safe" || os.callOutcome === "callback" || os.callOutcome === "ended"
         ? "checks before trusting a voice"
         : os.callOutcome === "declined"
           ? "lets unknown calls ring out"
