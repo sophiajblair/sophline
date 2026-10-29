@@ -15,7 +15,7 @@ export function Intro({ streamer, onStart }: { streamer: boolean; onStart: () =>
       <p className="intro-who">
         {streamer
           ? "for a few minutes it is. a partner, a kid, a parent and far too many apps."
-          : "this is sam’s phone for a few minutes: a partner, a kid called jules, a mum, a little brother and far too many apps."}
+          : "this is sam’s phone for a few minutes: a partner, a kid, a mum, a little brother and far too many apps."}
       </p>
       <ol className="intro-steps">
         {steps.map((step) => (

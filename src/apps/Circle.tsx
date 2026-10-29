@@ -6,7 +6,7 @@ const path = { left: ["22%", "22%", "48%", "48%", "70%"], top: ["24%", "46%", "4
 
 export function Circle() {
   const os = useOS();
-  const kid = os.name("jules", "child");
+  const kid = os.name("kid", "child");
   return (
     <AppShell app="circle" title="family circle">
       <div className="circle-map" aria-label={`map showing ${kid} moving from school towards home`}>

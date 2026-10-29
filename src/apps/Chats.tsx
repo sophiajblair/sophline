@@ -68,7 +68,7 @@ function OtherHalf() {
 
 function Family() {
   const os = useOS();
-  const kid = os.name("jules", "child");
+  const kid = os.name("kid", "child");
   const lines = [`${kid}: did u see what someone made from ur party pic??`, `${kid}: it’s going round year 9`];
   const script = useScript(lines.length + 1, true);
   return (

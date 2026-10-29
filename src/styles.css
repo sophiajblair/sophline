@@ -607,8 +607,8 @@ svg[shape-rendering="crispEdges"],
   transition: opacity 0.25s;
 }
 .icon-grid .is-dim .app-icon {
-  opacity: 0.32;
-  filter: grayscale(0.7);
+  opacity: 0.7;
+  filter: grayscale(0.35);
 }
 .icon-grid .is-next .icon-tile {
   outline: 3px solid var(--sick);

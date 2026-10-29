@@ -85,13 +85,13 @@ export const timeline: TimelineEvent[] = [
     id: "circle",
     delay: 6,
     when: (s) => s.flags.has("callDone"),
-    notify: { app: "circle", title: "family circle", body: "jules left school · moving" },
+    notify: { app: "circle", title: "family circle", body: "your kid left school · moving" },
   },
   {
     id: "photos",
     delay: 10,
     when: (s) => s.fired.has("circle"),
-    notify: { app: "chats", title: "family 🏠", body: "jules: did u see what someone made from ur party pic??", target: "family" },
+    notify: { app: "chats", title: "family 🏠", body: "kid: did u see what someone made from ur party pic??", target: "family" },
   },
   {
     id: "mira",
