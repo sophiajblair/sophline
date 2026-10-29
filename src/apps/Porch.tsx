@@ -9,7 +9,7 @@ const choices: Choice[] = [
   { label: "share to neighbours", won: false, result: "you just posted a stranger’s face to the whole street. it was the parcel driver. you can’t pull that clip back now." },
   { label: "save it", won: false, result: "saved. one more clip of someone who never agreed to be filmed, kept on a server you don’t own." },
   { label: "ignore it", won: false, result: "the door’s fine. the clip saved itself to the cloud anyway. ignoring isn’t the same as off." },
-  { label: "check what the camera records first", won: true, result: "audio off. old clips deleted. search party off. the camera still watches, just a bit less." },
+  { label: "check the settings first", won: true, result: "audio off. old clips deleted. search party off. the camera still watches, just a bit less." },
 ];
 
 export function Porch() {
@@ -50,7 +50,6 @@ export function Porch() {
           >
             <strong>{choice.won ? "you beat it." : "you messed it up."}</strong>
             <p>{choice.result}</p>
-            {!choice.won && <p className="porch-hint">hint: before doing anything with the clip, ask what this camera records and keeps.</p>}
             <button className="porch-retry" onClick={() => setChoice(null)}>
               try again
             </button>

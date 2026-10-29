@@ -16,7 +16,7 @@ import { Settings } from "./apps/Settings";
 import { You } from "./apps/You";
 import { Banners } from "./os/Banners";
 import { CallOverlay } from "./os/CallOverlay";
-import { OSContext, type CallOutcome, type Note, type OSApi, type Theme } from "./os/context";
+import { OSContext, type CallOutcome, type Note, type OSApi } from "./os/context";
 import { guide } from "./os/guide";
 import { HomeScreen } from "./os/HomeScreen";
 import { Intro } from "./os/Intro";
@@ -100,8 +100,6 @@ export default function App() {
   const [minutes, setMinutes] = useState(0);
   const [announcement, setAnnouncement] = useState("");
   const [visitTips, setVisitTips] = useState(0);
-  const [theme, setTheme] = useState<Theme>("default");
-  const [owner, setOwner] = useState("sam");
 
   const screenRef = useRef<HTMLDivElement>(null);
   const appLayerRef = useRef<HTMLDivElement>(null);
@@ -197,12 +195,6 @@ export default function App() {
     setTip(null);
   }, [tip]);
 
-  const leaveLoop = useCallback(() => {
-    if (live.current.screen !== "loop") return;
-    addFlag("loopClosed");
-    if (live.current.fired.has("ad")) addFlag("adClosed");
-  }, [addFlag]);
-
   const open = useCallback(
     (app: AppId, nextTarget?: string, from?: HTMLElement | null) => {
       const screenEl = screenRef.current;
@@ -212,7 +204,6 @@ export default function App() {
         setOrigin({ x: ((f.left + f.width / 2 - s.left) / s.width) * 100, y: ((f.top + f.height / 2 - s.top) / s.height) * 100 });
       }
       addFlag("awake");
-      leaveLoop();
       setTip(null);
       setVisitTips(0);
       setTarget(nextTarget);
@@ -220,14 +211,13 @@ export default function App() {
       setNotes((prev) => (prev.some((n) => n.app === app && !n.read) ? prev.map((n) => (n.app === app ? { ...n, read: true } : n)) : prev));
       setBanners((prev) => prev.filter((id) => live.current.notes.find((n) => n.id === id)?.app !== app));
     },
-    [addFlag, leaveLoop],
+    [addFlag],
   );
 
   const home = useCallback(() => {
-    leaveLoop();
     setTip(null);
     setScreen((current) => (current === "off" || current === "lock" ? current : "home"));
-  }, [leaveLoop]);
+  }, []);
 
   const unlock = () => {
     addFlag("awake");
@@ -280,10 +270,6 @@ export default function App() {
     addInterest: (interest) => setInterests((prev) => (prev.includes(interest) ? prev : [...prev, interest])),
     caller,
     callOutcome,
-    theme,
-    setTheme,
-    owner: owner.trim() || "sam",
-    setOwner,
     name: (real, generic) => (streamer ? generic : real),
   };
 
@@ -301,7 +287,7 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <OSContext.Provider value={os}>
-        <div className={`world${alert ? " is-alert" : ""}${night ? " is-night" : ""}${theme !== "default" ? ` theme-${theme}` : ""}`}>
+        <div className={`world${alert ? " is-alert" : ""}${night ? " is-night" : ""}`}>
           <div className="world-eyes" aria-hidden="true">
             <span className="w-eye e1">
               <WatchingEye px={4} alert={alert} />
@@ -345,7 +331,7 @@ export default function App() {
                 <Intro streamer={streamer} onStart={() => setScreen("lock")} />
               ) : (
                 <>
-                  <StatusBar time={time} watched={beats.size} dark={theme === "light"} />
+                  <StatusBar time={time} watched={beats.size} />
                   <div className="screen-body">
                     {screen !== "lock" && <HomeScreen badges={badges} watched={beats.size} nudge={nudge} next={next} hint={hint} onOpen={(app, el) => open(app, undefined, el)} />}
                     <AnimatePresence>

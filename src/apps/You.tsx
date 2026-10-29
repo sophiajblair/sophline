@@ -1,18 +1,9 @@
-import { useState } from "react";
 import { motion } from "motion/react";
-import { useOS, type Theme } from "../os/context";
+import { useOS } from "../os/context";
 import { AppShell } from "../os/ui";
-
-const themes: { id: Theme; label: string }[] = [
-  { id: "default", label: "original" },
-  { id: "light", label: "light" },
-  { id: "pink", label: "pink" },
-  { id: "blue", label: "blue" },
-];
 
 export function You() {
   const os = useOS();
-  const [draft, setDraft] = useState(os.owner);
   const interests = os.interests.length ? os.interests.join(" · ") : "nothing yet (we guessed cats anyway)";
   const night = os.flags.has("night") || os.beats.has("companion");
   const persuadable = os.flags.has("adSeen") ? "mint packaging" : "things that look urgent";
@@ -66,35 +57,6 @@ export function You() {
           <button className="pixel-button is-ghost" onClick={(event) => os.open("receipts", undefined, event.currentTarget)}>
             all receipts →
           </button>
-        </div>
-        <div className="customise">
-          <p className="wrapped-kicker">make it yours (it still isn’t)</p>
-          <label className="owner-field">
-            <small>this phone belongs to</small>
-            <input
-              type="text"
-              value={draft}
-              maxLength={16}
-              placeholder="sam"
-              onChange={(event) => {
-                setDraft(event.target.value);
-                os.setOwner(event.target.value);
-              }}
-            />
-          </label>
-          <div className="theme-picker" role="group" aria-label="phone theme">
-            <small>theme</small>
-            {themes.map((t) => (
-              <button
-                key={t.id}
-                className={`theme-swatch is-${t.id}${os.theme === t.id ? " is-on" : ""}`}
-                aria-pressed={os.theme === t.id}
-                onClick={() => os.setTheme(t.id)}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </AppShell>
