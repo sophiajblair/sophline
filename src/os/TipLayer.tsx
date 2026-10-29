@@ -182,7 +182,7 @@ export function TipLayer({ tip, phoneRef, onClose }: Props) {
               </details>
             )}
             <Receipts ids={annotation.sourceIds} />
-            <p className="tip-next">done? × to close.</p>
+            <p className="tip-next">done? tap × to close, then ‹ home.</p>
           </motion.aside>
         )}
       </AnimatePresence>
