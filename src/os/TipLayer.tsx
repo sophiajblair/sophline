@@ -167,7 +167,9 @@ export function TipLayer({ tip, phoneRef, onClose }: Props) {
             <button className="tip-close" onClick={onClose} aria-label="close explanation">
               ×
             </button>
-            <p className="tip-eyebrow">{annotation.eyebrow}</p>
+            <p className="tip-eyebrow">
+              <span className="tip-flag">red flag</span> {annotation.eyebrow}
+            </p>
             <h2>{annotation.title}</h2>
             <p>{annotation.body}</p>
             {(annotation.detail || annotation.accuracy) && (

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import type { TipId } from "./content/annotations";
-import { timeline, type AppId, type Flag, type Story } from "./content/timeline";
+import { pendingTask, timeline, type AppId, type Flag, type Story } from "./content/timeline";
 import { Chats } from "./apps/Chats";
 import { Circle } from "./apps/Circle";
 import { Loop } from "./apps/Loop";
@@ -144,7 +144,8 @@ export default function App() {
         settled: !tipOpen && (screen === "home" || screen === "lock"),
         sinceWake: awakeAt.current === null ? 0 : (now - awakeAt.current) / 1000,
       };
-      for (const event of timeline) {
+      if (pendingTask(story)) eligible.current.clear();
+      else for (const event of timeline) {
         if (fired.has(event.id)) continue;
         if (!event.when(story)) {
           eligible.current.delete(event.id);
@@ -275,7 +276,7 @@ export default function App() {
   const badges: Partial<Record<AppId, number>> = {};
   for (const note of notes) if (!note.read) badges[note.app] = (badges[note.app] ?? 0) + 1;
   const unread = notes.some((note) => !note.read);
-  const next = notes.find((note) => !note.read)?.app;
+  const next = notes.find((note) => !note.read)?.app ?? pendingTask({ flags, beats, fired })?.notify?.app;
   const hint = guide({ screen, calling, tipOpen: tip !== null, unread, next, visitTips, finished: fired.has("settings") && !unread });
   const alert = calling || unread;
   const night = flags.has("night");

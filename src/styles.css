@@ -2564,6 +2564,14 @@ svg[shape-rendering="crispEdges"],
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+.tip-flag {
+  display: inline-block;
+  margin-right: 4px;
+  padding: 0 5px;
+  color: #fff;
+  background: var(--warn);
+  border: 2px solid var(--outline);
+}
 .tip-card h2 {
   margin: 6px 26px 8px 0;
   font-size: 16px;

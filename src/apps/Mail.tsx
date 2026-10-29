@@ -84,7 +84,7 @@ function CheckBar({ clues }: { clues: Clues }) {
   );
 }
 
-function MailChoices({ choices, redFlags }: { choices: Choice[]; redFlags: string[] }) {
+function MailChoices({ choices, redFlags, onPick }: { choices: Choice[]; redFlags: string[]; onPick?: () => void }) {
   const os = useOS();
   const boxRef = useRef<HTMLDivElement>(null);
   const [picked, setPicked] = useState<Choice | null>(null);
@@ -113,6 +113,7 @@ function MailChoices({ choices, redFlags }: { choices: Choice[]; redFlags: strin
               whileTap={{ scale: 0.96 }}
               onClick={() => {
                 setPicked(choice);
+                onPick?.();
                 os.tip("phishing", boxRef.current);
               }}
             >
@@ -171,7 +172,7 @@ function WorkMail() {
         <p className="mail-sign">IT Service Desk</p>
       </div>
       <CheckBar clues={clues} />
-      <MailChoices choices={workChoices} redFlags={workFlags} />
+      <MailChoices choices={workChoices} redFlags={workFlags} onPick={() => os.setFlag("workDone")} />
       <p className="fake-stamp">training fake · these buttons go nowhere · no data collected</p>
     </article>
   );
