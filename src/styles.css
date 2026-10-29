@@ -1133,6 +1133,36 @@ svg[shape-rendering="crispEdges"],
 .video-slot.paste-video {
   background: #0a1112;
 }
+.post-reveal {
+  position: relative;
+  z-index: 2;
+  margin-top: 10px;
+  padding: 8px 10px;
+  font-family: var(--body-font);
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: #d8d3c2;
+  background: rgba(5, 7, 10, 0.92);
+  border: 2px solid var(--sick);
+  box-shadow: 3px 3px 0 #000;
+}
+.post-reveal p {
+  margin: 0;
+}
+.post-reveal strong {
+  display: block;
+  margin: 6px 0 2px;
+  font-family: var(--phone-font);
+  font-size: 13px;
+  color: var(--sick);
+}
+.post-reveal ul {
+  margin: 0 0 6px;
+  padding-left: 14px;
+}
+.post-reveal li {
+  margin: 2px 0;
+}
 .post-guess {
   position: relative;
   z-index: 2;
@@ -1404,6 +1434,9 @@ svg[shape-rendering="crispEdges"],
   font-size: 12px;
   line-height: 1.4;
   color: #aab3bc;
+}
+.porch-result .porch-hint {
+  color: var(--sick);
 }
 .porch-retry {
   justify-self: start;
@@ -2320,6 +2353,107 @@ svg[shape-rendering="crispEdges"],
 .wrapped-links .pixel-button {
   margin-top: 0;
   font-size: 12px;
+}
+.customise {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 10px;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  box-shadow: 3px 3px 0 #000;
+}
+.customise small {
+  display: block;
+  font-size: 10px;
+  color: var(--fog);
+  text-transform: uppercase;
+}
+.owner-field input {
+  width: 100%;
+  margin-top: 4px;
+  padding: 7px 9px;
+  font-family: var(--phone-font);
+  font-size: 14px;
+  color: var(--bone);
+  background: var(--ink);
+  border: 2px solid var(--line);
+  border-radius: 0;
+}
+.owner-field input:focus-visible {
+  border-color: var(--sick);
+}
+.theme-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.theme-picker small {
+  grid-column: 1 / -1;
+}
+.theme-swatch {
+  padding: 6px 2px;
+  font-size: 11px;
+  border: 2px solid var(--outline);
+  box-shadow: 2px 2px 0 #000;
+}
+.theme-swatch.is-default {
+  background: #0b0f15;
+  color: #d8d3c2;
+}
+.theme-swatch.is-light {
+  background: #f4f2ec;
+  color: #111418;
+}
+.theme-swatch.is-pink {
+  background: #3a1630;
+  color: #ffd6e5;
+}
+.theme-swatch.is-blue {
+  background: #16294a;
+  color: #d6e4ff;
+}
+.theme-swatch.is-on {
+  outline: 2px solid var(--sick);
+  outline-offset: 2px;
+}
+
+/* phone themes */
+.world.theme-light .phone-screen {
+  --ink: #f4f2ec;
+  --panel: #ffffff;
+  --panel-2: #e6e1d2;
+  --line: #c9c4b4;
+  --fog: #5a6470;
+  --bone: #111418;
+}
+.world.theme-light .phone-screen :is(.note > span:last-child, .icon-label, .guide-list p, .porch-result p, .party-warning small, .intro-who) {
+  color: #4b4e57;
+}
+.world.theme-light .phone-screen :is(.call, .intro, .app-loop, .app-mira, .porch-video, .porch-hud) {
+  --ink: #0b0f15;
+  --panel: #121821;
+  --panel-2: #18202b;
+  --line: #2a3646;
+  --fog: #6f8091;
+  --bone: #d8d3c2;
+  color: var(--bone);
+}
+.world.theme-pink .phone-screen {
+  --ink: #1a0b14;
+  --panel: #2b1020;
+  --panel-2: #3a1630;
+  --line: #5a2446;
+  --fog: #b07a96;
+  --bone: #ffd6e5;
+}
+.world.theme-blue .phone-screen {
+  --ink: #070f1c;
+  --panel: #0f1d33;
+  --panel-2: #16294a;
+  --line: #24406a;
+  --fog: #7a95bf;
+  --bone: #d6e4ff;
 }
 
 /* settings + receipts */

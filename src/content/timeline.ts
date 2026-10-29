@@ -14,7 +14,17 @@ export type AppId =
   | "settings"
   | "receipts";
 
-export type Flag = "awake" | "notesRead" | "chatReplied" | "adSeen" | "callDone" | "callDeclined" | "night" | "workDone";
+export type Flag =
+  | "awake"
+  | "notesRead"
+  | "chatReplied"
+  | "adSeen"
+  | "callDone"
+  | "callDeclined"
+  | "night"
+  | "workDone"
+  | "loopClosed"
+  | "adClosed";
 
 export type Story = {
   beats: Set<TipId>;
@@ -75,7 +85,7 @@ export const timeline: TimelineEvent[] = [
     delay: 7,
     when: (s) => s.flags.has("awake") && s.fired.has("chat"),
     notify: { app: "loop", title: "loop", body: "3 new videos picked just for u" },
-    done: (s) => s.beats.has("feed"),
+    done: (s) => s.beats.has("feed") || s.flags.has("loopClosed"),
   },
   {
     id: "ad",
@@ -83,12 +93,12 @@ export const timeline: TimelineEvent[] = [
     when: (s) => s.flags.has("chatReplied") || s.sinceWake > 60,
     notify: { app: "loop", title: "sponsored", body: "mint. — the paste that knows you", target: "ad" },
     setsFlag: "adSeen",
-    done: (s) => s.beats.has("toothpaste"),
+    done: (s) => s.beats.has("toothpaste") || s.flags.has("adClosed"),
   },
   {
     id: "mail",
     delay: 3,
-    when: (s) => s.beats.has("toothpaste") || since(s, "ad") > 25,
+    when: (s) => s.beats.has("toothpaste") || s.flags.has("adClosed") || since(s, "ad") > 25,
     notify: { app: "mail", title: "ParcelPal Support", body: "your mint. order is waiting · action needed", target: "parcel" },
     done: (s) => s.beats.has("phishing"),
   },

@@ -113,13 +113,26 @@ function GadgetPost() {
   );
 }
 
-const guesses = ["it listened", "it read the text", "something else i did", "nobody knows"];
+type Guess = { label: string; reply: string };
+
+const guesses: Guess[] = [
+  { label: "it listened", reply: "no proof it did. it didn’t need to." },
+  { label: "it read the text", reply: "it couldn’t. the chat was end-to-end encrypted, like personal whatsapp chats." },
+  { label: "something else i did", reply: "closest. that’s usually how it works." },
+  { label: "nobody knows", reply: "half right. but there are usual suspects." },
+];
+
+const routes = [
+  "activity: what you searched, bought or lingered on, here or on accounts you chose to link.",
+  "customer lists: a shop you’ve bought from can upload your email or number and match it to you.",
+  "timing: everyone runs out of toothpaste. a coincidence can feel like surveillance.",
+];
 
 function ToothpastePost() {
   const os = useOS();
   const adRef = useRef<HTMLDivElement>(null);
   const [asking, setAsking] = useState(false);
-  const [guess, setGuess] = useState<string | null>(null);
+  const [guess, setGuess] = useState<Guess | null>(null);
   return (
     <section className="post post-toothpaste" aria-label="sponsored: mint toothpaste">
       <span className="post-ai is-ad">SPONSORED</span>
@@ -133,7 +146,20 @@ function ToothpastePost() {
       <motion.button className="buy-button" whileTap={{ scale: 0.94 }} onClick={() => setAsking(true)}>
         shop now
       </motion.button>
-      {guess && <p className="post-guess">you guessed “{guess}”. honest answer: nobody can tell you.</p>}
+      {guess && (
+        <div className="post-reveal" aria-live="polite">
+          <p>
+            you guessed “{guess.label}”. {guess.reply}
+          </p>
+          <strong>so how did it know?</strong>
+          <ul>
+            {routes.map((route) => (
+              <li key={route}>{route}</li>
+            ))}
+          </ul>
+          <p>which one was it this time? nobody can tell you. you can’t audit it.</p>
+        </div>
+      )}
       <AnimatePresence>
         {asking && !guess && (
           <motion.div
@@ -148,13 +174,13 @@ function ToothpastePost() {
             <strong>wait. how did that happen?</strong>
             {guesses.map((g) => (
               <button
-                key={g}
+                key={g.label}
                 onClick={() => {
                   setGuess(g);
                   os.tip("toothpaste", adRef.current);
                 }}
               >
-                {g}
+                {g.label}
               </button>
             ))}
           </motion.div>

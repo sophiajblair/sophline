@@ -5,6 +5,8 @@ import { AppShell } from "../os/ui";
 
 type MailId = "parcel" | "work" | "screentime" | "digest";
 
+const cap = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+
 const flags = ["lookalike sender", "tiny fee", "urgent timer", "link you didn’t expect", "knows what you bought"];
 
 const workFlags = ["lookalike sender", "asks for your password", "deadline today", "link you didn’t expect", "sounds like your workplace"];
@@ -158,7 +160,7 @@ function WorkMail() {
         </div>
       </div>
       <div className="mail-body">
-        <p>Hi {os.name("Sam", "there")},</p>
+        <p>Hi {os.name(cap(os.owner), "there")},</p>
         <p>
           Your work account password expires at{" "}
           <Spot id="deadline" clues={clues} className="is-inline">
@@ -199,7 +201,7 @@ function ParcelMail() {
         </div>
       </div>
       <div className="mail-body">
-        <p>Hi {os.name("Sam", "there")}!</p>
+        <p>Hi {os.name(cap(os.owner), "there")}!</p>
         <p>
           We couldn’t deliver your <b>mint. toothpaste (x2)</b>. Confirm the{" "}
           <Spot id="fee" clues={clues} className="is-inline">
