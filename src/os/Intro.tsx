@@ -1,6 +1,10 @@
 import { motion } from "motion/react";
 
-const steps = ["wait for it to buzz. tap the notification.", "in the app, tap whatever looks off. an explanation pops up.", "close it and go ‹ home. the glowing app is next."];
+const steps = [
+  "wait for a buzz. tap the notification.",
+  "in the app, tap whatever looks off. read the note, then tap ×.",
+  "tap ‹ home and open the app marked ‘next’. the green hint always says what to do.",
+];
 
 export function Intro({ streamer, onStart }: { streamer: boolean; onStart: () => void }) {
   return (

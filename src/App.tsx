@@ -275,7 +275,8 @@ export default function App() {
   for (const note of notes) if (!note.read) badges[note.app] = (badges[note.app] ?? 0) + 1;
   const unread = notes.some((note) => !note.read);
   const next = notes.find((note) => !note.read)?.app;
-  const hint = guide({ screen, calling, tipOpen: tip !== null, unread, next, visitTips, finished: fired.has("settings") && !unread });
+  const step = Math.max(1, Math.min(fired.size, timeline.length));
+  const hint = guide({ screen, calling, tipOpen: tip !== null, unread, next, visitTips, finished: fired.has("settings") && !unread, step, total: timeline.length });
   const alert = calling || unread;
   const night = flags.has("night");
   const time = clock(minutes, night);
