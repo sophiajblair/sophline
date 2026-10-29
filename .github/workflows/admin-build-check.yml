@@ -20,5 +20,5 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run lint
-      - run: npm run build
+      - name: lint, typecheck and build
+        run: node scripts/admin-check.mjs
