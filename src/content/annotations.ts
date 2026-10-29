@@ -5,7 +5,6 @@ export type TipId =
   | "toothpaste"
   | "phishing"
   | "call"
-  | "alpha"
   | "location"
   | "deepfake"
   | "companion"
@@ -62,13 +61,6 @@ export const annotations: Record<TipId, Annotation> = {
     detail: "a made-up word beats a perfect voice. text your family to choose one today; don’t type the word itself in the chat. and call back on a number you already trust. jennifer destefano warned this tech “will erode our sense of ‘familiar’”: the voice you trust most can now be the easiest one to fake.",
     accuracy: "‘as little as three seconds’ is a Starling Bank and McAfee claim, not independent field testing. Starling’s 28% is people who think they were targeted. safe words reduce risk; they do not remove it.",
     sourceIds: ["starling", "starlingsp", "ic3psa", "ftcfam", "ftcai", "destefano", "crvoice", "himum"],
-  },
-  alpha: {
-    eyebrow: "gen alpha corner",
-    title: "who is the experiment on?",
-    body: "Alpha School says students learn academics in two hours using AI-driven tools. outside researchers quoted by CNN questioned its comparisons and lack of independent access; Alpha disputes critical reporting about its platform and privacy.",
-    detail: "separately: 72% of US teens surveyed by Common Sense Media said they had used AI companions. a 2025 PIRG test of an AI teddy led to its sales being suspended. UK child-safety rules and proposed age limits are still changing.",
-    sourceIds: ["alphacnn", "alpha404", "alphawbur", "csm", "pirg", "caiblog", "osa", "ban"],
   },
   location: {
     eyebrow: "family circle",

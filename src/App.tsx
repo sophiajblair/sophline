@@ -4,7 +4,6 @@ import type { TipId } from "./content/annotations";
 import { timeline, type AppId, type Flag, type Story } from "./content/timeline";
 import { Chats } from "./apps/Chats";
 import { Circle } from "./apps/Circle";
-import { Junior } from "./apps/Junior";
 import { Loop } from "./apps/Loop";
 import { Mail } from "./apps/Mail";
 import { Mira } from "./apps/Mira";
@@ -34,7 +33,6 @@ const apps: Record<AppId, () => React.ReactElement> = {
   porch: Porch,
   mail: Mail,
   phone: PhoneApp,
-  junior: Junior,
   circle: Circle,
   photos: Photos,
   mira: Mira,
@@ -312,7 +310,7 @@ export default function App() {
             nothing leaves this browser · no analytics · no cookies
           </p>
           <p className="ambient ambient-right" aria-hidden="true">
-            esc = home · {beats.size}/11 noticed
+            esc = home · {beats.size}/10 noticed
           </p>
           <p className="guide-line" aria-live="polite">
             <span aria-hidden="true">▸</span> {hint}

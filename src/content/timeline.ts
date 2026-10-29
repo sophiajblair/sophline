@@ -6,7 +6,6 @@ export type AppId =
   | "porch"
   | "mail"
   | "phone"
-  | "junior"
   | "circle"
   | "photos"
   | "mira"
@@ -83,15 +82,9 @@ export const timeline: TimelineEvent[] = [
     call: true,
   },
   {
-    id: "junior",
-    delay: 5,
-    when: (s) => s.flags.has("callDone"),
-    notify: { app: "junior", title: "junior", body: "jules finished today’s 2-hour school. +240xp" },
-  },
-  {
     id: "circle",
-    delay: 12,
-    when: (s) => s.fired.has("junior") && (s.beats.has("alpha") || since(s, "junior") > 10),
+    delay: 6,
+    when: (s) => s.flags.has("callDone"),
     notify: { app: "circle", title: "family circle", body: "jules left school · moving" },
   },
   {
