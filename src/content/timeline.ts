@@ -64,26 +64,19 @@ export const timeline: TimelineEvent[] = [
     done: (s) => s.flags.has("chatReplied"),
   },
   {
-    id: "porch",
-    delay: 2.6,
-    when: (s) => s.fired.has("chat"),
-    notify: { app: "porch", title: "front door", body: "person detected · live now" },
-    done: (s) => s.beats.has("doorbell"),
-  },
-  {
-    id: "loop",
-    delay: 7,
-    when: (s) => s.flags.has("awake") && s.fired.has("chat"),
-    notify: { app: "loop", title: "loop", body: "3 new videos picked just for u" },
-    done: (s) => s.beats.has("feed"),
-  },
-  {
     id: "ad",
     delay: 2.5,
     when: (s) => s.flags.has("chatReplied") || s.sinceWake > 60,
     notify: { app: "loop", title: "sponsored", body: "mint. — the paste that knows you", target: "ad" },
     setsFlag: "adSeen",
     done: (s) => s.beats.has("toothpaste"),
+  },
+  {
+    id: "porch",
+    delay: 2.6,
+    when: (s) => s.fired.has("chat"),
+    notify: { app: "porch", title: "front door", body: "person detected · live now" },
+    done: (s) => s.beats.has("doorbell"),
   },
   {
     id: "mail",
