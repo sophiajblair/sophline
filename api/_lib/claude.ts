@@ -48,27 +48,50 @@ const schema = {
 
 export type RepoFile = { path: string; content: string };
 
-function filesBlock(files: RepoFile[]) {
-  return files.map((file) => `<file path="${file.path}">\n${file.content}\n</file>`).join("\n\n");
+export type ClaudeContext = {
+  prompt: string;
+  /** editable files, exactly as the edits will be applied to */
+  files: RepoFile[];
+  /** config and entry files Claude may read but never change */
+  readOnly: RepoFile[];
+  importMap: string;
+  /** set when asking for a fix after the build check failed on a preview branch */
+  fix?: { errors: string[]; summary: string; related: string[]; attempt: number; maxAttempts: number };
+};
+
+function filesBlock(files: RepoFile[], readOnly = false) {
+  return files.map((file) => `<file path="${file.path}"${readOnly ? " readonly" : ""}>\n${file.content}\n</file>`).join("\n\n");
 }
 
-/** Asks Claude for edits. `retryErrors` re-asks once with the problems from a previous attempt. */
-export async function askClaude(
-  prompt: string,
-  files: RepoFile[],
-  retry?: { previous: string; errors: string[] },
-): Promise<{ proposal: ClaudeProposal; raw: string; model: string }> {
+function fixRequest(fix: NonNullable<ClaudeContext["fix"]>) {
+  return [
+    `Your change for this request ("${fix.summary}") is already applied in the editable files above: they are the preview branch, not main.`,
+    `The build check (eslint, tsc -b, vite build) failed with:`,
+    fix.errors.map((error) => `- ${error}`).join("\n"),
+    `Files you edited and every file that imports them or that they import (all shown in full above): ${fix.related.join(", ")}.`,
+    `This is fix attempt ${fix.attempt} of ${fix.maxAttempts}. Return only the edits needed to make lint, typecheck and build pass against the files exactly as shown, while still doing what Hannah asked. If you changed how a component or function is called, update its definition (Props, parameters, exported types) too. Use "summary" to say what you fixed.`,
+  ].join("\n\n");
+}
+
+/** Asks Claude for edits. `retry` re-asks once with the problems from a previous attempt that could not be applied. */
+export async function askClaude(context: ClaudeContext, retry?: { previous: string; errors: string[] }): Promise<{ proposal: ClaudeProposal; raw: string; model: string }> {
   const client = new Anthropic({ apiKey: env.anthropicKey, maxRetries: 2 });
+  const where = context.fix ? "preview branch, with your change applied" : "main branch";
   const messages: Anthropic.MessageParam[] = [
     {
       role: "user",
       content: [
         {
           type: "text",
-          text: `File policy:\n${policySummary}\n\nCurrent editable files (main branch):\n\n${filesBlock(files)}`,
+          text: [
+            `File policy:\n${policySummary}`,
+            `Import map (who imports whom among the repo's own files):\n${context.importMap}`,
+            `Read-only files (for context: entry point, types, lint and TypeScript config, dependencies). Never change these:\n\n${filesBlock(context.readOnly, true)}`,
+            `Current editable files (${where}):\n\n${filesBlock(context.files)}`,
+          ].join("\n\n"),
           cache_control: { type: "ephemeral" },
         },
-        { type: "text", text: `Hannah's request:\n<request>\n${prompt}\n</request>` },
+        { type: "text", text: `Hannah's request:\n<request>\n${context.prompt}\n</request>${context.fix ? `\n\n${fixRequest(context.fix)}` : ""}` },
       ],
     },
   ];
@@ -76,7 +99,7 @@ export async function askClaude(
     messages.push({ role: "assistant", content: retry.previous });
     messages.push({
       role: "user",
-      content: `Those changes could not be applied:\n- ${retry.errors.join("\n- ")}\n\nReturn the complete corrected JSON. Each "find" must match the current file exactly once.`,
+      content: `Those changes could not be applied:\n- ${retry.errors.join("\n- ")}\n\nReturn the complete corrected JSON again: every change from your previous reply, the ones that applied as well as the corrected ones, because this reply replaces the previous one entirely. Each "find" must match the current file exactly once.`,
     });
   }
   let message: Anthropic.Message;

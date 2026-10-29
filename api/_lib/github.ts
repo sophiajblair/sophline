@@ -90,6 +90,8 @@ export async function fastForward(branch: string, sha: string) {
 }
 
 export async function deleteBranch(branch: string) {
+  // GitHub answers 422, not 404, for a ref that is already gone.
+  if (!(await branchSha(branch))) return;
   await gh("DELETE", `/git/refs/heads/${branch}`, undefined, { allow404: true });
 }
 
@@ -103,11 +105,27 @@ export async function listCommits(perPage = 50): Promise<ListedCommit[]> {
   return list.map((c) => ({ sha: c.sha, message: c.commit.message, date: c.commit.committer.date, url: c.html_url }));
 }
 
-export type WorkflowRun = { name: string; status: string; conclusion: string | null; html_url: string };
+export type WorkflowRun = { id: number; name: string; status: string; conclusion: string | null; html_url: string };
 
 export async function workflowRuns(sha: string): Promise<WorkflowRun[]> {
   const result = await gh<{ workflow_runs: WorkflowRun[] }>("GET", `/actions/runs?head_sha=${sha}&per_page=20`);
   return result.workflow_runs;
+}
+
+export type WorkflowJob = { id: number; name: string; status: string; conclusion: string | null };
+
+export async function runJobs(runId: number): Promise<WorkflowJob[]> {
+  const result = await gh<{ jobs: WorkflowJob[] }>("GET", `/actions/runs/${runId}/jobs`);
+  return result.jobs;
+}
+
+/** Plain-text job log. GitHub answers with a redirect to short-lived storage; fetch drops the token on that cross-origin hop. */
+export async function jobLog(jobId: number): Promise<string> {
+  const response = await fetch(`${env.githubApi}/repos/${env.repo}/actions/jobs/${jobId}/logs`, {
+    headers: { authorization: `Bearer ${env.githubToken}`, accept: "application/vnd.github+json", "x-github-api-version": "2022-11-28", "user-agent": "sophline-admin" },
+  });
+  if (!response.ok) throw new HttpError(502, "github_error", `GitHub returned ${response.status} for the build log.`);
+  return response.text();
 }
 
 export type CommitStatus = { context: string; state: string; target_url: string | null; description: string | null };

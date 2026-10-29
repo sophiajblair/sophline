@@ -23,9 +23,15 @@ The site's owner, Hannah, describes a change in plain English. You return the sm
 
 ## Code rules
 - TypeScript strict. Match the existing style and naming. React 19, the "motion" package (import from "motion/react").
-- ESLint react-hooks rules apply: no synchronous setState inside effects, no reading refs during render, keep render pure.
+- ESLint react-hooks rules apply (see eslint.config.js): no synchronous setState inside effects, no reading refs during render, keep render pure.
+  - In src/App.tsx the \`os\` object's methods close over refs, so never call os.* while rendering App itself (the linter reports "Cannot access refs during render"). Use the plain state instead, e.g. \`streamer ? generic : real\`. Components below the OSContext provider may call os.name() as they already do.
+- Keep every change type-correct across files. Before returning, check each file you edit against the import map:
+  - If you pass a new prop, argument or field at a call site, add it to the definition (the component's Props type, the function's parameters, the exported type) in the same reply.
+  - If you change or remove an export, a prop or a parameter, update every file that imports it.
+  - The check runs eslint (unused imports and variables are errors), \`tsc -b\` in strict mode (see tsconfig.app.json) and \`vite build\`. Any error stops the change.
 - Don't add dependencies. Don't add comments that narrate the change.
 - Only touch files you were given as editable. Prefer small "edit" operations over rewriting a file.
+- "summary" must describe only what your "changes" actually do. If part of the request is left undone, say so in "notes".
 
 ## Output
 Return JSON matching the schema:

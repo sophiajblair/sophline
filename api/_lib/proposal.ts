@@ -86,30 +86,32 @@ export function warningsFor(files: { path: string; before: string | null; after:
   return warnings;
 }
 
-export type ProposalToken = {
-  v: 1;
-  exp: number;
+/** A change that has been committed to a preview branch, signed so the browser can hand it back. */
+export type ProposalData = {
   baseSha: string;
   prompt: string;
   summary: string;
   commitMessage: string;
-  files: FileResult[];
+  sha: string;
+  branch: string;
+  /** what each automatic build fix changed, oldest first */
+  fixes: string[];
 };
+
+type ProposalToken = ProposalData & { v: 2; exp: number };
 
 const PROPOSAL_SECONDS = 30 * 60;
 
-export function signProposal(data: Omit<ProposalToken, "v" | "exp">): string {
-  return sign(signingKey(), "proposal", { v: 1, exp: Math.floor(Date.now() / 1000) + PROPOSAL_SECONDS, ...data } satisfies ProposalToken);
+export function signProposal(data: ProposalData): string {
+  return sign(signingKey(), "proposal", { v: 2, exp: Math.floor(Date.now() / 1000) + PROPOSAL_SECONDS, ...data } satisfies ProposalToken);
 }
 
-export function readProposal(token: unknown): ProposalToken {
+export function readProposal(token: unknown): ProposalData {
   const proposal = typeof token === "string" ? verify<ProposalToken>(signingKey(), "proposal", token) : null;
-  if (!proposal || proposal.v !== 1) throw new HttpError(400, "bad_proposal", "this proposal is not valid. propose the change again.");
-  if (proposal.exp < Date.now() / 1000) throw new HttpError(410, "expired", "this proposal expired. propose the change again.");
-  for (const file of proposal.files) {
-    if (!isEditable(file.path)) throw new HttpError(400, "bad_proposal", `${file.path} is not allowed to change.`);
-    if (file.after !== null && looksLikeSecret(file.after)) throw new HttpError(400, "bad_proposal", `${file.path} looks like it contains a secret.`);
+  if (!proposal || proposal.v !== 2 || !/^[0-9a-f]{40}$/.test(proposal.sha) || proposal.branch !== `admin/preview-${proposal.sha.slice(0, 7)}`) {
+    throw new HttpError(400, "bad_proposal", "this proposal is not valid. propose the change again.");
   }
+  if (proposal.exp < Date.now() / 1000) throw new HttpError(410, "expired", "this proposal expired. propose the change again.");
   return proposal;
 }
 

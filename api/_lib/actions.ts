@@ -1,4 +1,4 @@
-import { askClaude, type RepoFile } from "./claude.js";
+import { askClaude, type ClaudeContext, type RepoFile } from "./claude.js";
 import { buildCheck, deployStatus } from "./deploy.js";
 import { env, missing } from "./env.js";
 import {
@@ -15,10 +15,21 @@ import {
   getTree,
   headSha,
   listCommits,
+  type TreeEntry,
 } from "./github.js";
 import { HttpError, assertSameOrigin, clientIp, errorResponse, json, readJson } from "./http.js";
+import { importGraph, importMapText, relatedFiles, type ImportGraph } from "./imports.js";
 import { isEditable } from "./policy.js";
-import { applyChanges, cleanCommitMessage, diffFor, readProposal, signProposal, warningsFor } from "./proposal.js";
+import {
+  applyChanges,
+  cleanCommitMessage,
+  diffFor,
+  readProposal,
+  signProposal,
+  warningsFor,
+  type FileResult,
+  type ProposalData,
+} from "./proposal.js";
 import { assertNotLocked, rateLimitStore, recordFailure, recordSuccess } from "./ratelimit.js";
 import { safeEqual } from "./crypto.js";
 import { assertConfigured, clearCookie, createSession, readSession, requireSession } from "./session.js";
@@ -26,6 +37,7 @@ import { assertConfigured, clearCookie, createSession, readSession, requireSessi
 const SHA = /^[0-9a-f]{40}$/;
 const PREVIEW = /^admin\/preview-[0-9a-f]{7}$/;
 const MAX_CONTEXT_BYTES = 600_000;
+const MAX_FIXES = 2;
 
 async function session(request: Request) {
   const authGaps = missing("auth");
@@ -68,85 +80,168 @@ async function logout(request: Request) {
   return json({ ok: true }, 200, { "set-cookie": clearCookie });
 }
 
-async function readEditableFiles(sha: string): Promise<{ files: RepoFile[]; tree: string }> {
+/** Entry point, ambient types and the build/lint config: sent to Claude for context, never editable. */
+const READ_ONLY_CONTEXT = ["src/main.tsx", "src/vite-env.d.ts", "tsconfig.app.json", "eslint.config.js", "package.json"];
+
+type Snapshot = {
+  sha: string;
+  tree: Map<string, TreeEntry>;
+  files: RepoFile[];
+  readOnly: RepoFile[];
+  graph: ImportGraph;
+};
+
+/** Every editable file at `sha` (files related to `priority` first if the budget runs out), plus read-only context. */
+async function snapshot(sha: string, priority: string[] = []): Promise<Snapshot> {
   const commit = await getCommit(sha);
   const tree = await getTree(commit.tree);
-  const entries = [...tree.values()].filter((entry) => isEditable(entry.path)).sort((a, b) => a.path.localeCompare(b.path));
+  const first = new Set(priority);
+  const entries = [...tree.values()]
+    .filter((entry) => isEditable(entry.path))
+    .sort((a, b) => Number(first.has(b.path)) - Number(first.has(a.path)) || a.path.localeCompare(b.path));
   let budget = MAX_CONTEXT_BYTES;
   const chosen = entries.filter((entry) => {
     budget -= entry.size ?? 0;
     return budget >= 0;
   });
-  const files = await Promise.all(chosen.map(async (entry) => ({ path: entry.path, content: await getBlobText(entry.sha) })));
-  return { files, tree: commit.tree };
+  const read = (entry: TreeEntry) => getBlobText(entry.sha).then((content) => ({ path: entry.path, content }));
+  const [files, readOnly] = await Promise.all([
+    Promise.all(chosen.sort((a, b) => a.path.localeCompare(b.path)).map(read)),
+    Promise.all(READ_ONLY_CONTEXT.flatMap((path) => (tree.has(path) ? [read(tree.get(path)!)] : []))),
+  ]);
+  return { sha, tree, files, readOnly, graph: importGraph(files) };
 }
 
-async function propose(request: Request) {
-  requireSession(request, { mutating: true });
-  assertConfigured("changes");
-  const { prompt } = await readJson<{ prompt?: unknown }>(request);
-  if (typeof prompt !== "string" || prompt.trim().length < 3) throw new HttpError(400, "bad_request", "describe the change you want.");
-  if (prompt.length > 4000) throw new HttpError(400, "bad_request", "keep the request under 4000 characters.");
-  const baseSha = await headSha();
-  const { files } = await readEditableFiles(baseSha);
-  const current = new Map(files.map((file) => [file.path, file.content]));
-
-  let attempt = await askClaude(prompt, files);
+/** Ask Claude, apply its edits to `snap`, and re-ask once if any edit doesn't apply cleanly. */
+async function askAndApply(prompt: string, snap: Snapshot, fix?: ClaudeContext["fix"]) {
+  const context: ClaudeContext = { prompt, files: snap.files, readOnly: snap.readOnly, importMap: importMapText(snap.graph), fix };
+  const current = new Map(snap.files.map((file) => [file.path, file.content]));
+  let attempt = await askClaude(context);
   let applied = applyChanges(current, attempt.proposal.changes);
   if (applied.errors.length) {
-    attempt = await askClaude(prompt, files, { previous: attempt.raw, errors: applied.errors });
+    attempt = await askClaude(context, { previous: attempt.raw, errors: applied.errors });
     applied = applyChanges(current, attempt.proposal.changes);
   }
   if (applied.errors.length) {
     throw new HttpError(422, "invalid_changes", "Claude's changes could not be applied safely. try rephrasing.", { errors: applied.errors });
   }
-  const { summary, notes, commit_message } = attempt.proposal;
-  const commitMessage = cleanCommitMessage(commit_message);
-  const base = { summary, notes, commitMessage, model: attempt.model, baseSha };
-  if (!applied.files.length) return json({ ...base, token: null, files: [], warnings: [] });
-  const token = signProposal({
-    baseSha,
-    prompt: prompt.trim(),
-    summary,
-    commitMessage,
-    files: applied.files.map(({ path, after }) => ({ path, after })),
-  });
-  return json({
-    ...base,
-    token,
-    warnings: warningsFor(applied.files),
-    files: applied.files.map((file) => ({
+  return { ...attempt, applied };
+}
+
+function commitMessageFor(p: { commitMessage: string; summary: string; prompt: string; fixes: string[] }) {
+  const quoted = p.prompt.slice(0, 1500).split("\n").map((line) => `> ${line}`).join("\n");
+  const fixes = p.fixes.length ? `\n\nBuild fixes by Claude after the check failed:\n${p.fixes.map((f) => `- ${f}`).join("\n")}` : "";
+  return `${p.commitMessage}\n\n${p.summary}${fixes}\n\nRequested in /admin:\n${quoted}`;
+}
+
+/** Commit the change on top of main as an admin/preview-* branch; the build check Action runs on it. */
+async function commitPreview(baseSha: string, files: FileResult[], message: string) {
+  const head = await headSha();
+  const headCommit = await getCommit(head);
+  if (head !== baseSha) {
+    const [baseTree, headTree] = await Promise.all([getCommit(baseSha).then((c) => getTree(c.tree)), getTree(headCommit.tree)]);
+    const moved = files.filter((file) => baseTree.get(file.path)?.sha !== headTree.get(file.path)?.sha);
+    if (moved.length) throw new HttpError(409, "stale", `the site changed meanwhile (${moved.map((f) => f.path).join(", ")}). propose it again.`);
+  }
+  const tree = await createTree(
+    headCommit.tree,
+    files.map((file) => (file.after === null ? { path: file.path, sha: null } : { path: file.path, content: file.after })),
+  );
+  const sha = await createCommit(message, tree, head);
+  const branch = `admin/preview-${sha.slice(0, 7)}`;
+  await createBranch(branch, sha);
+  return { sha, branch, parent: head };
+}
+
+type ChangedFile = { path: string; before: string | null; after: string | null };
+
+function proposalResponse(p: ProposalData & { notes: string; model: string; changed: ChangedFile[]; token: string }) {
+  return {
+    token: p.token,
+    baseSha: p.baseSha,
+    sha: p.sha,
+    branch: p.branch,
+    commitUrl: commitUrl(p.sha),
+    attempt: p.fixes.length,
+    maxFixes: MAX_FIXES,
+    summary: p.summary,
+    fixes: p.fixes,
+    notes: p.notes,
+    commitMessage: p.commitMessage,
+    model: p.model,
+    warnings: warningsFor(p.changed),
+    files: p.changed.map((file) => ({
       path: file.path,
       status: file.before === null ? "added" : file.after === null ? "deleted" : "modified",
       diff: diffFor(file),
     })),
-  });
+  };
 }
 
-async function approve(request: Request) {
+async function propose(request: Request) {
+  requireSession(request, { mutating: true });
+  assertConfigured("changes");
+  const { prompt: raw } = await readJson<{ prompt?: unknown }>(request);
+  if (typeof raw !== "string" || raw.trim().length < 3) throw new HttpError(400, "bad_request", "describe the change you want.");
+  if (raw.length > 4000) throw new HttpError(400, "bad_request", "keep the request under 4000 characters.");
+  const prompt = raw.trim();
+  const base = await snapshot(await headSha());
+  const { proposal, applied, model } = await askAndApply(prompt, base);
+  const { summary, notes } = proposal;
+  const commitMessage = cleanCommitMessage(proposal.commit_message);
+  if (!applied.files.length) return json({ summary, notes, commitMessage, model, baseSha: base.sha, token: null, files: [], warnings: [] });
+  const files = applied.files.map(({ path, after }) => ({ path, after }));
+  const { sha, branch } = await commitPreview(base.sha, files, commitMessageFor({ commitMessage, summary, prompt, fixes: [] }));
+  const data: ProposalData = { baseSha: base.sha, prompt, summary, commitMessage, sha, branch, fixes: [] };
+  return json(proposalResponse({ ...data, notes, model, changed: applied.files, token: signProposal(data) }));
+}
+
+/** After a failed build check: give Claude the errors and the preview files, and commit its fix as a new preview. */
+async function fix(request: Request) {
   requireSession(request, { mutating: true });
   assertConfigured("changes");
   const { token } = await readJson<{ token?: unknown }>(request);
-  const proposal = readProposal(token);
-  const head = await headSha();
-  const headCommit = await getCommit(head);
-  if (head !== proposal.baseSha) {
-    const [baseTree, headTree] = await Promise.all([getCommit(proposal.baseSha).then((c) => getTree(c.tree)), getTree(headCommit.tree)]);
-    const moved = proposal.files.filter((file) => baseTree.get(file.path)?.sha !== headTree.get(file.path)?.sha);
-    if (moved.length) {
-      throw new HttpError(409, "stale", `the site changed since this was proposed (${moved.map((f) => f.path).join(", ")}). propose it again.`);
-    }
+  const p = readProposal(token);
+  if (p.fixes.length >= MAX_FIXES) throw new HttpError(409, "out_of_fixes", `Claude already tried ${MAX_FIXES} fixes. nothing was published.`);
+  if ((await branchSha(p.branch)) !== p.sha) throw new HttpError(409, "stale", "this preview no longer exists. propose the change again.");
+  const check = await buildCheck(p.sha);
+  if (check.state !== "failure") throw new HttpError(409, "not_failed", "the build check hasn't failed, so there is nothing to fix.");
+  const errors = check.errors?.length ? check.errors : [check.detail];
+
+  const previewCommit = await getCommit(p.sha);
+  const parentSha = previewCommit.parents[0];
+  const baseTree = await getCommit(parentSha).then((c) => getTree(c.tree));
+  const edited = changedPaths(baseTree, await getTree(previewCommit.tree)).filter(isEditable);
+  const errorFiles = errors.map((e) => e.match(/^([\w./-]+\.(?:tsx?|css))[:(]/)?.[1]).filter((f): f is string => Boolean(f));
+  const preview = await snapshot(p.sha, [...edited, ...errorFiles]);
+  const missingEdited = edited.filter((path) => preview.tree.has(path) && !preview.files.some((file) => file.path === path));
+  if (missingEdited.length) throw new HttpError(422, "too_big", "the site is too large to send the changed files to Claude. nothing was published.");
+  const related = relatedFiles(preview.graph, [...new Set([...edited, ...errorFiles])]);
+  const attempt = p.fixes.length + 1;
+  const { proposal, applied, model } = await askAndApply(p.prompt, preview, { errors, summary: p.summary, related, attempt, maxAttempts: MAX_FIXES });
+  if (!applied.files.length) {
+    throw new HttpError(422, "no_fix", proposal.notes || "Claude couldn't find a fix for the build errors. nothing was published.", { errors });
   }
-  const tree = await createTree(
-    headCommit.tree,
-    proposal.files.map((file) => (file.after === null ? { path: file.path, sha: null } : { path: file.path, content: file.after })),
+
+  const after = new Map(preview.files.map((file) => [file.path, file.content as string | null]));
+  for (const file of applied.files) after.set(file.path, file.after);
+  const paths = [...new Set([...edited, ...applied.files.map((file) => file.path)])].sort();
+  const baseText = async (path: string) => {
+    const entry = baseTree.get(path);
+    return entry ? getBlobText(entry.sha) : null;
+  };
+  const changed: ChangedFile[] = (await Promise.all(paths.map(async (path) => ({ path, before: await baseText(path), after: after.get(path) ?? null })))).filter(
+    (file) => file.before !== file.after,
   );
-  const quoted = proposal.prompt.slice(0, 1500).split("\n").map((line) => `> ${line}`).join("\n");
-  const message = `${proposal.commitMessage}\n\n${proposal.summary}\n\nRequested in /admin:\n${quoted}`;
-  const sha = await createCommit(message, tree, head);
-  const branch = `admin/preview-${sha.slice(0, 7)}`;
-  await createBranch(branch, sha);
-  return json({ sha, branch, commitUrl: commitUrl(sha) });
+  const fixes = [...p.fixes, proposal.summary.trim() || "fixed the build errors."];
+  const { sha, branch } = await commitPreview(
+    parentSha,
+    changed.map(({ path, after }) => ({ path, after })),
+    commitMessageFor({ commitMessage: p.commitMessage, summary: p.summary, prompt: p.prompt, fixes }),
+  );
+  await deleteBranch(p.branch);
+  const data: ProposalData = { ...p, baseSha: parentSha, sha, branch, fixes };
+  return json({ ...proposalResponse({ ...data, notes: proposal.notes, model, changed, token: signProposal(data) }), fixedErrors: errors });
 }
 
 async function status(request: Request) {
@@ -161,18 +256,19 @@ async function status(request: Request) {
   throw new HttpError(400, "bad_request", "unknown stage.");
 }
 
-async function promote(request: Request) {
+/** Hannah's approval: fast-forward main to the preview commit, only once its build check has passed. */
+async function approve(request: Request) {
   requireSession(request, { mutating: true });
   assertConfigured("changes");
-  const { sha, branch, skipCheck } = await readJson<{ sha?: string; branch?: string; skipCheck?: boolean }>(request);
-  if (!sha || !SHA.test(sha) || branch !== `admin/preview-${sha.slice(0, 7)}`) throw new HttpError(400, "bad_request", "invalid preview.");
+  const { token, skipCheck } = await readJson<{ token?: unknown; skipCheck?: boolean }>(request);
+  const { sha, branch } = readProposal(token);
   if ((await branchSha(branch)) !== sha) throw new HttpError(409, "stale", "this preview no longer exists. propose the change again.");
   const commit = await getCommit(sha);
   if (!commit.message.startsWith("admin:") || commit.parents.length !== 1) throw new HttpError(400, "bad_request", "not an admin preview commit.");
   const [tree, parentTree] = await Promise.all([getTree(commit.tree), getCommit(commit.parents[0]).then((p) => getTree(p.tree))]);
   const touched = changedPaths(parentTree, tree);
   if (!touched.length || touched.some((path) => !isEditable(path))) throw new HttpError(400, "bad_request", "this commit changes files outside the admin allowlist.");
-  const check = await buildCheck(sha);
+  const check = await buildCheck(sha, { withErrors: false });
   if (check.state !== "success" && !(skipCheck && check.state === "missing")) {
     throw new HttpError(409, "check_not_passed", check.state === "failure" ? "the build check failed, so this change was not published." : "the build check hasn't passed yet.");
   }
@@ -249,9 +345,9 @@ const routes: Record<string, { GET?: (r: Request) => Promise<Response>; POST?: (
   login: { POST: login },
   logout: { POST: logout },
   propose: { POST: propose },
-  approve: { POST: approve },
+  fix: { POST: fix },
   status: { GET: status },
-  promote: { POST: promote },
+  approve: { POST: approve },
   discard: { POST: discard },
   history: { GET: history },
   undo: { POST: undo },

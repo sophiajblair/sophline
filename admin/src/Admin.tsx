@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ApiError, api, setCsrf, type HistoryItem, type Proposal, type SessionInfo, type Stage } from "./api";
 
-type Phase = "idle" | "thinking" | "proposed" | "checking" | "committing" | "deploying" | "live" | "failed";
+type Phase = "idle" | "thinking" | "checking" | "fixing" | "review" | "committing" | "deploying" | "live" | "failed";
 
 type Pipeline = {
   phase: Phase;
@@ -14,14 +14,16 @@ type Pipeline = {
   link?: string | null;
   commitUrl?: string;
   noCheck?: boolean;
+  /** build errors (or apply errors) to show; on a failed check these are the compiler and lint lines */
   errors?: string[];
+  errorsTitle?: string;
 };
 
 const STORE = "sophline-admin-pipeline";
 const steps: { phase: Phase; label: string }[] = [
   { phase: "thinking", label: "thinking" },
-  { phase: "proposed", label: "proposed diff" },
   { phase: "checking", label: "build check" },
+  { phase: "review", label: "proposed diff" },
   { phase: "committing", label: "committing" },
   { phase: "deploying", label: "deploying" },
   { phase: "live", label: "live" },
@@ -33,7 +35,9 @@ const idle = (): Pipeline => ({ phase: "idle", prompt: "", since: Date.now() });
 function loadPipeline(): Pipeline {
   try {
     const saved = JSON.parse(sessionStorage.getItem(STORE) ?? "null") as Pipeline | null;
-    if (saved && (saved.phase === "checking" || saved.phase === "deploying" || saved.phase === "proposed")) return saved;
+    if (saved && (saved.phase === "checking" || saved.phase === "fixing" || saved.phase === "deploying" || saved.phase === "review")) {
+      return saved.phase === "fixing" ? { ...saved, phase: "checking" } : saved;
+    }
   } catch {
     // ignore unreadable state
   }
@@ -98,7 +102,7 @@ function Diff({ text }: { text: string }) {
 
 function Stepper({ phase }: { phase: Phase }) {
   const failedAt = phase === "failed";
-  const current = order.indexOf(phase);
+  const current = order.indexOf(phase === "fixing" ? "checking" : phase);
   return (
     <ol className="stepper" aria-label="change status">
       {steps.map((step, index) => {
@@ -199,12 +203,64 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
     setPipelineState(next);
   }, []);
 
+  const fixing = useRef(false);
+
   const fail = useCallback(
     (from: Pipeline, err: unknown) => {
       if (err instanceof ApiError && err.status === 401) onExpired();
-      setPipeline({ ...from, phase: "failed", detail: message(err), errors: err instanceof ApiError ? err.errors : [] });
+      const errors = err instanceof ApiError ? err.errors : [];
+      setPipeline({ ...from, phase: "failed", detail: message(err), errors: errors.length ? errors : from.errors, errorsTitle: errors.length ? "errors" : from.errorsTitle });
     },
     [onExpired, setPipeline],
+  );
+
+  const checking = (p: Pipeline, proposal: Proposal): Pipeline => {
+    const attempt = proposal.attempt ?? 0;
+    const fixed = attempt ? ` claude fixed the build (fix ${attempt} of ${proposal.maxFixes ?? 2}).` : "";
+    return {
+      ...p,
+      phase: "checking",
+      proposal,
+      sha: proposal.sha,
+      branch: proposal.branch,
+      commitUrl: proposal.commitUrl,
+      since: Date.now(),
+      detail: `${fixed} checking that it lints, typechecks and builds…`.trim(),
+      errors: proposal.fixedErrors,
+      errorsTitle: proposal.fixedErrors?.length ? "errors claude just fixed" : undefined,
+      link: null,
+      noCheck: false,
+    };
+  };
+
+  const autoFix = useCallback(
+    async (p: Pipeline, errors: string[], link: string | null) => {
+      const proposal = p.proposal;
+      if (!proposal?.token || fixing.current) return;
+      fixing.current = true;
+      const n = (proposal.attempt ?? 0) + 1;
+      const waiting: Pipeline = {
+        ...p,
+        phase: "fixing",
+        since: Date.now(),
+        link,
+        errors,
+        errorsTitle: "build check errors",
+        detail: `the build check failed. claude is fixing it (fix ${n} of ${proposal.maxFixes ?? 2})…`,
+      };
+      setPipeline(waiting);
+      try {
+        const next = await api<Proposal>("fix", { token: proposal.token });
+        setPipeline(checking(waiting, next));
+        setPolls((k) => k + 1);
+      } catch (err) {
+        if (p.branch) await api("discard", { branch: p.branch }).catch(() => undefined);
+        fail({ ...waiting, branch: undefined }, err);
+      } finally {
+        fixing.current = false;
+      }
+    },
+    [fail, setPipeline],
   );
 
   useEffect(() => {
@@ -220,16 +276,26 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
       api<Stage>("status", undefined, `?stage=check&sha=${p.sha}`)
         .then(async (stage) => {
           if (stage.state === "success") {
-            setPipeline({ ...p, phase: "committing", detail: "build passed. publishing to main…", link: stage.url });
-            const result = await api<{ commitUrl: string }>("promote", { sha: p.sha, branch: p.branch });
-            setPipeline({ ...p, phase: "deploying", since: Date.now(), detail: "committed. waiting for Vercel…", commitUrl: result.commitUrl, link: null });
-            setHistoryKey((k) => k + 1);
+            setPipeline({ ...p, phase: "review", link: stage.url, errors: undefined, detail: "the build check passed. review the diff, then approve or discard." });
           } else if (stage.state === "failure") {
+            const errors = stage.errors?.length ? stage.errors : [stage.detail];
+            const used = p.proposal?.attempt ?? 0;
+            if (used < (p.proposal?.maxFixes ?? 2)) return autoFix(p, errors, stage.url);
             await api("discard", { branch: p.branch }).catch(() => undefined);
-            setPipeline({ ...p, phase: "failed", detail: `${stage.detail} nothing was published; the live site is unchanged.`, link: stage.url });
+            setPipeline({
+              ...p,
+              phase: "failed",
+              branch: undefined,
+              link: stage.url,
+              errors,
+              errorsTitle: "build check errors",
+              detail: `the build check still failed after ${used} automatic fix${used === 1 ? "" : "es"}. nothing was published; the live site is unchanged.`,
+            });
           } else {
             const stalled = stage.state === "missing" && Date.now() - p.since > 4 * 60_000;
-            setPipeline({ ...p, detail: stage.detail, link: stage.url, noCheck: stalled });
+            const used = p.proposal?.attempt ?? 0;
+            const fixed = used ? `claude fixed the build (fix ${used} of ${p.proposal?.maxFixes ?? 2}). ` : "";
+            setPipeline({ ...p, detail: `${fixed}${stage.detail} the diff below can't be approved until it passes.`, link: stage.url, noCheck: stalled });
           }
         })
         .catch((err) => fail(p, err));
@@ -252,40 +318,32 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
     try {
       const proposal = await api<Proposal>("propose", { prompt });
       if (!proposal.token) setPipeline({ ...start, phase: "failed", detail: proposal.notes || "Claude didn't propose any changes.", proposal });
-      else setPipeline({ ...start, phase: "proposed", proposal, detail: "review the diff, then approve or discard." });
+      else {
+        setPipeline(checking(start, proposal));
+        setPolls((n) => n + 1);
+      }
     } catch (err) {
       fail(start, err);
     }
   };
 
-  const approve = async () => {
+  const publish = async (skipCheck = false) => {
     const p = pipeline;
     if (!p.proposal?.token) return;
-    setPipeline({ ...p, phase: "checking", since: Date.now(), detail: "creating a preview commit…" });
+    if (skipCheck && !window.confirm("no build check ran. publish anyway? if Vercel's build fails, the previous version stays live.")) return;
+    setPipeline({ ...p, phase: "committing", since: Date.now(), detail: "publishing to main…", errors: undefined });
     try {
-      const result = await api<{ sha: string; branch: string; commitUrl: string }>("approve", { token: p.proposal.token });
-      setPipeline({ ...p, phase: "checking", since: Date.now(), sha: result.sha, branch: result.branch, commitUrl: result.commitUrl, detail: "waiting for the build check…" });
+      const result = await api<{ sha: string; commitUrl: string }>("approve", { token: p.proposal.token, skipCheck });
+      setPipeline({ ...p, phase: "deploying", since: Date.now(), sha: result.sha, branch: undefined, detail: "committed to main. waiting for Vercel…", commitUrl: result.commitUrl, link: null, noCheck: false, errors: undefined });
+      setHistoryKey((k) => k + 1);
       setPolls((n) => n + 1);
     } catch (err) {
       fail(p, err);
     }
   };
 
-  const publishWithoutCheck = async () => {
-    const p = pipeline;
-    if (!window.confirm("no build check ran. publish anyway? if Vercel's build fails, the previous version stays live.")) return;
-    try {
-      setPipeline({ ...p, phase: "committing", detail: "publishing to main…" });
-      const result = await api<{ commitUrl: string }>("promote", { sha: p.sha, branch: p.branch, skipCheck: true });
-      setPipeline({ ...p, phase: "deploying", since: Date.now(), detail: "committed. waiting for Vercel…", commitUrl: result.commitUrl, noCheck: false });
-      setHistoryKey((k) => k + 1);
-    } catch (err) {
-      fail(p, err);
-    }
-  };
-
   const reset = async () => {
-    if (pipeline.branch && (pipeline.phase === "checking" || pipeline.phase === "failed")) await api("discard", { branch: pipeline.branch }).catch(() => undefined);
+    if (pipeline.branch && pipeline.phase !== "live" && pipeline.phase !== "deploying") await api("discard", { branch: pipeline.branch }).catch(() => undefined);
     sessionStorage.removeItem(STORE);
     setPipelineState(idle());
   };
@@ -325,11 +383,16 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
           <Stepper phase={pipeline.phase} />
           <p className={pipeline.phase === "failed" ? "error" : "detail"}>{pipeline.detail}</p>
           {pipeline.errors && pipeline.errors.length > 0 && (
-            <ul className="errors">
-              {pipeline.errors.map((e) => (
-                <li key={e}>{e}</li>
-              ))}
-            </ul>
+            <div className={`errors${pipeline.errorsTitle === "errors claude just fixed" ? " is-fixed" : ""}`}>
+              <p className="errors-title">{pipeline.errorsTitle ?? "errors"}</p>
+              <ul>
+                {pipeline.errors.map((e) => (
+                  <li key={e}>
+                    <code>{e}</code>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
           <p className="links">
             {pipeline.link && (
@@ -351,14 +414,23 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
           {pipeline.noCheck && pipeline.phase === "checking" && (
             <div className="row">
               <span className="muted">no build check started after 4 minutes. GitHub Actions may be disabled.</span>
-              <button className="btn" onClick={publishWithoutCheck}>
+              <button className="btn" onClick={() => publish(true)}>
                 publish without check
               </button>
             </div>
           )}
-          {proposal && pipeline.phase === "proposed" && (
+          {proposal?.token && (pipeline.phase === "checking" || pipeline.phase === "fixing" || pipeline.phase === "review") && (
             <div className="proposal">
               <p className="summary">{proposal.summary}</p>
+              {proposal.fixes && proposal.fixes.length > 0 && (
+                <ul className="fixes">
+                  {proposal.fixes.map((f, i) => (
+                    <li key={i}>
+                      build fix {i + 1}: {f}
+                    </li>
+                  ))}
+                </ul>
+              )}
               {proposal.notes && <p className="notes">note from claude: {proposal.notes}</p>}
               {proposal.warnings.length > 0 && (
                 <ul className="warnings">
@@ -379,8 +451,8 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
                 </details>
               ))}
               <div className="row">
-                <button className="btn primary" onClick={approve}>
-                  approve &amp; publish
+                <button className="btn primary" onClick={() => publish()} disabled={pipeline.phase !== "review"}>
+                  {pipeline.phase === "review" ? "approve & publish" : "approve (after the build check)"}
                 </button>
                 <button className="btn" onClick={reset}>
                   discard

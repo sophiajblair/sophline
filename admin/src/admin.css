@@ -255,9 +255,38 @@ textarea {
   font-size: 13px;
 }
 .errors {
+  padding: 8px 10px;
+  border: 2px solid var(--warn);
+  background: #1a0b0d;
   color: var(--warn);
-  font-family: var(--mono);
-  font-size: 12px;
+}
+.errors.is-fixed {
+  border-color: var(--line);
+  background: var(--ink);
+  color: var(--fog);
+}
+.errors-title {
+  margin: 0 0 6px;
+  font-family: var(--pixel);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.errors ul {
+  margin: 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 6px;
+}
+.errors code {
+  color: inherit;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.fixes {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--sick);
 }
 details {
   margin: 10px 0;

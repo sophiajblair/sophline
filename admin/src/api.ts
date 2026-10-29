@@ -14,9 +14,18 @@ export type SessionInfo = {
 
 export type ProposedFile = { path: string; status: "added" | "modified" | "deleted"; diff: string };
 
+/** A proposed change, already committed to a preview branch for the build check. `token` is null when Claude proposed nothing. */
 export type Proposal = {
   token: string | null;
   baseSha: string;
+  sha?: string;
+  branch?: string;
+  commitUrl?: string;
+  /** automatic build fixes so far, and how many are allowed */
+  attempt?: number;
+  maxFixes?: number;
+  fixes?: string[];
+  fixedErrors?: string[];
   summary: string;
   notes: string;
   commitMessage: string;
@@ -25,7 +34,7 @@ export type Proposal = {
   files: ProposedFile[];
 };
 
-export type Stage = { state: "pending" | "success" | "failure" | "missing"; url: string | null; detail: string; commitUrl?: string };
+export type Stage = { state: "pending" | "success" | "failure" | "missing"; url: string | null; detail: string; errors?: string[]; commitUrl?: string };
 
 export type HistoryItem = { sha: string; title: string; date: string; url: string; kind: "admin" | "undo"; reverted: boolean };
 
