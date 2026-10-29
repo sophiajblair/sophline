@@ -1,6 +1,7 @@
 import type { TipId } from "./annotations";
 
 export type AppId =
+  | "notes"
   | "loop"
   | "chats"
   | "porch"
@@ -13,7 +14,7 @@ export type AppId =
   | "settings"
   | "receipts";
 
-export type Flag = "awake" | "chatReplied" | "adSeen" | "callDone" | "callDeclined" | "night";
+export type Flag = "awake" | "notesRead" | "chatReplied" | "adSeen" | "callDone" | "callDeclined" | "night";
 
 export type Story = {
   beats: Set<TipId>;
@@ -47,9 +48,15 @@ const since = (s: Story, id: string) => {
  */
 export const timeline: TimelineEvent[] = [
   {
-    id: "chat",
+    id: "notes",
     delay: 1.4,
     when: () => true,
+    notify: { app: "notes", title: "to do", body: "open me first" },
+  },
+  {
+    id: "chat",
+    delay: 1.4,
+    when: (s) => s.flags.has("notesRead") || since(s, "notes") > 45,
     notify: { app: "chats", title: "other half ♥", body: "we need toothpaste", target: "other" },
   },
   {
@@ -61,7 +68,7 @@ export const timeline: TimelineEvent[] = [
   {
     id: "loop",
     delay: 7,
-    when: (s) => s.flags.has("awake"),
+    when: (s) => s.flags.has("awake") && s.fired.has("chat"),
     notify: { app: "loop", title: "loop", body: "3 new videos picked just for u" },
   },
   {

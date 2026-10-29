@@ -4,7 +4,7 @@ import { appMeta, glyphs } from "../pixel/icons";
 import type { AppId } from "../content/timeline";
 import { WatchingEye } from "./LockScreen";
 
-const order: AppId[] = ["loop", "chats", "porch", "mail", "phone", "circle", "photos", "mira", "you", "settings", "receipts"];
+const order: AppId[] = ["notes", "loop", "chats", "porch", "mail", "phone", "circle", "photos", "mira", "you", "settings", "receipts"];
 
 type Props = {
   badges: Partial<Record<AppId, number>>;

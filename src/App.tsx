@@ -7,6 +7,7 @@ import { Circle } from "./apps/Circle";
 import { Loop } from "./apps/Loop";
 import { Mail } from "./apps/Mail";
 import { Mira } from "./apps/Mira";
+import { Notes } from "./apps/Notes";
 import { PhoneApp } from "./apps/PhoneApp";
 import { Photos } from "./apps/Photos";
 import { Porch } from "./apps/Porch";
@@ -28,6 +29,7 @@ import { appMeta } from "./pixel/icons";
 type Screen = "off" | "lock" | "home" | AppId;
 
 const apps: Record<AppId, () => React.ReactElement> = {
+  notes: Notes,
   loop: Loop,
   chats: Chats,
   porch: Porch,

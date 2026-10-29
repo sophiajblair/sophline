@@ -12,11 +12,11 @@ export type GuideState = {
   finished: boolean;
 };
 
-const noTips: AppId[] = ["settings", "receipts"];
+const noTips: AppId[] = ["notes", "settings", "receipts"];
 
 /** The one thing the visitor should do now, in story order. */
 export function guide(s: GuideState): string {
-  if (s.screen === "off") return "read the steps, then tap ‘pick it up’";
+  if (s.screen === "off") return "tap ‘pick it up’";
   if (s.calling) return "someone’s calling. answer to play it out, or decline to skip.";
   if (s.tipOpen) return "read the note, then tap × to close it";
   if (s.screen === "lock") return s.unread ? "tap the notification to open it" : "wait for a buzz, or tap to unlock";

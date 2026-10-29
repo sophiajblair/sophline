@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useOS } from "../os/context";
 import { AppShell } from "../os/ui";
@@ -9,9 +9,74 @@ const flags = ["lookalike sender", "tiny fee", "urgent timer", "link you didn’
 
 const workFlags = ["lookalike sender", "asks for your password", "deadline today", "link you didn’t expect", "sounds like your workplace"];
 
+type Choice = { label: string; won: boolean; result: string };
+
+const parcelChoices: Choice[] = [
+  { label: "pay the £1.49", won: false, result: "pretend card details, gone. real ones would be too. nothing was sent." },
+  { label: "forward it to report@phishing.gov.uk", won: true, result: "reported. parcelpa1.help was never your courier." },
+  { label: "check the order in the shop’s own app", won: true, result: "no missed delivery there. the email was the only thing waiting." },
+];
+
+const workChoices: Choice[] = [
+  { label: "enter my password", won: false, result: "your work login just went to a stranger. pretend. nothing was submitted." },
+  { label: "report it to the real IT team", won: true, result: "they never sent it. you just saved the whole team’s inbox." },
+  { label: "ignore it", won: true, result: "nothing got locked. reporting it would help the next person too." },
+];
+
+function MailChoices({ choices, redFlags }: { choices: Choice[]; redFlags: string[] }) {
+  const os = useOS();
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [picked, setPicked] = useState<Choice | null>(null);
+  return (
+    <div ref={boxRef} className="mail-choices">
+      {picked ? (
+        <motion.div
+          className={`mail-result ${picked.won ? "is-won" : "is-lost"}`}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          aria-live="polite"
+        >
+          <strong>{picked.won ? "you beat it." : "you messed it up."}</strong>
+          <p>{picked.result}</p>
+          <button className="mail-retry" onClick={() => setPicked(null)}>
+            try again
+          </button>
+        </motion.div>
+      ) : (
+        <div className="mail-options" role="group" aria-label="what do you do?">
+          <small>what do you do?</small>
+          {choices.map((choice, index) => (
+            <motion.button
+              key={choice.label}
+              className={index === 0 ? "mail-cta" : "mail-choice"}
+              whileTap={{ scale: 0.96 }}
+              onClick={() => {
+                setPicked(choice);
+                os.tip("phishing", boxRef.current);
+              }}
+            >
+              {choice.label}
+            </motion.button>
+          ))}
+        </div>
+      )}
+      <AnimatePresence>
+        {picked && (
+          <motion.div className="red-flags" initial="hidden" animate="shown" variants={{ shown: { transition: { staggerChildren: 0.18 } } }}>
+            {redFlags.map((flag) => (
+              <motion.span key={flag} variants={{ hidden: { opacity: 0, scale: 0.6 }, shown: { opacity: 1, scale: 1 } }}>
+                {flag}
+              </motion.span>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 function WorkMail() {
   const os = useOS();
-  const [clicked, setClicked] = useState(false);
   return (
     <article className="mail-view">
       <button className="mail-from" onClick={(event) => os.tip("phishing", event.currentTarget)}>
@@ -26,35 +91,14 @@ function WorkMail() {
         Hi {os.name("Sam", "there")}, your work account password expires at <b>17:00 today</b>. Sign in below to keep access to email, payroll and
         shared files. Accounts not updated will be <b>locked</b>.
       </p>
-      <motion.button
-        className="mail-cta"
-        whileTap={{ scale: 0.96 }}
-        onClick={(event) => {
-          setClicked(true);
-          os.tip("phishing", event.currentTarget);
-        }}
-      >
-        keep my password
-      </motion.button>
-      <AnimatePresence>
-        {clicked && (
-          <motion.div className="red-flags" initial="hidden" animate="shown" variants={{ shown: { transition: { staggerChildren: 0.18 } } }}>
-            {workFlags.map((flag) => (
-              <motion.span key={flag} variants={{ hidden: { opacity: 0, scale: 0.6 }, shown: { opacity: 1, scale: 1 } }}>
-                {flag}
-              </motion.span>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <p className="fake-stamp">training fake · this button goes nowhere · no data collected</p>
+      <MailChoices choices={workChoices} redFlags={workFlags} />
+      <p className="fake-stamp">training fake · these buttons go nowhere · no data collected</p>
     </article>
   );
 }
 
 function ParcelMail() {
   const os = useOS();
-  const [clicked, setClicked] = useState(false);
   return (
     <article className="mail-view">
       <button className="mail-from" onClick={(event) => os.tip("phishing", event.currentTarget)}>
@@ -69,28 +113,8 @@ function ParcelMail() {
         Hi {os.name("Sam", "there")}! We couldn’t deliver your <b>mint. toothpaste (x2)</b>. Confirm the £1.49 redelivery fee within{" "}
         <b>14 minutes</b> or it will be returned to sender.
       </p>
-      <motion.button
-        className="mail-cta"
-        whileTap={{ scale: 0.96 }}
-        onClick={(event) => {
-          setClicked(true);
-          os.tip("phishing", event.currentTarget);
-        }}
-      >
-        confirm your delivery
-      </motion.button>
-      <AnimatePresence>
-        {clicked && (
-          <motion.div className="red-flags" initial="hidden" animate="shown" variants={{ shown: { transition: { staggerChildren: 0.18 } } }}>
-            {flags.map((flag) => (
-              <motion.span key={flag} variants={{ hidden: { opacity: 0, scale: 0.6 }, shown: { opacity: 1, scale: 1 } }}>
-                {flag}
-              </motion.span>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <p className="fake-stamp">training fake · this button goes nowhere · no data collected</p>
+      <MailChoices choices={parcelChoices} redFlags={flags} />
+      <p className="fake-stamp">training fake · these buttons go nowhere · no data collected</p>
     </article>
   );
 }

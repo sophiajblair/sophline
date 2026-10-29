@@ -4,6 +4,17 @@ export type PixelMap = string[];
 
 /** 9×9 glyphs. `#` is the glyph colour, `o` the accent, `.` transparent. */
 export const glyphs: Record<AppId, PixelMap> = {
+  notes: [
+    ".........",
+    "#########",
+    "#ooooooo#",
+    "#########",
+    "#.......#",
+    "#.#####.#",
+    "#.......#",
+    "#.####..#",
+    "#########",
+  ],
   loop: [
     ".........",
     "..##.....",
@@ -148,6 +159,7 @@ export const eyeClosed: PixelMap = [
 ];
 
 export const appMeta: Record<AppId, { label: string; tile: string; glyph: string; accent: string }> = {
+  notes: { label: "notes", tile: "#2a2610", glyph: "#f2efe4", accent: "#e7c75b" },
   loop: { label: "loop", tile: "#3a1630", glyph: "#ff5fa2", accent: "#ff5fa2" },
   chats: { label: "chats", tile: "#12301f", glyph: "#7fe08a", accent: "#0b0f15" },
   porch: { label: "porch", tile: "#10262b", glyph: "#6fd6d0", accent: "#ff3d3d" },
