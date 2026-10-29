@@ -21,6 +21,8 @@ export type Story = {
   flags: Set<Flag>;
   sinceLoad: number;
   sinceWake: number;
+  /** no explanation open and the visitor is on the home or lock screen */
+  settled: boolean;
 };
 
 export type TimelineEvent = {
@@ -77,8 +79,8 @@ export const timeline: TimelineEvent[] = [
   },
   {
     id: "call",
-    delay: 4,
-    when: (s) => s.beats.has("phishing") || s.beats.size >= 4 || since(s, "mail") > 35,
+    delay: 2,
+    when: (s) => s.settled && (s.beats.has("phishing") || s.beats.size >= 4 || since(s, "mail") > 35),
     call: true,
   },
   {

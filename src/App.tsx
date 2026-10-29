@@ -106,9 +106,9 @@ export default function App() {
   const lastFire = useRef(-MIN_GAP);
   const lastInput = useRef(0);
   const awakeAt = useRef<number | null>(null);
-  const live = useRef({ screen, fired, flags, beats, calling, notes });
+  const live = useRef({ screen, fired, flags, beats, calling, notes, tipOpen: tip !== null });
   useEffect(() => {
-    live.current = { screen, fired, flags, beats, calling, notes };
+    live.current = { screen, fired, flags, beats, calling, notes, tipOpen: tip !== null };
   });
 
   const addFlag = useCallback((flag: Flag) => {
@@ -132,13 +132,14 @@ export default function App() {
     const tick = () => {
       const now = elapsed();
       setMinutes(Math.floor(now / 20000));
-      const { screen, fired, flags, beats, calling, notes } = live.current;
+      const { screen, fired, flags, beats, calling, notes, tipOpen } = live.current;
       if (calling || screen === "off") return;
       const story: Story = {
         beats,
         fired,
         flags,
         sinceLoad: now / 1000,
+        settled: !tipOpen && (screen === "home" || screen === "lock"),
         sinceWake: awakeAt.current === null ? 0 : (now - awakeAt.current) / 1000,
       };
       for (const event of timeline) {
