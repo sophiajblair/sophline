@@ -1,32 +1,53 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useOS } from "../os/context";
-import { AppShell } from "../os/ui";
+import { AppShell, Typing, bubbleMotion } from "../os/ui";
 import { useScript } from "../os/useScript";
 
-function CallBack({ caller }: { caller: string }) {
+function CallAnswer() {
   const os = useOS();
   const script = useScript(2, true);
   return (
-    <div className="callback">
-      <p className="callback-status">{script.shown ? "connected · 00:0" + script.shown : `calling ${caller}…`}</p>
-      <AnimatePresence>
-        {script.shown > 0 && (
-          <motion.p className="bubble theirs" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            {os.caller === "brother" ? "yeah? i’m literally on the sofa. what’s up?" : "hello? i’m in the kitchen. what’s up love?"}
-          </motion.p>
-        )}
-        {script.shown > 1 && (
-          <motion.button
-            className="bubble theirs is-tip"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            onClick={(event) => os.tip("call", event.currentTarget)}
-          >
-            no, i haven’t called you today. why? ↗
-          </motion.button>
-        )}
-      </AnimatePresence>
+    <>
+      {script.shown > 0 && (
+        <motion.p className="bubble theirs" {...bubbleMotion}>
+          {os.caller === "brother" ? "on the sofa. literally been here all day. why?" : "in the kitchen, love. why?"}
+        </motion.p>
+      )}
+      {script.shown > 1 && (
+        <motion.button className="bubble theirs is-tip" {...bubbleMotion} onClick={(event) => os.tip("call", event.currentTarget)}>
+          no, i haven’t called you today. why? ↗
+        </motion.button>
+      )}
+      <AnimatePresence>{script.typing && <Typing />}</AnimatePresence>
+    </>
+  );
+}
+
+function CallBack({ caller }: { caller: string }) {
+  const os = useOS();
+  const connect = useScript(1, true);
+  const [asked, setAsked] = useState(false);
+  const connected = connect.shown > 0;
+  return (
+    <div className="callback" aria-live="polite">
+      <p className="callback-status">{connected ? `connected · ${caller}` : `calling ${caller}…`}</p>
+      {connected && (
+        <motion.p className="bubble theirs" {...bubbleMotion}>
+          {os.caller === "brother" ? "yeah? what’s up?" : "hello love, what’s up?"}
+        </motion.p>
+      )}
+      {asked && (
+        <motion.p className="bubble mine" {...bubbleMotion}>
+          where are you right now? did you just ring me?
+        </motion.p>
+      )}
+      {asked && <CallAnswer />}
+      {connected && !asked && (
+        <motion.button className="quick-reply" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} onClick={() => setAsked(true)}>
+          ask: “where are you right now?”
+        </motion.button>
+      )}
     </div>
   );
 }
