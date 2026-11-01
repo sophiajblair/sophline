@@ -131,3 +131,21 @@ h3 {
     width: min(260px, 100%);
   }
 }
+.project p {
+  margin-bottom: 12px;
+}
+.project figure {
+  margin: 20px 0 0;
+}
+.project img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 3px solid var(--line);
+  box-shadow: 5px 5px 0 #000;
+}
+figcaption {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--fog);
+}
