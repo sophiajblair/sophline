@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import { Pixels } from "../pixel/Pixels";
-import { appMeta, glyphs } from "../pixel/icons";
+import { appMeta, creatorGlyph, creatorMeta, glyphs } from "../pixel/icons";
 import type { AppId } from "../content/timeline";
 import { WatchingEye } from "./LockScreen";
 
@@ -81,6 +81,19 @@ export function HomeScreen({ badges, watched, nudge, next, hint, onOpen }: Props
             </motion.li>
           );
         })}
+        <motion.li
+          className={next ? "is-dim" : undefined}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: order.length * 0.025, type: "spring", stiffness: 420, damping: 30 }}
+        >
+          <motion.a className="app-icon" href="/blog" aria-label={`${creatorMeta.label}, opens the blog`} whileTap={{ scale: 0.88 }}>
+            <span className="icon-tile" style={{ background: creatorMeta.tile }}>
+              <Pixels map={creatorGlyph} colors={{ "#": creatorMeta.glyph, o: creatorMeta.accent }} px={6} />
+            </span>
+            <span className="icon-label">{creatorMeta.label}</span>
+          </motion.a>
+        </motion.li>
       </ul>
       <p className={`home-hint${next ? " is-next" : ""}`}>{hint}</p>
     </motion.div>
