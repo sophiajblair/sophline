@@ -31,7 +31,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 .blog {
-  max-width: 640px;
+  max-width: 720px;
   margin: 0 auto;
   padding: 32px 20px 80px;
 }
@@ -69,4 +69,65 @@ p {
 .blog-nav a:hover,
 .blog-nav a:focus-visible {
   color: var(--sick);
+}
+.subtitle {
+  margin: -12px 0 0;
+  font-size: 15px;
+  color: var(--fog);
+}
+.about {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+.about > div {
+  display: grid;
+  gap: 14px;
+}
+.portrait {
+  flex: 0 0 220px;
+  width: 220px;
+  height: auto;
+  border: 3px solid var(--line);
+  box-shadow: 5px 5px 0 #000;
+}
+.job {
+  margin-bottom: 24px;
+}
+h3 {
+  margin: 0;
+  font-size: 18px;
+  text-transform: lowercase;
+}
+.where {
+  font-size: 14px;
+  color: var(--fog);
+  margin: 2px 0 8px;
+}
+.job ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 16px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.chips li {
+  padding: 4px 12px;
+  font-size: 15px;
+  border: 2px solid var(--line);
+}
+@media (max-width: 560px) {
+  .about {
+    flex-direction: column;
+  }
+  .portrait {
+    flex-basis: auto;
+    width: min(260px, 100%);
+  }
 }
