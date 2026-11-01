@@ -9,9 +9,9 @@ type Post =
   | { id: string; kind: "gadget" };
 
 const clips: Post[] = [
-  { id: "cat", kind: "clip", slot: "feed-cat-opera", title: "cat performs a tiny opera", handle: "@content_farm_404", interest: "cats", hue: "violet" },
+  { id: "cat", kind: "clip", slot: "feed-cat-opera", title: "cat wins gold at the pole vault", handle: "@content_farm_404", interest: "cats", hue: "violet" },
   { id: "gadget", kind: "gadget" },
-  { id: "kitchen", kind: "clip", slot: "feed-flooded-kitchen", title: "kitchen floods with blue jelly", handle: "@oddly_satisfying_bot", interest: "chaos", hue: "aqua" },
+  { id: "kitchen", kind: "clip", slot: "feed-flooded-kitchen", title: "small dog owners, this one’s for you", handle: "@oddly_satisfying_bot", interest: "dogs", hue: "aqua" },
   { id: "ceo", kind: "clip", slot: "feed-motivational-ceo", title: "ceo wakes up at 3:44am (apparently)", handle: "@grindset.exe", interest: "hustle", hue: "rust" },
 ];
 

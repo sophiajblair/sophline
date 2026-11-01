@@ -34,7 +34,7 @@ export const videos: VideoSlot[] = [
     suggestedLength: "6–10 seconds, seamless loop",
     aspectRatio: "9:16",
     filePath: "videos/feed-cat-opera.mp4",
-    webmPath: "videos/feed-cat-opera.webm",
+    posterPath: "videos/feed-cat-opera-poster.jpg",
   },
   {
     id: "feed-flooded-kitchen",
@@ -44,7 +44,7 @@ export const videos: VideoSlot[] = [
     suggestedLength: "6–10 seconds, seamless loop",
     aspectRatio: "9:16",
     filePath: "videos/feed-flooded-kitchen.mp4",
-    webmPath: "videos/feed-flooded-kitchen.webm",
+    posterPath: "videos/feed-flooded-kitchen-poster.jpg",
   },
   {
     id: "feed-motivational-ceo",
@@ -74,7 +74,7 @@ export const videos: VideoSlot[] = [
     suggestedLength: "6–10 seconds, seamless loop",
     aspectRatio: "9:16",
     filePath: "videos/ai-gadget-ad.mp4",
-    webmPath: "videos/ai-gadget-ad.webm",
+    posterPath: "videos/ai-gadget-ad-poster.jpg",
   },
 ];
 
