@@ -3,7 +3,9 @@
   "functions": {
     "api/admin/*.ts": { "maxDuration": 300 }
   },
-  "rewrites": [{ "source": "/admin", "destination": "/admin/index.html" }],
+  "rewrites": [{ "source": "/admin", "destination": "/admin/index.html" },
+    { "source": "/blog", "destination": "/blog/index.html" }
+  ],
   "headers": [
     {
       "source": "/admin(.*)",
