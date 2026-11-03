@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { useOS } from "../os/context";
+import { cetDate, useCetClock } from "../os/cet";
 import { AppShell } from "../os/ui";
 
 const steps = [
@@ -13,12 +14,13 @@ const steps = [
 
 export function Notes() {
   const os = useOS();
+  const time = useCetClock();
   const [ticked, setTicked] = useState<string[]>([]);
   const started = os.flags.has("notesRead");
   return (
     <AppShell app="notes" title="notes">
       <div className="notes-page">
-        <p className="notes-date">wednesday, 28 october · 09:41</p>
+        <p className="notes-date">{cetDate()} · {time}</p>
         <h2>{os.name(`you’re ${os.owner}.`, "this phone isn’t yours.")}</h2>
         <p className="notes-who">just for a few minutes. one thing at a time. follow the list.</p>
         <ul className="notes-list" aria-label="to do">

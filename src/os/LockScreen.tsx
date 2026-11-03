@@ -4,6 +4,7 @@ import { Pixels } from "../pixel/Pixels";
 import { appMeta, eye, eyeClosed } from "../pixel/icons";
 import type { AppId } from "../content/timeline";
 import type { Note } from "./context";
+import { cetDate } from "./cet";
 
 function useBlink() {
   const [closed, setClosed] = useState(false);
@@ -45,7 +46,7 @@ export function LockScreen({ time, notes, onOpen, onUnlock }: Props) {
         <p className="lock-wall-title">not your phone.</p>
         <p className="lock-wall-sub">explore it.</p>
       </div>
-      <p className="lock-date">wednesday, 28 october</p>
+      <p className="lock-date">{cetDate()}</p>
       <p className="lock-time">{time}</p>
       <ol className="lock-stack" aria-label="notifications">
         <AnimatePresence initial={false}>

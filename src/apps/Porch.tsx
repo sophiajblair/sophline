@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { useOS } from "../os/context";
+import { useCetClock } from "../os/cet";
 import { AppShell, VideoSlot } from "../os/ui";
 
 type Choice = { label: string; result: string };
@@ -71,6 +72,7 @@ function CameraSettings({ onBack }: { onBack: () => void }) {
 
 export function Porch() {
   const os = useOS();
+  const cameraTime = useCetClock(true);
   const panelRef = useRef<HTMLDivElement>(null);
   const [choice, setChoice] = useState<Choice | null>(null);
   const [view, setView] = useState<"live" | "settings">("live");
@@ -86,7 +88,7 @@ export function Porch() {
       </VideoSlot>
       <div className="porch-hud" aria-hidden="true">
         <span className="rec">● LIVE</span>
-        <span>09:41:12 · cam 01</span>
+        <span>{cameraTime} · cam 01</span>
       </div>
       <motion.div
         className="porch-detect"

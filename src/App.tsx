@@ -19,6 +19,7 @@ import { CallOverlay } from "./os/CallOverlay";
 import { OSContext, type CallOutcome, type Note, type OSApi, type PhoneTheme } from "./os/context";
 import { guide } from "./os/guide";
 import { HomeScreen } from "./os/HomeScreen";
+import { useCetClock } from "./os/cet";
 import { LockScreen } from "./os/LockScreen";
 import { StatusBar } from "./os/StatusBar";
 import { TipLayer, type Tip } from "./os/TipLayer";
@@ -73,11 +74,6 @@ function usePhonePlacement() {
   return placement;
 }
 
-function clock(minutes: number) {
-  const total = 9 * 60 + 41 + minutes;
-  return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
-}
-
 const isApp = (screen: Screen): screen is AppId => screen !== "lock" && screen !== "home";
 
 export default function App() {
@@ -97,7 +93,6 @@ export default function App() {
   const [interests, setInterests] = useState<string[]>([]);
   const [glow, setGlow] = useState(0);
   const [nudge, setNudge] = useState(0);
-  const [minutes, setMinutes] = useState(0);
   const [announcement, setAnnouncement] = useState("");
   const [visitTips, setVisitTips] = useState(0);
   const [theme, setTheme] = useState<PhoneTheme>("dark");
@@ -134,7 +129,6 @@ export default function App() {
   useEffect(() => {
     const tick = () => {
       const now = elapsed();
-      setMinutes(Math.floor(now / 20000));
       const { screen, fired, flags, beats, calling, notes, tipOpen } = live.current;
       if (calling) return;
       const story: Story = {
@@ -285,7 +279,7 @@ export default function App() {
   const next = notes.find((note) => !note.read)?.app ?? pendingTask({ flags, beats, fired })?.notify?.app;
   const hint = guide({ screen, calling, tipOpen: tip !== null, unread, next, visitTips, finished: fired.has("settings") && !unread });
   const alert = calling || unread;
-  const time = clock(minutes);
+  const time = useCetClock();
   const ActiveApp = isApp(screen) ? apps[screen] : null;
   const bannerNotes = banners.map((id) => notes.find((n) => n.id === id)).filter((n): n is Note => Boolean(n));
 
