@@ -173,4 +173,4 @@ export const creatorGlyph: PixelMap = [
   "#########",
   ".........",
 ];
-export const creatorMeta = { label: "creator", tile: "#2a0f1d", glyph: "#ff6fb5", accent: "#ffe6f2" };
+export const creatorMeta = { label: "about me", tile: "#2a0f1d", glyph: "#ff6fb5", accent: "#ffe6f2" };

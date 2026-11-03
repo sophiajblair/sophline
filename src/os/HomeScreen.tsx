@@ -18,6 +18,18 @@ export function HomeScreen({ badges, nudge, next, hint, onOpen }: Props) {
   return (
     <motion.div className="home" initial={{ opacity: 0, scale: 1.06 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
       <ul className="icon-grid">
+        <motion.li
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0, type: "spring", stiffness: 420, damping: 30 }}
+        >
+          <motion.a className="app-icon" href="/blog" aria-label={`${creatorMeta.label}, opens the blog`} whileTap={{ scale: 0.88 }}>
+            <span className="icon-tile" style={{ background: creatorMeta.tile }}>
+              <Pixels map={creatorGlyph} colors={{ "#": creatorMeta.glyph, o: creatorMeta.accent }} px={6} />
+            </span>
+            <span className="icon-label">{creatorMeta.label}</span>
+          </motion.a>
+        </motion.li>
         {order.map((app, index) => {
           const meta = appMeta[app];
           const count = badges[app] ?? 0;
@@ -28,7 +40,7 @@ export function HomeScreen({ badges, nudge, next, hint, onOpen }: Props) {
               className={state.trim() || undefined}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.025, type: "spring", stiffness: 420, damping: 30 }}
+              transition={{ delay: (index + 1) * 0.025, type: "spring", stiffness: 420, damping: 30 }}
             >
               <motion.button
                 key={count ? `${app}-${nudge}` : app}
@@ -66,19 +78,6 @@ export function HomeScreen({ badges, nudge, next, hint, onOpen }: Props) {
             </motion.li>
           );
         })}
-        <motion.li
-          className={next ? "is-dim" : undefined}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: order.length * 0.025, type: "spring", stiffness: 420, damping: 30 }}
-        >
-          <motion.a className="app-icon" href="/blog" aria-label={`${creatorMeta.label}, opens the blog`} whileTap={{ scale: 0.88 }}>
-            <span className="icon-tile" style={{ background: creatorMeta.tile }}>
-              <Pixels map={creatorGlyph} colors={{ "#": creatorMeta.glyph, o: creatorMeta.accent }} px={6} />
-            </span>
-            <span className="icon-label">{creatorMeta.label}</span>
-          </motion.a>
-        </motion.li>
       </ul>
       <p className={`home-hint${next ? " is-next" : ""}`}>{hint}</p>
     </motion.div>
