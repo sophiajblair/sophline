@@ -20,14 +20,13 @@ import { CallOverlay } from "./os/CallOverlay";
 import { OSContext, type CallOutcome, type Note, type OSApi, type PhoneTheme } from "./os/context";
 import { guide } from "./os/guide";
 import { HomeScreen } from "./os/HomeScreen";
-import { Intro } from "./os/Intro";
 import { LockScreen } from "./os/LockScreen";
 import { StatusBar } from "./os/StatusBar";
 import { TipLayer, type Tip } from "./os/TipLayer";
 import { PHONE_H, PHONE_W, PixelPhone } from "./phone/PixelPhone";
 import { appMeta } from "./pixel/icons";
 
-type Screen = "off" | "lock" | "home" | AppId;
+type Screen = "lock" | "home" | AppId;
 
 const apps: Record<AppId, () => React.ReactElement> = {
   notes: Notes,
@@ -82,11 +81,11 @@ function clock(minutes: number, night: boolean) {
   return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
 }
 
-const isApp = (screen: Screen): screen is AppId => screen !== "off" && screen !== "lock" && screen !== "home";
+const isApp = (screen: Screen): screen is AppId => screen !== "lock" && screen !== "home";
 
 export default function App() {
   const placement = usePhonePlacement();
-  const [screen, setScreen] = useState<Screen>("off");
+  const [screen, setScreen] = useState<Screen>("lock");
   const [origin, setOrigin] = useState({ x: 50, y: 50 });
   const [target, setTarget] = useState<string | undefined>();
   const [notes, setNotes] = useState<Note[]>([]);
@@ -129,8 +128,7 @@ export default function App() {
     setAnnouncement(`new notification from ${appMeta[note.app].label}: ${note.title}, ${note.body}`);
     setGlow((n) => n + 1);
     const current = live.current.screen;
-    if (current === "off") setScreen("lock");
-    else if (current !== "lock") {
+    if (current !== "lock") {
       setBanners((prev) => [...prev, note.id]);
       setTimeout(() => setBanners((prev) => prev.filter((id) => id !== note.id)), BANNER_MS);
     }
@@ -141,7 +139,7 @@ export default function App() {
       const now = elapsed();
       setMinutes(Math.floor(now / 20000));
       const { screen, fired, flags, beats, calling, notes, tipOpen } = live.current;
-      if (calling || screen === "off") return;
+      if (calling) return;
       const story: Story = {
         beats,
         fired,
@@ -222,7 +220,7 @@ export default function App() {
 
   const home = useCallback(() => {
     setTip(null);
-    setScreen((current) => (current === "off" || current === "lock" ? current : "home"));
+    setScreen((current) => (current === "lock" ? current : "home"));
   }, []);
 
   const unlock = () => {
@@ -325,10 +323,7 @@ export default function App() {
             role="region"
           >
             <PixelPhone ref={screenRef} alert={alert} night={night}>
-              {screen === "off" ? (
-                <Intro streamer={streamer} onStart={() => setScreen("lock")} />
-              ) : (
-                <>
+              <>
                   <StatusBar time={time} />
                   <div className="screen-body">
                     {screen !== "lock" && <HomeScreen badges={badges} nudge={nudge} next={next} hint={hint} onOpen={(app, el) => open(app, undefined, el)} />}
@@ -355,7 +350,6 @@ export default function App() {
                     {screen !== "lock" && <Banners banners={bannerNotes} onOpen={(app, t, el) => open(app, t, el)} onDismiss={(id) => setBanners((prev) => prev.filter((b) => b !== id))} />}
                   </div>
                 </>
-              )}
               <AnimatePresence>{calling && <CallOverlay onDone={finishCall} />}</AnimatePresence>
               <AnimatePresence>
                 {glow > 0 && (
