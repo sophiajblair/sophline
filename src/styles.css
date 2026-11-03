@@ -1361,23 +1361,6 @@ a.app-icon {
   border-color: var(--sick);
   color: var(--sick);
 }
-.porch-toggle {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  padding: 9px 10px;
-  border: 2px solid var(--line);
-  font-size: 13px;
-}
-.porch-toggle b {
-  color: var(--ink);
-  background: var(--sick);
-  padding: 0 6px;
-}
-.porch-toggle b.is-off {
-  color: var(--fog);
-  background: var(--line);
-}
 .porch-ask {
   grid-column: 1 / -1;
   margin: 0;
@@ -1412,6 +1395,47 @@ a.app-icon {
   font-size: 12px;
   line-height: 1.4;
   color: #aab3bc;
+}
+.porch-open {
+  border-color: var(--sick) !important;
+  color: var(--sick);
+}
+.porch-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 4px;
+}
+.porch-result-actions .porch-open {
+  padding: 6px 8px;
+  font-size: 12px;
+  border: 2px solid var(--sick);
+  background: var(--panel);
+}
+.porch-settings {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px 18px;
+}
+.porch-settings h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+.porch-lede {
+  margin: 0 0 4px;
+  font-family: var(--body-font);
+  font-size: 13px;
+  line-height: 1.4;
+  color: #aab3bc;
+}
+.porch-tally {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--fog);
+}
+.porch-tally.is-done {
+  color: var(--sick);
 }
 .porch-retry {
   justify-self: start;
