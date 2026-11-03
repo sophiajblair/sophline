@@ -24,6 +24,7 @@ export function guide(s: GuideState): string {
     if (s.next) return `next: tap the glowing ${appMeta[s.next].label} icon`;
     return s.finished ? "that’s everything. look around, or open receipts for every source." : "nothing to do yet. wait for the next buzz.";
   }
+  if (s.screen === "porch" && s.visitTips === 0) return "tap the green button, then ‘turn everything off’";
   if (s.visitTips === 0 && !noTips.includes(s.screen)) return `find the odd thing in ${appMeta[s.screen].label} and tap it`;
   return s.next ? `done here. tap ‹ home, then the glowing ${appMeta[s.next].label}` : "done here. tap ‹ home and wait for the next buzz";
 }

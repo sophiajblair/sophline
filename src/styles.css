@@ -1290,6 +1290,11 @@ a.app-icon {
   line-height: 1.4;
   color: #aab3bc;
 }
+.porch-actions .porch-primary {
+  grid-column: 1 / -1;
+  padding: 14px 8px;
+  font-size: 14px;
+}
 .porch-open {
   border-color: var(--sick) !important;
   color: var(--sick);

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { useOS } from "../os/context";
 import { AppShell, VideoSlot } from "../os/ui";
@@ -23,6 +23,18 @@ function CameraSettings({ onBack }: { onBack: () => void }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [on, setOn] = useState<Record<string, boolean>>({ audio: true, cloud: true, history: true, party: true });
   const left = settings.filter((s) => on[s.id]).length;
+  const tipRef = useRef(os.tip);
+  const explained = useRef(false);
+  useEffect(() => {
+    tipRef.current = os.tip;
+  });
+  // switching everything off finishes the task by itself: no extra button to find
+  useEffect(() => {
+    if (left > 0 || explained.current) return;
+    explained.current = true;
+    const timer = setTimeout(() => tipRef.current("doorbell", panelRef.current), 900);
+    return () => clearTimeout(timer);
+  }, [left]);
   return (
     <AppShell app="porch" title="porch · camera settings">
       <div ref={panelRef} className="porch-settings">
@@ -31,8 +43,11 @@ function CameraSettings({ onBack }: { onBack: () => void }) {
         </button>
         <h2>what is this camera keeping?</h2>
         <p className="porch-lede">
-          your doorbell camera records and stores everyone who walks up to your door. these are its settings. switch off what you don’t need, then tap done.
+          your doorbell camera records and stores everyone who walks up to your door. tap the green button to switch everything off in one go.
         </p>
+        <button className="pixel-button is-sick" onClick={() => setOn({ audio: false, cloud: false, history: false, party: false })}>
+          turn everything off
+        </button>
         {settings.map((s) => (
           <label key={s.id} className="setting-toggle">
             <span>
@@ -46,8 +61,8 @@ function CameraSettings({ onBack }: { onBack: () => void }) {
         <p className={`porch-tally${left === 0 ? " is-done" : ""}`} aria-live="polite">
           {left === 0 ? "all off. the camera still sees the door, but keeps far less." : `${left} of ${settings.length} still on`}
         </p>
-        <button className="pixel-button is-sick" onClick={() => os.tip("doorbell", panelRef.current)}>
-          done
+        <button className="pixel-button is-ghost" onClick={() => os.tip("doorbell", panelRef.current)}>
+          skip, what does this mean?
         </button>
       </div>
     </AppShell>
@@ -88,7 +103,7 @@ export function Porch() {
           <motion.div className="porch-result is-lost" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} aria-live="polite">
             <strong>not great.</strong>
             <p>{choice.result}</p>
-            <small>there’s a better move: open the camera settings and see what it’s keeping.</small>
+            <small>there’s an easier fix: open the camera settings and switch off what it’s keeping.</small>
             <div className="porch-result-actions">
               <button className="porch-retry" onClick={() => setChoice(null)}>
                 try again
@@ -100,7 +115,10 @@ export function Porch() {
           </motion.div>
         ) : (
           <div className="porch-actions" role="group" aria-label="what do you do?">
-            <p className="porch-ask">what do you do?</p>
+            <motion.button className="porch-open porch-primary" whileTap={{ scale: 0.95 }} onClick={() => setView("settings")}>
+              ⚙ see what this camera keeps
+            </motion.button>
+            <p className="porch-ask">or, if you’d rather not:</p>
             {choices.map((c) => (
               <motion.button
                 key={c.label}
@@ -113,9 +131,6 @@ export function Porch() {
                 {c.label}
               </motion.button>
             ))}
-            <motion.button className="porch-open" whileTap={{ scale: 0.95 }} onClick={() => setView("settings")}>
-              ⚙ open camera settings
-            </motion.button>
           </div>
         )}
         <p className="tiny-note">pretend porch. nothing here is recorded or sent anywhere.</p>
