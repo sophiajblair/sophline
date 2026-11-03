@@ -52,7 +52,7 @@ export const timeline: TimelineEvent[] = [
   {
     id: "notes",
     delay: 1.4,
-    when: () => true,
+    when: () => false,
     notify: { app: "notes", title: "to do", body: "open me first" },
     done: (s) => s.flags.has("notesRead"),
   },
@@ -102,7 +102,7 @@ export const timeline: TimelineEvent[] = [
   {
     id: "call",
     delay: 2,
-    when: (s) => s.settled && (s.beats.has("phishing") || s.beats.size >= 4 || since(s, "mail") > 35),
+    when: (s) => s.settled,
     call: true,
     done: (s) => s.flags.has("callDone"),
   },

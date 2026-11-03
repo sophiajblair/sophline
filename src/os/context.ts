@@ -22,6 +22,8 @@ export type OSApi = {
   interests: string[];
   addInterest: (interest: string) => void;
   caller: "mum" | "brother";
+  /** a made-up UK number from the Ofcom drama range, the same for the whole visit */
+  callerNumber: string;
   callOutcome: CallOutcome | null;
   theme: PhoneTheme;
   setTheme: (theme: PhoneTheme) => void;

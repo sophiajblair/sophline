@@ -50,6 +50,9 @@ const caller: "mum" | "brother" = (() => {
   return Math.random() < 0.5 ? "mum" : "brother";
 })();
 
+/** 07700 900xxx is the range Ofcom reserves for TV and drama, so it never reaches a real phone. */
+const callerNumber = `+44 7700 900${String(Math.floor(Math.random() * 1000)).padStart(3, "0")}`;
+
 const loadedAt = performance.now();
 const elapsed = () => performance.now() - loadedAt;
 const MIN_GAP = 3000;
@@ -235,7 +238,7 @@ export default function App() {
     if (outcome === "declined") {
       addFlag("callDeclined");
       const who = caller === "brother" ? (streamer ? "sibling" : "ollie") : streamer ? "parent" : "mum";
-      setTimeout(() => pushNote({ id: "voicemail", app: "phone", title: `${who} · voicemail`, body: "0:21 · “please pick up…” · transcript ready" }), 1200);
+      setTimeout(() => pushNote({ id: "voicemail", app: "phone", title: `${callerNumber} · voicemail`, body: `0:21 · says it’s ${who} · transcript ready` }), 1200);
     }
   };
 
@@ -272,6 +275,7 @@ export default function App() {
     interests,
     addInterest: (interest) => setInterests((prev) => (prev.includes(interest) ? prev : [...prev, interest])),
     caller,
+    callerNumber,
     callOutcome,
     theme,
     setTheme,

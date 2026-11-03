@@ -9,11 +9,12 @@ type Props = { onDone: (outcome: CallOutcome) => void };
 export function CallOverlay({ onDone }: Props) {
   const os = useOS();
   const brother = os.caller === "brother";
-  const caller = brother ? os.name("ollie · little brother", "sibling") : os.name("mum", "parent");
+  const caller = os.callerNumber;
+  const claim = brother ? os.name("ollie, your little brother", "your sibling") : os.name("mum", "your parent");
   const amount = brother ? "£300" : "£800";
   const script = brother
     ? "it’s ollie. i’ve lost my phone, i’m on a mate’s. can you transfer me £300 for the train? i’ll pay you back. please, i can’t talk long."
-    : "it’s me. i’ve been in an accident. don’t tell dad yet. my account’s frozen — please send £800 to my friend now. i’ll explain later.";
+    : "hi, it’s mum. i’ve been in an accident. don’t tell dad yet. my account’s frozen — please send £800 to my friend now. i’ll explain later.";
   const words = script.split(" ");
   const [phase, setPhase] = useState<"ringing" | "live" | CallOutcome>("ringing");
   const [spoken, setSpoken] = useState(0);
@@ -68,10 +69,11 @@ export function CallOverlay({ onDone }: Props) {
             <i />
             <i />
             <i />
-            <span>{brother ? "O" : "M"}</span>
+            <span>?</span>
           </div>
           <p>incoming call</p>
           <h2>{caller}</h2>
+          <p className="call-claim">not in your contacts · says it’s {claim}</p>
           <p className="call-note">content note: a distressed voice asks for money. decline to skip it.</p>
           <div className="call-actions">
             <button
@@ -99,6 +101,7 @@ export function CallOverlay({ onDone }: Props) {
           <div className="call-top">
             <span>00:{String(seconds).padStart(2, "0")}</span>
             <strong>{caller}</strong>
+            <small className="call-claim">says it’s {claim}</small>
             <i className="wave" aria-hidden="true">
               ▂▆▃▇▂▅▁▆
             </i>

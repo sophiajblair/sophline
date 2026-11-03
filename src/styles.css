@@ -1860,8 +1860,22 @@ a.app-icon {
 }
 .call-ringing h2 {
   margin: 4px 0 0;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 400;
+}
+.call-claim {
+  margin: 6px 0 0;
+  max-width: 260px;
+  text-align: center;
+  font-family: var(--body-font);
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--bone);
+}
+.call-top .call-claim {
+  margin: 0;
+  font-size: 12px;
+  color: var(--fog);
 }
 .call-note {
   margin-top: auto !important;
