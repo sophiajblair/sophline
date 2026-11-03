@@ -29,7 +29,6 @@ export function You() {
     { label: "2am mood", value: night ? "awake, apparently" : "unknown (for now)" },
     { label: "most persuadable by", value: persuadable },
     { label: "voice-trust score", value: voice },
-    { label: "things we noticed", value: `${os.beats.size} of 10` },
   ];
   return (
     <AppShell app="you" title="you · wrapped">

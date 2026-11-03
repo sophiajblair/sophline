@@ -412,17 +412,6 @@ svg[shape-rendering="crispEdges"],
   font-size: 13px;
   background: linear-gradient(var(--ink), rgba(11, 15, 21, 0));
 }
-.status-watch {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--warn);
-  font-size: 12px;
-}
-.status-watch span {
-  display: inline-block;
-  min-width: 10px;
-}
 .status-icons {
   display: inline-flex;
   gap: 6px;
@@ -550,32 +539,6 @@ svg[shape-rendering="crispEdges"],
   padding: 10px 14px 14px;
   display: flex;
   flex-direction: column;
-}
-.widget {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  background: var(--panel);
-  border: 2px solid var(--line);
-  box-shadow: 3px 3px 0 #000;
-}
-.widget div {
-  display: grid;
-}
-.widget small {
-  font-size: 10px;
-  color: var(--fog);
-  text-transform: uppercase;
-}
-.widget strong {
-  font-size: 30px;
-  line-height: 1.05;
-  color: var(--warn);
-}
-.widget span {
-  font-size: 11px;
-  color: var(--fog);
 }
 .icon-grid {
   list-style: none;

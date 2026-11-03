@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
-import { annotations, type TipId } from "./content/annotations";
+import type { TipId } from "./content/annotations";
 import { MatrixRain } from "./os/MatrixRain";
 import { pendingTask, timeline, type AppId, type Flag, type Story } from "./content/timeline";
 import { Chats } from "./apps/Chats";
@@ -308,7 +308,7 @@ export default function App() {
             nothing leaves this browser · no analytics · no cookies
           </p>
           <p className="ambient ambient-right" aria-hidden="true">
-            esc = home · {beats.size}/{Object.keys(annotations).length} noticed
+            esc = home
           </p>
           <p className="guide-line" aria-live="polite">
             <span aria-hidden="true">▸</span> {hint}
@@ -325,9 +325,9 @@ export default function App() {
                 <Intro streamer={streamer} onStart={() => setScreen("lock")} />
               ) : (
                 <>
-                  <StatusBar time={time} watched={beats.size} />
+                  <StatusBar time={time} />
                   <div className="screen-body">
-                    {screen !== "lock" && <HomeScreen badges={badges} watched={beats.size} nudge={nudge} next={next} hint={hint} onOpen={(app, el) => open(app, undefined, el)} />}
+                    {screen !== "lock" && <HomeScreen badges={badges} nudge={nudge} next={next} hint={hint} onOpen={(app, el) => open(app, undefined, el)} />}
                     <AnimatePresence>
                       {ActiveApp && (
                         <motion.div
