@@ -163,14 +163,14 @@ export const appMeta: Record<AppId, { label: string; tile: string; glyph: string
 
 /** "creator" is not a story app: it is a plain link out of the phone to the /blog page. */
 export const creatorGlyph: PixelMap = [
-  ".......##",
-  "......###",
-  ".....##o#",
-  "....##o##",
-  "...##o##.",
-  "..##o##..",
-  ".###.#...",
-  ".###.....",
-  "##.......",
+  ".........",
+  "..####...",
+  "#########",
+  "#.......#",
+  "#..ooo..#",
+  "#.o###o.#",
+  "#..ooo..#",
+  "#########",
+  ".........",
 ];
-export const creatorMeta = { label: "creator", tile: "#102a1f", glyph: "#c4dc5a", accent: "#ffffff" };
+export const creatorMeta = { label: "creator", tile: "#2a0f1d", glyph: "#ff6fb5", accent: "#ffe6f2" };
