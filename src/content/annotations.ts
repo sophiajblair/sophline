@@ -3,6 +3,7 @@ export type TipId =
   | "ben"
   | "doorbell"
   | "toothpaste"
+  | "holiday"
   | "phishing"
   | "call"
   | "location"
@@ -45,6 +46,13 @@ export const annotations: Record<TipId, Annotation> = {
     title: "the text itself was private.",
     body: "personal whatsapp chats are end-to-end encrypted. the ad doesn’t prove anyone was listening either. advertisers can still match customer lists, infer from activity, and connect accounts you choose to link.",
     detail: "we can’t tell you which mechanism caused one ad. you can’t audit it. that’s the point.",
+    sourceIds: ["wapq", "wae2e", "waads", "metaca", "bbcmyth", "neu"],
+  },
+  holiday: {
+    eyebrow: "same trick, different ad",
+    title: "you said ‘sure’ to a friend. a travel ad showed up.",
+    body: "the chat itself was end-to-end encrypted, so the ad didn’t need the words. advertisers can still match customer lists, infer from what you watch and search, and connect accounts you choose to link. a friend looking at flights is a strong signal too.",
+    detail: "we can’t tell you which mechanism put this ad here. you can’t audit it. that’s the point.",
     sourceIds: ["wapq", "wae2e", "waads", "metaca", "bbcmyth", "neu"],
   },
   phishing: {

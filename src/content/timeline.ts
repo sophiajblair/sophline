@@ -14,7 +14,7 @@ export type AppId =
   | "settings"
   | "receipts";
 
-export type Flag = "awake" | "notesRead" | "chatReplied" | "adSeen" | "callDone" | "callDeclined" | "night" | "workDone";
+export type Flag = "awake" | "notesRead" | "chatReplied" | "adSeen" | "callDone" | "callDeclined" | "night" | "workDone" | "holidayReplied";
 
 export type Story = {
   beats: Set<TipId>;
@@ -79,9 +79,23 @@ export const timeline: TimelineEvent[] = [
     done: (s) => s.beats.has("doorbell"),
   },
   {
+    id: "holiday",
+    delay: 2.6,
+    when: (s) => s.beats.has("doorbell") || since(s, "porch") > 40,
+    notify: { app: "chats", title: "angela", body: "we should go on holiday soon!", target: "angela" },
+    done: (s) => s.flags.has("holidayReplied"),
+  },
+  {
+    id: "booking",
+    delay: 2.5,
+    when: (s) => s.flags.has("holidayReplied"),
+    notify: { app: "loop", title: "sponsored", body: "booking.com · your holiday, sorted", target: "booking" },
+    done: (s) => s.beats.has("holiday"),
+  },
+  {
     id: "mail",
     delay: 3,
-    when: (s) => s.beats.has("toothpaste") || since(s, "ad") > 25,
+    when: (s) => s.fired.has("booking") && (s.beats.has("toothpaste") || since(s, "ad") > 25),
     notify: { app: "mail", title: "ParcelPal Support", body: "your mint. order is waiting · action needed", target: "parcel" },
     done: (s) => s.beats.has("phishing"),
   },

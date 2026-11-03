@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
-import type { TipId } from "./content/annotations";
+import { annotations, type TipId } from "./content/annotations";
+import { MatrixRain } from "./os/MatrixRain";
 import { pendingTask, timeline, type AppId, type Flag, type Story } from "./content/timeline";
 import { Chats } from "./apps/Chats";
 import { Circle } from "./apps/Circle";
@@ -20,7 +21,7 @@ import { OSContext, type CallOutcome, type Note, type OSApi, type PhoneTheme } f
 import { guide } from "./os/guide";
 import { HomeScreen } from "./os/HomeScreen";
 import { Intro } from "./os/Intro";
-import { LockScreen, WatchingEye } from "./os/LockScreen";
+import { LockScreen } from "./os/LockScreen";
 import { StatusBar } from "./os/StatusBar";
 import { TipLayer, type Tip } from "./os/TipLayer";
 import { PHONE_H, PHONE_W, PixelPhone } from "./phone/PixelPhone";
@@ -58,7 +59,7 @@ const BANNER_MS = 5200;
 function measure() {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const scale = vw < 640 ? Math.min((vh - 16) / PHONE_H, (vw - 16) / PHONE_W) : Math.min((vh - 96) / PHONE_H, (vw * 0.4) / PHONE_W, 1);
+  const scale = vw < 640 ? Math.min((vh - 16) / PHONE_H, (vw - 16) / PHONE_W) : Math.min((vh - 96) / PHONE_H, (vw * 0.5) / PHONE_W, 1.6);
   return { scale, left: Math.round((vw - PHONE_W * scale) / 2), top: Math.round((vh - PHONE_H * scale) / 2) };
 }
 
@@ -294,20 +295,7 @@ export default function App() {
     <MotionConfig reducedMotion="user">
       <OSContext.Provider value={os}>
         <div className={`world${alert ? " is-alert" : ""}${night ? " is-night" : ""}${theme === "dark" ? "" : ` is-themed theme-${theme}`}`}>
-          <div className="world-eyes" aria-hidden="true">
-            <span className="w-eye e1">
-              <WatchingEye px={4} alert={alert} />
-            </span>
-            <span className="w-eye e2">
-              <WatchingEye px={3} alert={alert} />
-            </span>
-            <span className="w-eye e3">
-              <WatchingEye px={5} alert={alert} />
-            </span>
-            <span className="w-eye e4">
-              <WatchingEye px={3} alert={alert} />
-            </span>
-          </div>
+          <MatrixRain alert={alert} />
           <header className="world-header">
             <p className="wordmark">
               for you, forever<span>a phone that isn’t yours</span>
@@ -320,7 +308,7 @@ export default function App() {
             nothing leaves this browser · no analytics · no cookies
           </p>
           <p className="ambient ambient-right" aria-hidden="true">
-            esc = home · {beats.size}/10 noticed
+            esc = home · {beats.size}/{Object.keys(annotations).length} noticed
           </p>
           <p className="guide-line" aria-live="polite">
             <span aria-hidden="true">▸</span> {hint}

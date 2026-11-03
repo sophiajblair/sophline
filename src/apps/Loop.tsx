@@ -5,7 +5,7 @@ import { AppShell, VideoSlot } from "../os/ui";
 
 type Post =
   | { id: string; kind: "clip"; slot: string; title: string; handle: string; interest: string; hue: string }
-  | { id: string; kind: "toothpaste" }
+  | { id: string; kind: "toothpaste" | "booking" }
   | { id: string; kind: "gadget" };
 
 const clips: Post[] = [
@@ -128,20 +128,40 @@ const routes = [
   "you linked accounts, so your activity got combined.",
 ];
 
-function ToothpastePost() {
+const ads = {
+  toothpaste: {
+    slot: "toothpaste-ad",
+    aria: "sponsored: mint toothpaste",
+    title: "the paste that knows you",
+    sub: (os: ReturnType<typeof useOS>) => os.name("for people who just ran out", "for people like you"),
+    button: "shop now",
+    tip: "toothpaste",
+  },
+  booking: {
+    slot: "booking-ad",
+    aria: "sponsored: booking.com",
+    title: "booking.com",
+    sub: (os: ReturnType<typeof useOS>) => os.name("for people who just said ‘sure’", "for people like you"),
+    button: "book now",
+    tip: "holiday",
+  },
+} as const;
+
+function TargetedAd({ kind }: { kind: "toothpaste" | "booking" }) {
+  const ad = ads[kind];
   const os = useOS();
   const adRef = useRef<HTMLDivElement>(null);
   const [asking, setAsking] = useState(false);
   const [guess, setGuess] = useState<string | null>(null);
   return (
-    <section className="post post-toothpaste" aria-label="sponsored: mint toothpaste">
+    <section className="post post-toothpaste" aria-label={ad.aria}>
       <span className="post-ai is-ad">SPONSORED</span>
       <div ref={adRef} className="paste-ad">
-        <VideoSlot id="toothpaste-ad" className="post-video paste-video" />
+        <VideoSlot id={ad.slot} className="post-video paste-video" />
       </div>
       <div className="post-meta">
-        <strong>the paste that knows you</strong>
-        <small>{os.name("for people who just ran out", "for people like you")}</small>
+        <strong>{ad.title}</strong>
+        <small>{ad.sub(os)}</small>
       </div>
       {guess ? (
         <div className="post-answer" aria-live="polite">
@@ -158,7 +178,7 @@ function ToothpastePost() {
         </div>
       ) : (
         <motion.button className="buy-button" whileTap={{ scale: 0.94 }} onClick={() => setAsking(true)}>
-          shop now
+          {ad.button}
         </motion.button>
       )}
       <AnimatePresence>
@@ -178,7 +198,7 @@ function ToothpastePost() {
                 key={g}
                 onClick={() => {
                   setGuess(g);
-                  os.tip("toothpaste", adRef.current);
+                  os.tip(ad.tip, adRef.current);
                 }}
               >
                 {g}
@@ -194,12 +214,17 @@ function ToothpastePost() {
 export function Loop() {
   const os = useOS();
   const showAd = os.fired.has("ad");
-  const posts: Post[] = showAd ? [{ id: "ad", kind: "toothpaste" }, ...clips] : clips;
+  const showBooking = os.fired.has("booking");
+  const posts: Post[] = [
+    ...(showBooking ? [{ id: "booking", kind: "booking" } as const] : []),
+    ...(showAd ? [{ id: "ad", kind: "toothpaste" } as const] : []),
+    ...clips,
+  ];
   return (
     <AppShell app="loop" title="loop · just for u">
       <div className="feed" tabIndex={0} aria-label="video feed, scroll for more">
         {posts.map((post) =>
-          post.kind === "clip" ? <ClipPost key={post.id} post={post} /> : post.kind === "gadget" ? <GadgetPost key={post.id} /> : <ToothpastePost key={post.id} />,
+          post.kind === "clip" ? <ClipPost key={post.id} post={post} /> : post.kind === "gadget" ? <GadgetPost key={post.id} /> : <TargetedAd key={post.id} kind={post.kind} />,
         )}
         <section className="post post-end">
           <p>you reached the end.</p>

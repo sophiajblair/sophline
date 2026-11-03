@@ -122,28 +122,16 @@ svg[shape-rendering="crispEdges"],
     opacity: 0.55;
   }
 }
-.world-eyes .w-eye {
+.matrix-rain {
   position: absolute;
-  opacity: 0.55;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.4;
+  pointer-events: none;
 }
-.world-eyes .e1 {
-  left: 6%;
-  top: 18%;
-}
-.world-eyes .e2 {
-  right: 9%;
-  top: 12%;
-}
-.world-eyes .e3 {
-  right: 6%;
-  bottom: 16%;
-}
-.world-eyes .e4 {
-  left: 10%;
-  bottom: 22%;
-}
-.is-alert .world-eyes .w-eye {
-  opacity: 0.85;
+.matrix-rain.is-alert {
+  opacity: 0.5;
 }
 
 .world-header {
@@ -220,8 +208,7 @@ svg[shape-rendering="crispEdges"],
 @media (max-width: 639px) {
   .world-header,
   .ambient,
-  .guide-line,
-  .world-eyes {
+  .guide-line {
     display: none;
   }
 }
@@ -493,26 +480,26 @@ svg[shape-rendering="crispEdges"],
   gap: 2px;
   width: 100%;
   text-align: left;
-  padding: 9px 11px;
+  padding: 14px 15px;
   background: var(--panel);
   border: 2px solid var(--line);
   box-shadow: 3px 3px 0 #000;
-  font-size: 13px;
+  font-size: 16px;
 }
 .note:hover {
   border-color: var(--fog);
 }
 .note-app {
-  font-size: 10px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 .note strong {
-  font-size: 14px;
+  font-size: 17px;
 }
 .note > span:last-child {
   font-family: var(--body-font);
-  font-size: 13px;
+  font-size: 16px;
   color: #aab3bc;
 }
 .lock-hint {
@@ -668,8 +655,8 @@ a.app-icon {
 /* ---------- banners ---------- */
 .banners {
   position: absolute;
-  top: 2px;
-  left: 84px;
+  top: 6px;
+  left: 8px;
   right: 8px;
   margin: 0;
   padding: 0;
@@ -681,27 +668,28 @@ a.app-icon {
   grid-area: 1 / 1;
 }
 .note.is-banner {
-  gap: 0;
-  padding: 3px 8px;
+  gap: 3px;
+  padding: 12px 14px;
   background: #161e29;
   border-color: var(--fog);
   box-shadow:
     4px 4px 0 #000,
-    0 0 18px rgba(255, 61, 61, 0.18);
+    0 0 22px rgba(255, 61, 61, 0.25);
 }
-.note.is-banner > span {
+.note.is-banner > span:first-child {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 .note.is-banner .note-app strong {
-  font-size: 10px;
+  font-size: 14px;
   text-transform: none;
   letter-spacing: 0;
   color: var(--bone);
 }
 .note.is-banner > span:last-child {
-  font-size: 11px;
+  font-size: 16px;
+  line-height: 1.3;
 }
 
 /* ---------- apps ---------- */

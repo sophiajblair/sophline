@@ -74,7 +74,17 @@ export const videos: VideoSlot[] = [
     suggestedLength: "6–10 seconds, seamless loop",
     aspectRatio: "9:16",
     filePath: "videos/ai-gadget-ad.mp4",
-    posterPath: "videos/ai-gadget-ad-poster.jpg",
+    webmPath: "videos/ai-gadget-ad.webm",
+  },
+  {
+    id: "booking-ad",
+    scene: "Angela holiday text",
+    label: "booking.com ad",
+    intendedContent: "The sponsored Booking.com ad that appears in the feed after Angela’s holiday text. Supplied by Hannah.",
+    suggestedLength: "8 seconds, seamless loop",
+    aspectRatio: "9:16",
+    filePath: "videos/booking-ad.mp4",
+    posterPath: "videos/booking-ad-poster.jpg",
   },
 ];
 
