@@ -154,87 +154,105 @@ figcaption {
   font-size: 16px;
   color: var(--fog);
 }
-.polaroids {
+.posts {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 26px 22px;
+  gap: 22px;
   margin: 8px 0 0;
-  padding: 10px 0 6px;
+  padding: 0;
   list-style: none;
+  align-items: flex-start;
 }
-.polaroids li {
+.posts li {
   flex: 0 1 208px;
-  transition: transform 0.2s steps(4);
 }
-.polaroids li:nth-child(1) {
-  transform: rotate(-3deg);
+.ig-post {
+  background: #0b070a;
+  border: 2px solid var(--line);
+  box-shadow: 4px 4px 0 #000;
 }
-.polaroids li:nth-child(2) {
-  transform: rotate(2.5deg) translateY(8px);
+.ig-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
 }
-.polaroids li:nth-child(3) {
-  transform: rotate(-1.5deg);
+.ig-head img {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  object-position: center 20%;
+  border-radius: 50%;
+  border: 2px solid var(--sick);
 }
-.polaroids li:hover {
-  transform: rotate(0) scale(1.04);
-  z-index: 1;
+.ig-head strong {
+  flex: 1;
+  font-size: 16px;
 }
-.polaroids figure {
-  margin: 0;
-  padding: 10px 10px 44px;
-  background: #fff6fa;
-  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.7);
+.ig-more {
+  color: var(--fog);
+  letter-spacing: 1px;
 }
-.polaroids img {
+.ig-photo {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 1 / 1.1;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
-  object-position: center 30%;
-  background: #1a0e15;
 }
-.ig-under {
-  display: grid;
-  grid-template-columns: auto 1fr;
+.ig-actions {
+  display: flex;
   align-items: center;
-  gap: 2px 10px;
-  margin-top: 10px;
-  padding: 8px 10px 10px;
-  background: #0b070a;
-  border: 2px solid var(--line);
-  box-shadow: 3px 3px 0 #000;
+  gap: 12px;
+  padding: 8px 10px 0;
 }
-.ig-heart {
+.ig-btn {
+  display: inline-grid;
   padding: 0;
   border: 0;
   background: none;
-  color: var(--sick);
-  font: inherit;
-  font-size: 26px;
-  line-height: 1;
+  color: var(--bone);
+  cursor: default;
+}
+button.ig-btn {
   cursor: pointer;
 }
-.ig-heart:focus-visible {
+.ig-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.ig-heart[aria-pressed="true"] {
+  color: var(--sick);
+}
+.ig-heart[aria-pressed="true"] svg,
+.ig-save[aria-pressed="true"] svg {
+  fill: currentColor;
+}
+.ig-save {
+  margin-left: auto;
+}
+.ig-btn:focus-visible {
   outline: 2px solid var(--sick);
   outline-offset: 3px;
 }
 .ig-likes {
+  margin: 4px 0 0;
+  padding: 0 10px 10px;
   font-size: 16px;
   font-weight: 700;
 }
 .ig-comment {
-  grid-column: 1 / -1;
-  margin: 2px 0 0;
+  margin: -4px 0 0;
+  padding: 0 10px 10px;
   font-size: 16px;
   line-height: 1.35;
 }
 .ig-comment strong {
   color: var(--fog);
-}
-@media (prefers-reduced-motion: reduce) {
-  .polaroids li {
-    transition: none;
-  }
 }
