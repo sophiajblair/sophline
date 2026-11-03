@@ -5,7 +5,7 @@ import { AppShell, Typing, bubbleMotion } from "../os/ui";
 import { useScript } from "../os/useScript";
 import { PartyPhoto } from "./Photos";
 
-type Thread = "other" | "family";
+type Thread = "other" | "family" | "angela";
 
 function ThankYou() {
   return (
@@ -66,6 +66,67 @@ function OtherHalf() {
   );
 }
 
+const flightsLine = "ok ill look for flights and accommodation";
+
+function Flights() {
+  return (
+    <motion.p className="bubble theirs" {...bubbleMotion}>
+      {flightsLine}
+    </motion.p>
+  );
+}
+
+function LateFlights() {
+  const script = useScript(1, true);
+  return <AnimatePresence>{script.shown > 0 ? <Flights /> : script.typing && <Typing />}</AnimatePresence>;
+}
+
+function Angela() {
+  const os = useOS();
+  const replied = os.flags.has("holidayReplied");
+  const [justReplied, setJustReplied] = useState(false);
+  const opening = ["we should go on holiday soon!"];
+  const intro = useScript(opening.length, !replied);
+  return (
+    <div className="thread">
+      <button className="e2e-banner" onClick={(event) => os.tip("toothpaste", event.currentTarget)}>
+        🔒 messages are end-to-end encrypted. tap to learn more.
+      </button>
+      <div className="thread-body" aria-live="polite">
+        {opening.slice(0, intro.shown).map((text) => (
+          <motion.p key={text} className="bubble theirs" {...bubbleMotion}>
+            {text}
+          </motion.p>
+        ))}
+        {replied && (
+          <motion.p className="bubble mine" {...bubbleMotion}>
+            sure
+          </motion.p>
+        )}
+        {justReplied ? <LateFlights /> : replied && <Flights />}
+        <AnimatePresence>{intro.typing && <Typing />}</AnimatePresence>
+      </div>
+      <div className="composer">
+        {!replied && intro.shown === opening.length ? (
+          <motion.button
+            className="quick-reply"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            onClick={() => {
+              setJustReplied(true);
+              os.setFlag("holidayReplied");
+            }}
+          >
+            reply “sure”
+          </motion.button>
+        ) : (
+          <span className="composer-fake">message</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Family() {
   const os = useOS();
   const kid = os.name("kid", "child");
@@ -95,17 +156,19 @@ function Family() {
 
 export function Chats() {
   const os = useOS();
-  const initial: Thread | null = os.target === "other" || os.target === "family" ? os.target : null;
+  const initial: Thread | null = os.target === "other" || os.target === "family" || os.target === "angela" ? os.target : null;
   const [thread, setThread] = useState<Thread | null>(initial);
   const hasFamily = os.fired.has("photos");
+  const hasAngela = os.fired.has("holiday");
   const partner = os.name("other half ♥", "contact");
+  const friend = os.name("angela", "friend");
   if (thread) {
     return (
-      <AppShell app="chats" title={thread === "other" ? partner : os.name("family 🏠", "group")}>
+      <AppShell app="chats" title={thread === "other" ? partner : thread === "angela" ? friend : os.name("family 🏠", "group")}>
         <button className="thread-back" onClick={() => setThread(null)}>
           ‹ all chats
         </button>
-        {thread === "other" ? <OtherHalf /> : <Family />}
+        {thread === "other" ? <OtherHalf /> : thread === "angela" ? <Angela /> : <Family />}
       </AppShell>
     );
   }
@@ -121,6 +184,17 @@ export function Chats() {
             </span>
           </button>
         </li>
+        {hasAngela && (
+          <li>
+            <button onClick={() => setThread("angela")}>
+              <span className="avatar is-group">✈</span>
+              <span>
+                <strong>{friend}</strong>
+                <small>{os.flags.has("holidayReplied") ? flightsLine : "we should go on holiday soon!"}</small>
+              </span>
+            </button>
+          </li>
+        )}
         {hasFamily && (
           <li>
             <button onClick={() => setThread("family")}>

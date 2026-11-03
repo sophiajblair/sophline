@@ -20,7 +20,7 @@ import { OSContext, type CallOutcome, type Note, type OSApi, type PhoneTheme } f
 import { guide } from "./os/guide";
 import { HomeScreen } from "./os/HomeScreen";
 import { Intro } from "./os/Intro";
-import { LockScreen, WatchingEye } from "./os/LockScreen";
+import { LockScreen } from "./os/LockScreen";
 import { StatusBar } from "./os/StatusBar";
 import { TipLayer, type Tip } from "./os/TipLayer";
 import { PHONE_H, PHONE_W, PixelPhone } from "./phone/PixelPhone";
@@ -55,10 +55,19 @@ const MIN_GAP = 3000;
 const IDLE_NUDGE = 14000;
 const BANNER_MS = 5200;
 
+const RAIN_GLYPHS = "01<>/#=+:*▮";
+const RAIN_COLUMNS = 32;
+const rain = Array.from({ length: RAIN_COLUMNS }, (_, i) => ({
+  left: `${(i / RAIN_COLUMNS) * 100 + Math.random() * 2}%`,
+  duration: `${9 + Math.random() * 12}s`,
+  delay: `${-Math.random() * 20}s`,
+  text: Array.from({ length: 24 + Math.floor(Math.random() * 16) }, () => RAIN_GLYPHS[Math.floor(Math.random() * RAIN_GLYPHS.length)]).join(""),
+}));
+
 function measure() {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const scale = vw < 640 ? Math.min((vh - 16) / PHONE_H, (vw - 16) / PHONE_W) : Math.min((vh - 96) / PHONE_H, (vw * 0.4) / PHONE_W, 1);
+  const scale = vw < 640 ? Math.min((vh - 16) / PHONE_H, (vw - 16) / PHONE_W) : Math.min((vh - 88) / PHONE_H, (vw * 0.4) / PHONE_W, 1.3);
   return { scale, left: Math.round((vw - PHONE_W * scale) / 2), top: Math.round((vh - PHONE_H * scale) / 2) };
 }
 
@@ -288,25 +297,22 @@ export default function App() {
   const night = flags.has("night");
   const time = clock(minutes, night);
   const ActiveApp = isApp(screen) ? apps[screen] : null;
-  const bannerNotes = banners.map((id) => notes.find((n) => n.id === id)).filter((n): n is Note => Boolean(n));
+  const masked = (note: Note): Note => (streamer && note.generic ? { ...note, title: note.generic } : note);
+  const bannerNotes = banners
+    .map((id) => notes.find((n) => n.id === id))
+    .filter((n): n is Note => Boolean(n))
+    .map(masked);
 
   return (
     <MotionConfig reducedMotion="user">
       <OSContext.Provider value={os}>
         <div className={`world${alert ? " is-alert" : ""}${night ? " is-night" : ""}${theme === "dark" ? "" : ` is-themed theme-${theme}`}`}>
-          <div className="world-eyes" aria-hidden="true">
-            <span className="w-eye e1">
-              <WatchingEye px={4} alert={alert} />
-            </span>
-            <span className="w-eye e2">
-              <WatchingEye px={3} alert={alert} />
-            </span>
-            <span className="w-eye e3">
-              <WatchingEye px={5} alert={alert} />
-            </span>
-            <span className="w-eye e4">
-              <WatchingEye px={3} alert={alert} />
-            </span>
+          <div className="world-rain" aria-hidden="true">
+            {rain.map((col, i) => (
+              <span key={i} style={{ left: col.left, animationDuration: col.duration, animationDelay: col.delay }}>
+                {col.text}
+              </span>
+            ))}
           </div>
           <header className="world-header">
             <p className="wordmark">
@@ -358,7 +364,7 @@ export default function App() {
                       )}
                     </AnimatePresence>
                     <AnimatePresence>
-                      {screen === "lock" && <LockScreen time={time} notes={notes} onOpen={(app, t, el) => open(app, t, el)} onUnlock={unlock} />}
+                      {screen === "lock" && <LockScreen time={time} notes={notes.map(masked)} onOpen={(app, t, el) => open(app, t, el)} onUnlock={unlock} />}
                     </AnimatePresence>
                     {screen !== "lock" && <Banners banners={bannerNotes} onOpen={(app, t, el) => open(app, t, el)} onDismiss={(id) => setBanners((prev) => prev.filter((b) => b !== id))} />}
                   </div>

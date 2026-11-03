@@ -2,7 +2,7 @@ import { createContext, useContext } from "react";
 import type { TipId } from "../content/annotations";
 import type { AppId, Flag } from "../content/timeline";
 
-export type Note = { id: string; app: AppId; title: string; body: string; target?: string; read: boolean };
+export type Note = { id: string; app: AppId; title: string; generic?: string; body: string; target?: string; read: boolean };
 
 export type CallOutcome = "sent" | "safe" | "callback" | "ended" | "declined";
 

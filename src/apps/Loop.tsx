@@ -6,6 +6,7 @@ import { AppShell, VideoSlot } from "../os/ui";
 type Post =
   | { id: string; kind: "clip"; slot: string; title: string; handle: string; interest: string; hue: string }
   | { id: string; kind: "toothpaste" }
+  | { id: string; kind: "trip" }
   | { id: string; kind: "gadget" };
 
 const clips: Post[] = [
@@ -128,20 +129,22 @@ const routes = [
   "you linked accounts, so your activity got combined.",
 ];
 
-function ToothpastePost() {
+type AdProps = { label: string; title: string; tagline: string; className: string; onGuess?: () => void; children: React.ReactNode };
+
+function AdPost({ label, title, tagline, className, onGuess, children }: AdProps) {
   const os = useOS();
   const adRef = useRef<HTMLDivElement>(null);
   const [asking, setAsking] = useState(false);
   const [guess, setGuess] = useState<string | null>(null);
   return (
-    <section className="post post-toothpaste" aria-label="sponsored: mint toothpaste">
+    <section className={`post ${className}`} aria-label={label}>
       <span className="post-ai is-ad">SPONSORED</span>
       <div ref={adRef} className="paste-ad">
-        <VideoSlot id="toothpaste-ad" className="post-video paste-video" />
+        {children}
       </div>
       <div className="post-meta">
-        <strong>the paste that knows you</strong>
-        <small>{os.name("for people who just ran out", "for people like you")}</small>
+        <strong>{title}</strong>
+        <small>{tagline}</small>
       </div>
       {guess ? (
         <div className="post-answer" aria-live="polite">
@@ -178,6 +181,7 @@ function ToothpastePost() {
                 key={g}
                 onClick={() => {
                   setGuess(g);
+                  onGuess?.();
                   os.tip("toothpaste", adRef.current);
                 }}
               >
@@ -191,15 +195,53 @@ function ToothpastePost() {
   );
 }
 
+function ToothpastePost() {
+  const os = useOS();
+  return (
+    <AdPost
+      label="sponsored: mint toothpaste"
+      title="the paste that knows you"
+      tagline={os.name("for people who just ran out", "for people like you")}
+      className="post-toothpaste"
+    >
+      <VideoSlot id="toothpaste-ad" className="post-video paste-video" />
+    </AdPost>
+  );
+}
+
+function TripPost() {
+  const os = useOS();
+  return (
+    <AdPost
+      label="sponsored: wander. flights and stays"
+      title="flights + stays for two. just for you."
+      tagline={os.name("for people who just said ‘sure’", "for people like you")}
+      className="post-trip"
+      onGuess={() => os.setFlag("tripDone")}
+    >
+      <div className="poster-trip" />
+    </AdPost>
+  );
+}
+
 export function Loop() {
   const os = useOS();
-  const showAd = os.fired.has("ad");
-  const posts: Post[] = showAd ? [{ id: "ad", kind: "toothpaste" }, ...clips] : clips;
+  const posts: Post[] = [...clips];
+  if (os.fired.has("ad")) posts.unshift({ id: "ad", kind: "toothpaste" });
+  if (os.fired.has("trip")) posts.unshift({ id: "trip", kind: "trip" });
   return (
     <AppShell app="loop" title="loop · just for u">
       <div className="feed" tabIndex={0} aria-label="video feed, scroll for more">
         {posts.map((post) =>
-          post.kind === "clip" ? <ClipPost key={post.id} post={post} /> : post.kind === "gadget" ? <GadgetPost key={post.id} /> : <ToothpastePost key={post.id} />,
+          post.kind === "clip" ? (
+            <ClipPost key={post.id} post={post} />
+          ) : post.kind === "gadget" ? (
+            <GadgetPost key={post.id} />
+          ) : post.kind === "trip" ? (
+            <TripPost key={post.id} />
+          ) : (
+            <ToothpastePost key={post.id} />
+          ),
         )}
         <section className="post post-end">
           <p>you reached the end.</p>

@@ -14,7 +14,7 @@ export type AppId =
   | "settings"
   | "receipts";
 
-export type Flag = "awake" | "notesRead" | "chatReplied" | "adSeen" | "callDone" | "callDeclined" | "night" | "workDone";
+export type Flag = "awake" | "notesRead" | "chatReplied" | "adSeen" | "callDone" | "callDeclined" | "night" | "workDone" | "holidayReplied" | "tripDone";
 
 export type Story = {
   beats: Set<TipId>;
@@ -31,7 +31,8 @@ export type TimelineEvent = {
   /** seconds to wait after `when` first becomes true */
   delay: number;
   when: (s: Story) => boolean;
-  notify?: { app: AppId; title: string; body: string; target?: string };
+  /** `generic` replaces the title in streamer mode */
+  notify?: { app: AppId; title: string; generic?: string; body: string; target?: string };
   call?: true;
   setsFlag?: Flag;
   /** once fired, no other task is sent until this is true */
@@ -100,9 +101,23 @@ export const timeline: TimelineEvent[] = [
     done: (s) => s.flags.has("workDone"),
   },
   {
+    id: "holiday",
+    delay: 3,
+    when: (s) => s.flags.has("workDone"),
+    notify: { app: "chats", title: "angela", generic: "friend", body: "we should go on holiday soon!", target: "angela" },
+    done: (s) => s.flags.has("holidayReplied"),
+  },
+  {
+    id: "trip",
+    delay: 2.5,
+    when: (s) => s.flags.has("holidayReplied"),
+    notify: { app: "loop", title: "sponsored", body: "wander. — flights + stays, just for you", target: "trip" },
+    done: (s) => s.flags.has("tripDone"),
+  },
+  {
     id: "circle",
     delay: 15,
-    when: (s) => s.fired.has("work"),
+    when: (s) => s.fired.has("trip"),
     notify: { app: "circle", title: "family circle", body: "your kid left school · moving" },
     done: (s) => s.beats.has("location"),
   },
