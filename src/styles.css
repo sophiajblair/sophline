@@ -44,6 +44,7 @@
   color: var(--bone);
   background: var(--void);
   font-synthesis: none;
+  font-variant-ligatures: none;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -147,20 +148,20 @@ svg[shape-rendering="crispEdges"],
 }
 .wordmark {
   margin: 0;
-  font-size: 14px;
+  font-size: 16px;
   letter-spacing: 0.04em;
   color: var(--bone);
   text-transform: lowercase;
 }
 .wordmark span {
   display: block;
-  font-size: 10px;
+  font-size: 13px;
   color: var(--fog);
   margin-top: 4px;
 }
 .streamer-toggle {
   font-family: var(--annotation-font);
-  font-size: 11px;
+  font-size: 14px;
   padding: 7px 10px;
   border: 2px solid var(--line);
   background: var(--ink);
@@ -176,7 +177,7 @@ svg[shape-rendering="crispEdges"],
   bottom: 14px;
   margin: 0;
   font-family: var(--annotation-font);
-  font-size: 10px;
+  font-size: 13px;
   color: #3e4b5a;
   z-index: 6;
 }
@@ -196,7 +197,7 @@ svg[shape-rendering="crispEdges"],
   padding: 5px 10px;
   max-width: calc(100vw - 520px);
   font-family: var(--annotation-font);
-  font-size: 13px;
+  font-size: 16px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -303,7 +304,7 @@ svg[shape-rendering="crispEdges"],
   align-items: center;
   justify-content: space-between;
   padding: 0 18px 0 22px;
-  font-size: 13px;
+  font-size: 16px;
   background: linear-gradient(var(--ink), rgba(11, 15, 21, 0));
 }
 .status-icons {
@@ -357,7 +358,7 @@ svg[shape-rendering="crispEdges"],
 }
 .lock-date {
   margin: 10px 0 0;
-  font-size: 13px;
+  font-size: 16px;
   color: var(--fog);
 }
 .lock-time {
@@ -385,13 +386,13 @@ svg[shape-rendering="crispEdges"],
   background: var(--panel);
   border: 2px solid var(--line);
   box-shadow: 3px 3px 0 #000;
-  font-size: 16px;
+  font-size: 18px;
 }
 .note:hover {
   border-color: var(--fog);
 }
 .note-app {
-  font-size: 12px;
+  font-size: 15px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -400,18 +401,18 @@ svg[shape-rendering="crispEdges"],
 }
 .note > span:last-child {
   font-family: var(--body-font);
-  font-size: 16px;
+  font-size: 18px;
   color: #aab3bc;
 }
 .lock-hint {
   margin: auto 0 10px;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--sick);
   text-align: center;
 }
 .unlock {
   padding: 10px 18px;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--sick);
   border: 2px solid var(--sick);
   background: rgba(196, 220, 90, 0.08);
@@ -468,7 +469,7 @@ a.app-icon {
   filter: brightness(1.25);
 }
 .icon-label {
-  font-size: 13px;
+  font-size: 16px;
   color: #aab3bc;
 }
 .badge {
@@ -480,7 +481,7 @@ a.app-icon {
   padding: 0 5px;
   display: grid;
   place-items: center;
-  font-size: 12px;
+  font-size: 15px;
   color: #fff;
   background: var(--warn);
   border: 2px solid var(--outline);
@@ -511,7 +512,7 @@ a.app-icon {
   left: 50%;
   transform: translateX(-50%);
   padding: 1px 5px;
-  font-size: 9px;
+  font-size: 12px;
   color: var(--ink);
   background: var(--sick);
   border: 2px solid var(--outline);
@@ -520,7 +521,7 @@ a.app-icon {
 .home-hint {
   margin: auto 0 4px;
   text-align: center;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--fog);
 }
 .home-hint.is-next {
@@ -557,13 +558,13 @@ a.app-icon {
   text-overflow: ellipsis;
 }
 .note.is-banner .note-app strong {
-  font-size: 14px;
+  font-size: 16px;
   text-transform: none;
   letter-spacing: 0;
   color: var(--bone);
 }
 .note.is-banner > span:last-child {
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.3;
 }
 
@@ -592,16 +593,16 @@ a.app-icon {
   background: var(--panel);
 }
 .app-back {
-  font-size: 13px;
+  font-size: 16px;
   color: var(--sick);
   padding: 4px 2px;
 }
 .app-title {
-  font-size: 14px;
+  font-size: 16px;
 }
 .app-bar-eye {
   color: var(--warn);
-  font-size: 12px;
+  font-size: 15px;
   animation: alert-breathe 3s infinite;
 }
 .app-body {
@@ -620,7 +621,7 @@ a.app-icon {
 }
 .thread-back {
   margin: 8px 12px 0;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--fog);
 }
 .is-light .thread-back {
@@ -628,7 +629,7 @@ a.app-icon {
 }
 .tiny-note {
   margin: 12px 14px;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--fog);
 }
 .pixel-button {
@@ -637,7 +638,7 @@ a.app-icon {
   padding: 10px 12px;
   margin-top: 10px;
   font-family: var(--phone-font);
-  font-size: 14px;
+  font-size: 16px;
   text-align: center;
   color: var(--ink);
   background: var(--bone);
@@ -664,12 +665,12 @@ a.app-icon {
   align-items: center;
 }
 .receipts span {
-  font-size: 10px;
+  font-size: 13px;
   text-transform: uppercase;
   color: var(--fog);
 }
 .receipts a {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--sick);
   text-decoration: none;
   border-bottom: 1px dashed currentColor;
@@ -699,12 +700,12 @@ a.app-icon {
 }
 .list strong {
   display: block;
-  font-size: 14px;
+  font-size: 16px;
 }
 .list small {
   display: block;
   font-family: var(--body-font);
-  font-size: 13px;
+  font-size: 16px;
   color: var(--fog);
 }
 .list.is-light li > button,
@@ -727,7 +728,7 @@ a.app-icon {
   place-items: center;
   width: 36px;
   height: 36px;
-  font-size: 16px;
+  font-size: 18px;
   background: #2b1020;
   color: #ff7aa8;
   border: 2px solid var(--outline);
@@ -755,7 +756,7 @@ a.app-icon {
   margin: 10px 14px 0;
   padding: 7px 10px;
   font-family: var(--body-font);
-  font-size: 11px;
+  font-size: 14px;
   color: #e7c75b;
   background: #221f10;
   border: 1px solid #4a4220;
@@ -773,7 +774,7 @@ a.app-icon {
   margin: 0;
   padding: 8px 11px;
   font-family: var(--body-font);
-  font-size: 15px;
+  font-size: 17px;
   line-height: 1.35;
   border: 2px solid var(--outline);
   box-shadow: 2px 2px 0 #000;
@@ -825,14 +826,14 @@ a.app-icon {
   display: block;
   padding: 9px 12px;
   font-family: var(--body-font);
-  font-size: 12px;
+  font-size: 15px;
   color: #445261;
   border: 2px solid var(--line);
 }
 .quick-reply {
   width: 100%;
   padding: 10px;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--ink);
   background: var(--sick);
   border: 2px solid var(--outline);
@@ -895,7 +896,7 @@ a.app-icon {
   text-align: center;
   padding: 20px;
   color: var(--fog);
-  font-size: 14px;
+  font-size: 16px;
 }
 .post-ai {
   position: absolute;
@@ -903,7 +904,7 @@ a.app-icon {
   left: 12px;
   z-index: 3;
   padding: 3px 7px;
-  font-size: 10px;
+  font-size: 13px;
   color: var(--ink);
   background: var(--sick);
   border: 2px solid var(--outline);
@@ -928,7 +929,7 @@ a.app-icon {
 }
 .post-meta small {
   font-family: var(--body-font);
-  font-size: 12px;
+  font-size: 15px;
   color: #aab3bc;
 }
 .post-rail {
@@ -947,7 +948,7 @@ a.app-icon {
   justify-items: center;
 }
 .post-rail small {
-  font-size: 10px;
+  font-size: 13px;
 }
 .post-rail .is-on {
   color: var(--warn);
@@ -958,7 +959,7 @@ a.app-icon {
   top: 52px;
   z-index: 4;
   padding: 6px 9px;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--ink);
   background: var(--bone);
   border: 2px solid var(--outline);
@@ -969,7 +970,7 @@ a.app-icon {
   z-index: 2;
   margin-top: 12px;
   padding: 10px;
-  font-size: 15px;
+  font-size: 17px;
   color: #fff;
   background: var(--warn);
   border: 2px solid var(--outline);
@@ -980,7 +981,7 @@ a.app-icon {
   bottom: 6px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 11px;
+  font-size: 14px;
   color: var(--fog);
   pointer-events: none;
   animation: nudge-up 1.4s infinite;
@@ -1007,7 +1008,7 @@ a.app-icon {
   margin-top: 12px;
   padding: 9px 10px;
   font-family: var(--body-font);
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.4;
   background: rgba(11, 15, 21, 0.94);
   border: 2px solid var(--sick);
@@ -1015,13 +1016,13 @@ a.app-icon {
 }
 .post-answer strong {
   font-family: var(--phone-font);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 400;
   color: var(--sick);
 }
 .post-answer small {
   font-family: var(--phone-font);
-  font-size: 10px;
+  font-size: 13px;
   color: var(--fog);
   text-transform: uppercase;
 }
@@ -1039,7 +1040,7 @@ a.app-icon {
   position: relative;
   z-index: 2;
   font-family: var(--body-font);
-  font-size: 12px;
+  font-size: 15px;
   color: var(--sick);
   text-align: center;
 }
@@ -1056,12 +1057,12 @@ a.app-icon {
   border-top: 3px solid var(--sick);
 }
 .sheet strong {
-  font-size: 15px;
+  font-size: 17px;
   margin-bottom: 4px;
 }
 .sheet button {
   padding: 9px;
-  font-size: 13px;
+  font-size: 16px;
   border: 2px solid var(--line);
   background: var(--ink);
   text-align: left;
@@ -1092,7 +1093,7 @@ a.app-icon {
   z-index: 2;
   transform: translate(-50%, -50%);
   padding: 8px 12px;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--ink);
   background: var(--sick);
   border: 2px solid var(--outline);
@@ -1104,7 +1105,7 @@ a.app-icon {
   right: 10px;
   transform: none;
   padding: 4px 7px;
-  font-size: 10px;
+  font-size: 13px;
   opacity: 0.8;
 }
 .video-placeholder {
@@ -1123,17 +1124,17 @@ a.app-icon {
   display: grid;
   gap: 2px;
   padding: 7px 9px;
-  font-size: 10px;
+  font-size: 13px;
   background: rgba(5, 7, 10, 0.82);
   border: 1px dashed var(--fog);
   color: var(--fog);
 }
 .video-todo strong {
-  font-size: 12px;
+  font-size: 15px;
   color: var(--bone);
 }
 .video-todo code {
-  font-size: 10px;
+  font-size: 13px;
   color: var(--sick);
 }
 .poster-dither {
@@ -1206,7 +1207,7 @@ a.app-icon {
   right: 10px;
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--bone);
   z-index: 3;
 }
@@ -1220,7 +1221,7 @@ a.app-icon {
   width: 64px;
   height: 116px;
   border: 2px solid var(--warn);
-  font-size: 9px;
+  font-size: 12px;
   color: var(--warn);
   padding: 2px;
   z-index: 3;
@@ -1231,11 +1232,11 @@ a.app-icon {
   padding: 12px 14px;
 }
 .porch-panel strong {
-  font-size: 15px;
+  font-size: 17px;
 }
 .porch-panel small {
   font-family: var(--body-font);
-  font-size: 12px;
+  font-size: 15px;
   color: var(--fog);
 }
 .porch-actions {
@@ -1246,7 +1247,7 @@ a.app-icon {
 }
 .porch-actions button {
   padding: 8px 4px;
-  font-size: 11px;
+  font-size: 14px;
   border: 2px solid var(--line);
   background: var(--panel);
   box-shadow: 2px 2px 0 #000;
@@ -1258,7 +1259,7 @@ a.app-icon {
 .porch-ask {
   grid-column: 1 / -1;
   margin: 0;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--fog);
   text-transform: uppercase;
 }
@@ -1286,14 +1287,14 @@ a.app-icon {
 .porch-result p {
   margin: 0;
   font-family: var(--body-font);
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.4;
   color: #aab3bc;
 }
 .porch-actions .porch-primary {
   grid-column: 1 / -1;
   padding: 14px 8px;
-  font-size: 14px;
+  font-size: 16px;
 }
 .porch-open {
   border-color: var(--sick) !important;
@@ -1308,7 +1309,7 @@ a.app-icon {
 }
 .porch-result-actions .porch-open {
   padding: 6px 8px;
-  font-size: 12px;
+  font-size: 15px;
   border: 2px solid var(--sick);
   background: var(--panel);
 }
@@ -1324,13 +1325,13 @@ a.app-icon {
 .porch-lede {
   margin: 0 0 4px;
   font-family: var(--body-font);
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.4;
   color: #aab3bc;
 }
 .porch-tally {
   margin: 2px 0 0;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--fog);
 }
 .porch-tally.is-done {
@@ -1338,7 +1339,7 @@ a.app-icon {
 }
 .porch-retry {
   justify-self: start;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--fog);
   text-decoration: underline;
 }
@@ -1347,7 +1348,7 @@ a.app-icon {
 .mail-view {
   padding: 12px 14px 18px;
   font-family: var(--body-font);
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.45;
 }
 .mail-view h2 {
@@ -1387,7 +1388,7 @@ a.app-icon {
   display: inline-block;
   margin-left: 4px;
   padding: 0 5px;
-  font-size: 10px;
+  font-size: 13px;
   color: #4b4e57;
   border: 1px solid #a9a394;
   vertical-align: middle;
@@ -1405,12 +1406,12 @@ a.app-icon {
   min-width: 0;
 }
 .mail-meta small {
-  font-size: 12px;
+  font-size: 15px;
   color: #4b4e57;
   word-break: break-all;
 }
 .mail-meta strong {
-  font-size: 13px;
+  font-size: 16px;
 }
 .spot {
   text-align: left;
@@ -1456,17 +1457,17 @@ a.app-icon {
   border-top-color: var(--warn);
 }
 .check-bar small {
-  font-size: 10px;
+  font-size: 13px;
   color: var(--warn);
   text-transform: uppercase;
 }
 .check-bar span {
   font-family: var(--body-font);
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.35;
 }
 .check-bar b {
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 400;
   color: var(--sick);
 }
@@ -1475,7 +1476,7 @@ a.app-icon {
   padding: 12px;
   margin-top: 8px;
   font-family: var(--phone-font);
-  font-size: 15px;
+  font-size: 17px;
   color: #fff;
   background: #2050c8;
   border: 2px solid var(--outline);
@@ -1490,7 +1491,7 @@ a.app-icon {
 }
 .mail-options small {
   font-family: var(--phone-font);
-  font-size: 11px;
+  font-size: 14px;
   color: #4b4e57;
   text-transform: uppercase;
 }
@@ -1501,7 +1502,7 @@ a.app-icon {
   width: 100%;
   padding: 10px;
   font-family: var(--phone-font);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--ink);
   background: #e6e1d2;
   border: 2px solid var(--outline);
@@ -1516,7 +1517,7 @@ a.app-icon {
 }
 .mail-result strong {
   font-family: var(--phone-font);
-  font-size: 16px;
+  font-size: 18px;
 }
 .mail-result p {
   margin: 0;
@@ -1536,7 +1537,7 @@ a.app-icon {
 .mail-retry {
   justify-self: start;
   font-family: var(--phone-font);
-  font-size: 12px;
+  font-size: 15px;
   color: #4b4e57;
   text-decoration: underline;
 }
@@ -1549,7 +1550,7 @@ a.app-icon {
 .red-flags span {
   padding: 3px 7px;
   font-family: var(--phone-font);
-  font-size: 11px;
+  font-size: 14px;
   color: #fff;
   background: var(--warn);
   border: 2px solid var(--outline);
@@ -1557,7 +1558,7 @@ a.app-icon {
 .fake-stamp {
   margin-top: 16px;
   font-family: var(--phone-font);
-  font-size: 11px;
+  font-size: 14px;
   color: #8a1f1f;
   border: 2px dashed #8a1f1f;
   padding: 5px 7px;
@@ -1586,7 +1587,7 @@ a.app-icon {
 }
 .notes-date {
   margin: 0;
-  font-size: 11px;
+  font-size: 14px;
   color: #8a8a8a;
   text-align: center;
 }
@@ -1599,7 +1600,7 @@ a.app-icon {
 .notes-who {
   margin: 0 0 10px;
   font-family: var(--body-font);
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.45;
   color: #333;
 }
@@ -1616,7 +1617,7 @@ a.app-icon {
   text-align: left;
   padding: 9px 0;
   font-family: var(--body-font);
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.35;
   color: #111;
   border-bottom: 1px solid #e4e1d8;
@@ -1628,7 +1629,7 @@ a.app-icon {
   width: 16px;
   height: 16px;
   font-style: normal;
-  font-size: 11px;
+  font-size: 14px;
   color: #fff;
   border: 2px solid #b8860b;
   transform: translateY(2px);
@@ -1644,7 +1645,7 @@ a.app-icon {
   width: 100%;
   margin-top: 16px;
   padding: 11px;
-  font-size: 15px;
+  font-size: 17px;
   color: #fff;
   background: #111;
   border: 2px solid #000;
@@ -1663,12 +1664,12 @@ a.app-icon {
   box-shadow: 3px 3px 0 #000;
 }
 .voicemail small {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--warn);
 }
 .voicemail span {
   font-family: var(--body-font);
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.4;
 }
 .callback {
@@ -1680,7 +1681,7 @@ a.app-icon {
 .callback-status {
   margin: 0 0 10px;
   text-align: center;
-  font-size: 15px;
+  font-size: 17px;
   color: var(--sick);
 }
 
@@ -1699,7 +1700,7 @@ a.app-icon {
 .synthetic-label {
   margin: 0;
   text-align: center;
-  font-size: 10px;
+  font-size: 13px;
   color: var(--ink);
   background: var(--sick);
   padding: 3px;
@@ -1754,7 +1755,7 @@ a.app-icon {
 }
 .call-ringing > p {
   margin: 26px 0 0;
-  font-size: 13px;
+  font-size: 16px;
   color: var(--fog);
 }
 .call-ringing h2 {
@@ -1767,13 +1768,13 @@ a.app-icon {
   max-width: 260px;
   text-align: center;
   font-family: var(--body-font);
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.35;
   color: var(--bone);
 }
 .call-top .call-claim {
   margin: 0;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--fog);
 }
 .call-note {
@@ -1781,7 +1782,7 @@ a.app-icon {
   max-width: 250px;
   text-align: center;
   font-family: var(--body-font);
-  font-size: 11px !important;
+  font-size: 14px !important;
   line-height: 1.4;
 }
 .call-actions {
@@ -1794,7 +1795,7 @@ a.app-icon {
   display: grid;
   justify-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 15px;
 }
 .call-actions span {
   display: grid;
@@ -1826,7 +1827,7 @@ a.app-icon {
   gap: 4px;
 }
 .call-top span {
-  font-size: 12px;
+  font-size: 15px;
   color: var(--fog);
 }
 .call-top strong {
@@ -1846,14 +1847,14 @@ a.app-icon {
   min-height: 110px;
 }
 .caption-card small {
-  font-size: 10px;
+  font-size: 13px;
   color: var(--fog);
   text-transform: uppercase;
 }
 .caption-card p {
   margin: 4px 0 0;
   font-family: var(--body-font);
-  font-size: 15px;
+  font-size: 17px;
   line-height: 1.4;
 }
 .tactics {
@@ -1864,7 +1865,7 @@ a.app-icon {
 }
 .tactics span {
   padding: 3px 7px;
-  font-size: 11px;
+  font-size: 14px;
   color: #fff;
   background: var(--warn);
   border: 2px solid var(--outline);
@@ -1877,7 +1878,7 @@ a.app-icon {
 }
 .choice-buttons button {
   padding: 10px 6px;
-  font-size: 12px;
+  font-size: 15px;
   border: 2px solid var(--line);
   background: var(--panel);
   box-shadow: 2px 2px 0 #000;
@@ -1897,7 +1898,7 @@ a.app-icon {
 }
 .fake-burn {
   margin: 0 0 8px;
-  font-size: 12px;
+  font-size: 15px;
   color: #fff;
   background: var(--warn);
   padding: 2px 8px;
@@ -1921,7 +1922,7 @@ a.app-icon {
 .call-result p {
   margin: 0;
   font-family: var(--body-font);
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.4;
   color: #aab3bc;
 }
@@ -1965,7 +1966,7 @@ a.app-icon {
 .map-place {
   position: absolute;
   padding: 2px 6px;
-  font-size: 11px;
+  font-size: 14px;
   background: var(--panel);
   border: 2px solid var(--line);
 }
@@ -1984,7 +1985,7 @@ a.app-icon {
   margin: -8px 0 0 -8px;
   display: grid;
   place-items: center;
-  font-size: 13px;
+  font-size: 16px;
   color: var(--ink);
   background: #7aa6ff;
   border: 3px solid var(--outline);
@@ -2010,19 +2011,19 @@ a.app-icon {
   box-shadow: 3px 3px 0 #000;
 }
 .map-panel strong {
-  font-size: 15px;
+  font-size: 17px;
 }
 .map-panel span,
 .map-panel small {
   font-family: var(--body-font);
-  font-size: 12px;
+  font-size: 15px;
   color: var(--fog);
 }
 .map-check {
   margin-top: 6px;
   padding: 8px;
   text-align: left;
-  font-size: 13px;
+  font-size: 16px;
   color: var(--sick);
   border: 2px dashed var(--sick);
 }
@@ -2047,7 +2048,7 @@ a.app-icon {
 }
 .viewer-list b {
   display: block;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 400;
   color: var(--bone);
 }
@@ -2055,13 +2056,13 @@ a.app-icon {
   display: block;
   font-style: normal;
   font-family: var(--body-font);
-  font-size: 11px;
+  font-size: 14px;
   color: var(--fog);
 }
 .viewer-list button {
   flex: none;
   padding: 4px 7px;
-  font-size: 11px;
+  font-size: 14px;
   color: #fff;
   background: var(--warn);
   border: 2px solid var(--outline);
@@ -2069,14 +2070,14 @@ a.app-icon {
 }
 .map-status {
   margin: 6px 0 0;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--sick);
 }
 
 /* photos + deepfake */
 .photos-caption {
   margin: 10px 14px;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--fog);
 }
 .photo-grid {
@@ -2171,12 +2172,12 @@ a.app-icon {
   border: 2px solid var(--warn);
 }
 .party-warning strong {
-  font-size: 13px;
+  font-size: 16px;
   color: var(--warn);
 }
 .party-warning small {
   font-family: var(--body-font);
-  font-size: 11px;
+  font-size: 14px;
   color: #aab3bc;
 }
 
@@ -2208,7 +2209,7 @@ a.app-icon {
 .wrapped-kicker,
 .settings-kicker {
   margin: 0;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--fog);
   text-transform: uppercase;
 }
@@ -2233,24 +2234,24 @@ a.app-icon {
 }
 .profile-grid small {
   display: block;
-  font-size: 10px;
+  font-size: 13px;
   color: var(--fog);
   text-transform: uppercase;
 }
 .profile-grid strong {
   font-family: var(--body-font);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
 }
 .joke-label {
   font-family: var(--body-font);
-  font-size: 11px;
+  font-size: 14px;
   color: var(--fog);
 }
 .quiet-turn {
   margin: 18px 0;
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.4;
 }
 .quiet-turn strong {
@@ -2264,7 +2265,7 @@ a.app-icon {
 }
 .wrapped-links .pixel-button {
   margin-top: 0;
-  font-size: 12px;
+  font-size: 15px;
 }
 .customise {
   display: grid;
@@ -2283,7 +2284,7 @@ a.app-icon {
   justify-items: center;
   gap: 4px;
   padding: 6px 2px;
-  font-size: 11px;
+  font-size: 14px;
   background: var(--panel);
   border: 2px solid var(--line);
   box-shadow: 2px 2px 0 #000;
@@ -2314,14 +2315,14 @@ a.app-icon {
   gap: 4px;
 }
 .name-field small {
-  font-size: 10px;
+  font-size: 13px;
   color: var(--fog);
   text-transform: uppercase;
 }
 .name-field input {
   padding: 8px 10px;
   font-family: var(--phone-font);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--bone);
   background: var(--ink);
   border: 2px solid var(--line);
@@ -2417,11 +2418,11 @@ a.app-icon {
 }
 .setting-toggle strong {
   display: block;
-  font-size: 14px;
+  font-size: 16px;
 }
 .setting-toggle small {
   font-family: var(--body-font);
-  font-size: 11px;
+  font-size: 14px;
   color: var(--fog);
 }
 .setting-toggle input {
@@ -2476,28 +2477,28 @@ a.app-icon {
   place-items: center;
   width: 20px;
   height: 20px;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--ink);
   background: var(--sick);
   border: 2px solid var(--outline);
 }
 .guide-list strong {
-  font-size: 14px;
+  font-size: 16px;
 }
 .guide-list p {
   margin: 3px 0 0;
   font-family: var(--body-font);
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.4;
   color: #aab3bc;
 }
 .checked-date {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--fog);
 }
 .sources-count {
   font-family: var(--body-font);
-  font-size: 11px;
+  font-size: 14px;
   color: var(--fog);
 }
 .tag-filter {
@@ -2508,7 +2509,7 @@ a.app-icon {
 }
 .tag-filter button {
   padding: 3px 7px;
-  font-size: 11px;
+  font-size: 14px;
   border: 2px solid var(--line);
   color: var(--fog);
 }
@@ -2538,7 +2539,7 @@ a.app-icon {
 }
 .source-list span {
   flex: none;
-  font-size: 10px;
+  font-size: 13px;
   color: var(--sick);
   width: 26px;
 }
@@ -2548,13 +2549,13 @@ a.app-icon {
 .source-list strong {
   display: block;
   font-family: var(--body-font);
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   line-height: 1.3;
 }
 .source-list small {
   font-family: var(--body-font);
-  font-size: 11px;
+  font-size: 14px;
   color: var(--fog);
 }
 .source-list i {
@@ -2593,7 +2594,7 @@ a.app-icon {
   overflow-y: auto;
   padding: 16px 16px 14px;
   font-family: var(--annotation-font);
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.55;
   color: var(--bone);
   background: rgba(11, 15, 21, 0.96);
@@ -2622,7 +2623,7 @@ a.app-icon {
   width: 26px;
   height: 26px;
   font-family: var(--annotation-font);
-  font-size: 16px;
+  font-size: 18px;
   color: var(--fog);
 }
 .tip-close:hover {
@@ -2630,7 +2631,7 @@ a.app-icon {
 }
 .tip-eyebrow {
   margin: 0;
-  font-size: 10px;
+  font-size: 13px;
   color: var(--warn);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -2645,7 +2646,7 @@ a.app-icon {
 }
 .tip-card h2 {
   margin: 6px 26px 8px 0;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.3;
   font-weight: 700;
   color: var(--sick);
@@ -2663,7 +2664,7 @@ a.app-icon {
   cursor: pointer;
   width: fit-content;
   margin-bottom: 6px;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--fog);
 }
 .tip-more summary:hover,
@@ -2672,24 +2673,24 @@ a.app-icon {
 }
 .tip-next {
   margin: 10px 0 0 !important;
-  font-size: 10px;
+  font-size: 13px;
   color: var(--fog);
 }
 .tip-accuracy {
   padding: 6px 8px;
   border: 1px dashed var(--fog);
   color: #aab3bc;
-  font-size: 11px;
+  font-size: 14px;
 }
 .tip-card .receipts span {
   font-family: var(--annotation-font);
 }
 .tip-card .receipts a {
   font-family: var(--annotation-font);
-  font-size: 11px;
+  font-size: 14px;
 }
 .tip-card.is-overlay {
-  font-size: 11.5px;
+  font-size: 14.5px;
   max-height: 46vh;
 }
 
