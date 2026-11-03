@@ -79,14 +79,16 @@ p {
   font-size: 19px;
   color: var(--fog);
 }
-.about {
+.about-top {
   display: flex;
-  gap: 24px;
+  gap: 20px;
   align-items: flex-start;
+  flex-wrap: wrap;
 }
-.about > div {
+.about-text {
   display: grid;
   gap: 14px;
+  margin-top: 22px;
 }
 .portrait {
   flex: 0 0 220px;
@@ -128,9 +130,6 @@ h3 {
   border: 2px solid var(--line);
 }
 @media (max-width: 560px) {
-  .about {
-    flex-direction: column;
-  }
   .portrait {
     flex-basis: auto;
     width: min(260px, 100%);
@@ -154,27 +153,90 @@ figcaption {
   font-size: 16px;
   color: var(--fog);
 }
-.banner {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: minmax(0, 1fr);
-  gap: 4px;
-  height: clamp(160px, 24vw, 300px);
-  overflow: hidden;
-  background: var(--line);
-  border-bottom: 3px solid var(--sick);
+
+.ig {
+  flex: 1 1 260px;
+  max-width: 320px;
+  border: 2px solid var(--line);
+  background: #0b070a;
+  box-shadow: 5px 5px 0 #000;
 }
-.banner img {
-  width: 100%;
-  height: 100%;
+.ig-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+.ig-head img {
+  width: 40px;
+  height: 40px;
   object-fit: cover;
+  object-position: center 20%;
+  border-radius: 50%;
+  border: 2px solid var(--sick);
 }
-.banner img:nth-child(1) {
-  object-position: center 70%;
+.ig-head strong {
+  font-size: 18px;
 }
-.banner img:nth-child(2) {
-  object-position: center 18%;
+.ig-slides {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  outline-offset: 2px;
 }
-.banner img:nth-child(3) {
-  object-position: center 62%;
+.ig-slides::-webkit-scrollbar {
+  display: none;
+}
+.ig-slides img {
+  flex: 0 0 100%;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  scroll-snap-align: center;
+}
+.ig-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px 0;
+}
+.ig-heart {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sick);
+  font: inherit;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+.ig-dots {
+  position: absolute;
+  left: 50%;
+  display: flex;
+  gap: 6px;
+  transform: translateX(-50%);
+}
+.ig-dots i {
+  width: 7px;
+  height: 7px;
+  background: var(--line);
+}
+.ig-dots i.is-on {
+  background: var(--sick);
+}
+.ig-count {
+  font-size: 15px;
+  color: var(--fog);
+}
+.ig-caption {
+  margin: 0;
+  padding: 6px 12px 12px;
+  font-size: 18px;
+}
+.ig-caption strong {
+  color: var(--sick);
 }
