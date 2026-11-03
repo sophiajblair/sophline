@@ -41,8 +41,9 @@ export function LockScreen({ time, notes, onOpen, onUnlock }: Props) {
       exit={{ opacity: 0, y: -60 }}
       transition={{ duration: 0.35 }}
     >
-      <div className="lock-eye" aria-hidden="true">
-        <WatchingEye px={10} alert={unread.length > 0} />
+      <div className="lock-wall">
+        <p className="lock-wall-title">not your phone.</p>
+        <p className="lock-wall-sub">explore it.</p>
       </div>
       <p className="lock-date">wednesday, 28 october</p>
       <p className="lock-time">{time}</p>
