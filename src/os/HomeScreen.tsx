@@ -3,7 +3,7 @@ import { Pixels } from "../pixel/Pixels";
 import { appMeta, creatorGlyph, creatorMeta, glyphs } from "../pixel/icons";
 import type { AppId } from "../content/timeline";
 
-const order: AppId[] = ["notes", "loop", "chats", "porch", "mail", "phone", "circle", "photos", "mira", "you", "settings", "receipts"];
+const order: AppId[] = ["notes", "loop", "chats", "porch", "mail", "phone", "circle", "photos", "you", "settings", "receipts"];
 
 type Props = {
   badges: Partial<Record<AppId, number>>;

@@ -12,10 +12,10 @@ const body = toSvgPoints(steppedRect(4, 4, PHONE_W - 12, PHONE_H - 14, 52, 4));
 const bezel = toSvgPoints(steppedRect(SCREEN.x - 6, SCREEN.y - 6, SCREEN.w + 12, SCREEN.h + 12, SCREEN.r + 6, 4));
 const screenClip = toClipPath(steppedRect(0, 0, SCREEN.w, SCREEN.h, SCREEN.r, 4));
 
-type Props = { children: React.ReactNode; alert: boolean; night: boolean };
+type Props = { children: React.ReactNode; alert: boolean };
 
 /** Chunky pixel handset. The frame is static; only screen content animates. */
-export const PixelPhone = forwardRef<HTMLDivElement, Props>(function PixelPhone({ children, alert, night }, screenRef) {
+export const PixelPhone = forwardRef<HTMLDivElement, Props>(function PixelPhone({ children, alert }, screenRef) {
   return (
     <div className="pixel-phone">
       <svg className="phone-frame" viewBox={`0 0 ${PHONE_W} ${PHONE_H}`} shapeRendering="crispEdges" aria-hidden="true">
@@ -42,7 +42,7 @@ export const PixelPhone = forwardRef<HTMLDivElement, Props>(function PixelPhone(
       </svg>
       <div
         ref={screenRef}
-        className={`phone-screen${night ? " is-night" : ""}`}
+        className="phone-screen"
         style={{ left: SCREEN.x, top: SCREEN.y, width: SCREEN.w, height: SCREEN.h, clipPath: screenClip }}
       >
         {children}

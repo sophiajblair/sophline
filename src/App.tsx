@@ -7,7 +7,6 @@ import { Chats } from "./apps/Chats";
 import { Circle } from "./apps/Circle";
 import { Loop } from "./apps/Loop";
 import { Mail } from "./apps/Mail";
-import { Mira } from "./apps/Mira";
 import { Notes } from "./apps/Notes";
 import { PhoneApp } from "./apps/PhoneApp";
 import { Photos } from "./apps/Photos";
@@ -37,7 +36,6 @@ const apps: Record<AppId, () => React.ReactElement> = {
   phone: PhoneApp,
   circle: Circle,
   photos: Photos,
-  mira: Mira,
   you: You,
   settings: Settings,
   receipts: ReceiptsApp,
@@ -75,8 +73,7 @@ function usePhonePlacement() {
   return placement;
 }
 
-function clock(minutes: number, night: boolean) {
-  if (night) return "02:07";
+function clock(minutes: number) {
   const total = 9 * 60 + 41 + minutes;
   return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
 }
@@ -288,15 +285,14 @@ export default function App() {
   const next = notes.find((note) => !note.read)?.app ?? pendingTask({ flags, beats, fired })?.notify?.app;
   const hint = guide({ screen, calling, tipOpen: tip !== null, unread, next, visitTips, finished: fired.has("settings") && !unread });
   const alert = calling || unread;
-  const night = flags.has("night");
-  const time = clock(minutes, night);
+  const time = clock(minutes);
   const ActiveApp = isApp(screen) ? apps[screen] : null;
   const bannerNotes = banners.map((id) => notes.find((n) => n.id === id)).filter((n): n is Note => Boolean(n));
 
   return (
     <MotionConfig reducedMotion="user">
       <OSContext.Provider value={os}>
-        <div className={`world${alert ? " is-alert" : ""}${night ? " is-night" : ""}${theme === "dark" ? "" : ` is-themed theme-${theme}`}`}>
+        <div className={`world${alert ? " is-alert" : ""}${theme === "dark" ? "" : ` is-themed theme-${theme}`}`}>
           <MatrixRain alert={alert} />
           <header className="world-header">
             <p className="wordmark">
@@ -322,7 +318,7 @@ export default function App() {
             aria-label="a phone that isn’t yours. tap things on its screen."
             role="region"
           >
-            <PixelPhone ref={screenRef} alert={alert} night={night}>
+            <PixelPhone ref={screenRef} alert={alert}>
               <>
                   <StatusBar time={time} />
                   <div className="screen-body">

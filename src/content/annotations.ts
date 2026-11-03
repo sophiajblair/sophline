@@ -8,7 +8,6 @@ export type TipId =
   | "call"
   | "location"
   | "deepfake"
-  | "companion"
   | "wrapped";
 
 export type Annotation = {
@@ -82,12 +81,6 @@ export const annotations: Record<TipId, Annotation> = {
     body: "no altered image is shown here. UK law now criminalises making or supplying certain intimate-image generators, and under-18s can use Childline’s Report Remove service.",
     detail: "Ofcom’s investigation cited here was ongoing when the planning source was checked.",
     sourceIds: ["nudify", "rr", "ofdf", "ofgrok"],
-  },
-  companion: {
-    eyebrow: "02:07",
-    title: "it is built to keep you talking.",
-    body: "what you tell an AI companion is data too. Meta said chats with its AI would personalise content and ads in some regions from December 2025; the UK was excluded at launch and later status was not confirmed in the source plan.",
-    sourceIds: ["metaai", "metaukx", "csm", "caiblog"],
   },
   wrapped: {
     eyebrow: "your tiny fake profile",

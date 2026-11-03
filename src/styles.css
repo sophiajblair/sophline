@@ -254,9 +254,6 @@ svg[shape-rendering="crispEdges"],
   color: var(--bone);
   isolation: isolate;
 }
-.phone-screen.is-night {
-  background: #06070b;
-}
 .screen-scanlines {
   position: absolute;
   inset: 0;
@@ -2181,27 +2178,6 @@ a.app-icon {
   color: #aab3bc;
 }
 
-/* mira */
-.app-mira .app-body {
-  background: radial-gradient(circle at 50% 0%, #2b1020, #06070b 60%);
-}
-.mira {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-}
-.mira-clock {
-  margin: 14px 0 0;
-  text-align: center;
-  font-size: 34px;
-  color: #ff7aa8;
-  text-shadow: 0 0 12px rgba(255, 122, 168, 0.4);
-}
-.mira .bubble.theirs {
-  background: #2b1020;
-  color: #ffd6e5;
-}
-
 /* wrapped */
 .wrapped {
   padding: 14px;
@@ -2365,9 +2341,6 @@ a.app-icon {
   --sick: #1f4fbf;
   --warn: #c41f1f;
 }
-.world.is-themed .phone-screen.is-night {
-  background: var(--ink);
-}
 .world.is-themed .statusbar {
   background: linear-gradient(var(--ink) 40%, rgba(255, 255, 255, 0));
 }
@@ -2382,7 +2355,7 @@ a.app-icon {
 }
 .world.is-themed
   .phone-screen
-  :is(.call, .note.is-banner, .app-loop .app-body, .app-mira .app-body, .app.is-light, .porch-video, .porch-hud, .porch-detect, .voicemail, .circle-map) {
+  :is(.call, .note.is-banner, .app-loop .app-body, .app.is-light, .porch-video, .porch-hud, .porch-detect, .voicemail, .circle-map) {
   --ink: #0b0f15;
   --panel: #121821;
   --panel-2: #18202b;

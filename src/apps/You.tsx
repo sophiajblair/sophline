@@ -14,7 +14,6 @@ export function You() {
   const os = useOS();
   const [ownerName, setOwnerName] = useState(os.owner);
   const interests = os.interests.length ? os.interests.join(" · ") : "nothing yet (we guessed cats anyway)";
-  const night = os.flags.has("night") || os.beats.has("companion");
   const persuadable = os.flags.has("adSeen") ? "mint packaging" : "things that look urgent";
   const voice =
     os.callOutcome === "sent"
@@ -26,7 +25,6 @@ export function You() {
           : "hasn’t been tested. yet.";
   const rows = [
     { label: "guessed interests", value: interests },
-    { label: "2am mood", value: night ? "awake, apparently" : "unknown (for now)" },
     { label: "most persuadable by", value: persuadable },
     { label: "voice-trust score", value: voice },
   ];

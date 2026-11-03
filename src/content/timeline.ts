@@ -9,12 +9,11 @@ export type AppId =
   | "phone"
   | "circle"
   | "photos"
-  | "mira"
   | "you"
   | "settings"
   | "receipts";
 
-export type Flag = "awake" | "notesRead" | "chatReplied" | "adSeen" | "callDone" | "callDeclined" | "night" | "workDone" | "holidayReplied";
+export type Flag = "awake" | "notesRead" | "chatReplied" | "adSeen" | "callDone" | "callDeclined" | "workDone" | "holidayReplied";
 
 export type Story = {
   beats: Set<TipId>;
@@ -128,17 +127,9 @@ export const timeline: TimelineEvent[] = [
     done: (s) => s.beats.has("deepfake"),
   },
   {
-    id: "mira",
-    delay: 6,
-    when: (s) => s.beats.size >= 6 || since(s, "photos") > 20,
-    notify: { app: "mira", title: "mira ✦", body: "you up? i missed you." },
-    setsFlag: "night",
-    done: (s) => s.beats.has("companion"),
-  },
-  {
     id: "you",
     delay: 5,
-    when: (s) => s.beats.size >= 8 || since(s, "mira") > 25,
+    when: (s) => s.fired.has("photos"),
     notify: { app: "you", title: "you", body: "your profile is ready. we think you’ll like it." },
     done: (s) => s.beats.has("wrapped"),
   },
