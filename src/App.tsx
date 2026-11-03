@@ -20,6 +20,7 @@ import { OSContext, type CallOutcome, type Note, type OSApi, type PhoneTheme } f
 import { guide } from "./os/guide";
 import { HomeScreen } from "./os/HomeScreen";
 import { useCetClock } from "./os/cet";
+import { ding, setSoundEnabled, unlockAudio } from "./os/sound";
 import { LockScreen } from "./os/LockScreen";
 import { StatusBar } from "./os/StatusBar";
 import { TipLayer, type Tip } from "./os/TipLayer";
@@ -90,6 +91,7 @@ export default function App() {
   const [callOutcome, setCallOutcome] = useState<CallOutcome | null>(null);
   const [tip, setTip] = useState<Tip | null>(null);
   const [streamer, setStreamer] = useState(false);
+  const [sound, setSound] = useState(true);
   const [interests, setInterests] = useState<string[]>([]);
   const [glow, setGlow] = useState(0);
   const [nudge, setNudge] = useState(0);
@@ -119,6 +121,7 @@ export default function App() {
     setNotes((prev) => [...prev, { ...note, read: false }]);
     setAnnouncement(`new notification from ${appMeta[note.app].label}: ${note.title}, ${note.body}`);
     setGlow((n) => n + 1);
+    ding();
     const current = live.current.screen;
     if (current !== "lock") {
       setBanners((prev) => [...prev, note.id]);
@@ -176,6 +179,7 @@ export default function App() {
   useEffect(() => {
     const onInput = () => {
       lastInput.current = elapsed();
+      unlockAudio();
     };
     window.addEventListener("pointerdown", onInput);
     window.addEventListener("keydown", onInput);
@@ -292,9 +296,21 @@ export default function App() {
             <p className="wordmark">
               for you, forever<span>a phone that isn’t yours</span>
             </p>
-            <button className={`streamer-toggle${streamer ? " is-on" : ""}`} aria-pressed={streamer} onClick={() => setStreamer(!streamer)}>
-              streamer mode {streamer ? "on" : "off"}
-            </button>
+            <div className="world-toggles">
+              <button
+                className={`streamer-toggle${sound ? " is-on" : ""}`}
+                aria-pressed={sound}
+                onClick={() => {
+                  setSound(!sound);
+                  setSoundEnabled(!sound);
+                }}
+              >
+                sound {sound ? "on" : "off"}
+              </button>
+              <button className={`streamer-toggle${streamer ? " is-on" : ""}`} aria-pressed={streamer} onClick={() => setStreamer(!streamer)}>
+                streamer mode {streamer ? "on" : "off"}
+              </button>
+            </div>
           </header>
           <p className="ambient ambient-left" aria-hidden="true">
             nothing leaves this browser · no analytics · no cookies

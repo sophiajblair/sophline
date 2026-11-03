@@ -159,6 +159,11 @@ svg[shape-rendering="crispEdges"],
   color: var(--fog);
   margin-top: 4px;
 }
+.world-toggles {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
 .streamer-toggle {
   font-family: var(--annotation-font);
   font-size: 14px;
@@ -207,7 +212,7 @@ svg[shape-rendering="crispEdges"],
   box-shadow: 3px 3px 0 #000;
 }
 @media (max-width: 639px) {
-  .world-header,
+  .world-header .wordmark,
   .ambient,
   .guide-line {
     display: none;
