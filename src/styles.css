@@ -1154,196 +1154,124 @@ a.app-icon {
     repeating-conic-gradient(rgba(255, 255, 255, 0.05) 0 25%, transparent 0 50%) 0 0 / 4px 4px;
 }
 
-/* porch */
-.porch-video {
-  position: relative;
-  height: 300px;
-  border-bottom: 2px solid var(--line);
-}
-.porch-scene {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(#1a2229 0 62%, #222a22 62%),
-    var(--ink);
-  filter: saturate(0.4);
-}
-.porch-door {
-  position: absolute;
-  left: 50%;
-  top: 22%;
-  width: 70px;
-  height: 120px;
-  margin-left: -35px;
-  background: #3a2a1c;
-  border: 3px solid var(--outline);
-}
-.porch-lamp {
-  position: absolute;
-  left: calc(50% + 50px);
-  top: 26%;
-  width: 10px;
-  height: 14px;
-  background: #e7c75b;
-  box-shadow: 0 0 30px 10px rgba(231, 199, 91, 0.25);
-}
-.porch-person {
-  position: absolute;
-  left: 30%;
-  top: 36%;
-  width: 34px;
-  height: 90px;
-  background: #0a0c10;
-  clip-path: polygon(30% 0, 70% 0, 70% 22%, 100% 30%, 100% 100%, 0 100%, 0 30%, 30% 22%);
-  animation: lurk 6s ease-in-out infinite;
-}
-@keyframes lurk {
-  50% {
-    transform: translateX(16px);
-  }
-}
-.porch-hud {
-  position: absolute;
-  top: 8px;
-  left: 10px;
-  right: 10px;
+/* study buddy */
+.study-chat {
   display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: var(--bone);
-  z-index: 3;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
 }
-.rec {
-  color: var(--warn);
+.study-saved {
+  align-self: center;
+  margin: 2px 0 0;
+  padding: 5px 10px;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--sick);
+  border: 2px solid var(--outline);
 }
-.porch-detect {
-  position: absolute;
-  left: calc(30% - 10px);
-  top: 115px;
-  width: 64px;
-  height: 116px;
-  border: 2px solid var(--warn);
-  font-size: 12px;
-  color: var(--warn);
-  padding: 2px;
-  z-index: 3;
-}
-.porch-panel {
+.study-panel {
   display: grid;
   gap: 4px;
-  padding: 12px 14px;
+  padding: 4px 14px 14px;
 }
-.porch-panel strong {
-  font-size: 17px;
+.study-panel > strong {
+  font-size: 18px;
 }
-.porch-panel small {
+.study-panel > small {
   font-family: var(--body-font);
   font-size: 15px;
   color: var(--fog);
 }
-.porch-actions {
+.study-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
   margin-top: 8px;
 }
-.porch-actions button {
+.study-actions button {
   padding: 8px 4px;
   font-size: 14px;
   border: 2px solid var(--line);
   background: var(--panel);
   box-shadow: 2px 2px 0 #000;
 }
-.porch-actions .is-on {
-  border-color: var(--sick);
+.study-actions .study-primary {
+  grid-column: 1 / -1;
+  padding: 14px 8px;
+  font-size: 16px;
+}
+.study-open {
+  border-color: var(--sick) !important;
   color: var(--sick);
 }
-.porch-ask {
+.study-ask {
   grid-column: 1 / -1;
   margin: 0;
   font-size: 14px;
   color: var(--fog);
   text-transform: uppercase;
 }
-.porch-result {
+.study-result {
   display: grid;
   gap: 4px;
   margin-top: 8px;
   padding: 10px 12px;
   background: var(--panel-2);
-  border: 2px solid var(--line);
+  border: 2px solid var(--warn);
   box-shadow: 3px 3px 0 #000;
 }
-.porch-result.is-won {
-  border-color: var(--sick);
-}
-.porch-result.is-lost {
-  border-color: var(--warn);
-}
-.porch-result.is-won strong {
-  color: var(--sick);
-}
-.porch-result.is-lost strong {
+.study-result > strong {
   color: var(--warn);
 }
-.porch-result p {
+.study-result p {
   margin: 0;
   font-family: var(--body-font);
   font-size: 15px;
   line-height: 1.4;
   color: #aab3bc;
 }
-.porch-actions .porch-primary {
-  grid-column: 1 / -1;
-  padding: 14px 8px;
-  font-size: 16px;
-}
-.porch-open {
-  border-color: var(--sick) !important;
-  color: var(--sick);
-}
-.porch-result-actions {
+.study-result-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
   margin-top: 4px;
 }
-.porch-result-actions .porch-open {
+.study-result-actions .study-open {
   padding: 6px 8px;
-  font-size: 15px;
+  font-size: 14px;
   border: 2px solid var(--sick);
   background: var(--panel);
 }
-.porch-settings {
+.study-retry {
+  font-size: 14px;
+  color: var(--fog);
+  text-decoration: underline;
+}
+.study-settings {
   display: grid;
   gap: 8px;
   padding: 12px 14px 18px;
 }
-.porch-settings h2 {
+.study-settings h2 {
   margin: 4px 0 0;
-  font-size: 18px;
+  font-size: 20px;
 }
-.porch-lede {
+.study-lede {
   margin: 0 0 4px;
   font-family: var(--body-font);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.4;
   color: #aab3bc;
 }
-.porch-tally {
+.study-tally {
   margin: 2px 0 0;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--fog);
 }
-.porch-tally.is-done {
+.study-tally.is-done {
   color: var(--sick);
-}
-.porch-retry {
-  justify-self: start;
-  font-size: 15px;
-  color: var(--fog);
-  text-decoration: underline;
 }
 
 /* mail */
@@ -2368,12 +2296,12 @@ a.app-icon {
 .world.is-themed .lock-time {
   text-shadow: 3px 3px 0 var(--line);
 }
-.world.is-themed :is(.note:not(.is-banner) > span:last-child, .icon-label, .porch-result p, .guide-list p, .composer-fake) {
+.world.is-themed :is(.note:not(.is-banner) > span:last-child, .icon-label, .study-result p, .guide-list p, .composer-fake) {
   color: var(--fog);
 }
 .world.is-themed
   .phone-screen
-  :is(.call, .note.is-banner, .app-loop .app-body, .app.is-light, .porch-video, .porch-hud, .porch-detect, .voicemail, .circle-map) {
+  :is(.call, .note.is-banner, .app-loop .app-body, .app.is-light, .voicemail, .circle-map) {
   --ink: #0b0f15;
   --panel: #121821;
   --panel-2: #18202b;

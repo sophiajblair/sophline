@@ -4,7 +4,7 @@ export type AppId =
   | "notes"
   | "loop"
   | "chats"
-  | "porch"
+  | "study"
   | "mail"
   | "phone"
   | "circle"
@@ -71,16 +71,16 @@ export const timeline: TimelineEvent[] = [
     done: (s) => s.beats.has("toothpaste"),
   },
   {
-    id: "porch",
+    id: "study",
     delay: 2.6,
     when: (s) => s.fired.has("chat"),
-    notify: { app: "porch", title: "front door", body: "person detected · live now" },
-    done: (s) => s.beats.has("doorbell"),
+    notify: { app: "study", title: "study buddy ✎", body: "your homework helper sent a message" },
+    done: (s) => s.beats.has("study"),
   },
   {
     id: "holiday",
     delay: 2.6,
-    when: (s) => s.beats.has("doorbell") || since(s, "porch") > 40,
+    when: (s) => s.beats.has("study") || since(s, "study") > 40,
     notify: { app: "chats", title: "angela", body: "we should go on holiday soon!", target: "angela" },
     done: (s) => s.flags.has("holidayReplied"),
   },

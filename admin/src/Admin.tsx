@@ -455,7 +455,7 @@ function Workspace({ session, onExpired }: { session: SessionInfo; onExpired: ()
       <section className="panel" aria-labelledby="ask-title">
         <h2 id="ask-title">describe a change</h2>
         <label htmlFor="prompt" className="muted">
-          plain english. e.g. “make the doorbell tooltip title shorter” or “add this source to the phishing tooltip: …”
+          plain english. e.g. “make the study buddy tooltip title shorter” or “add this source to the phishing tooltip: …”
         </label>
         <textarea id="prompt" rows={5} value={prompt} maxLength={4000} onChange={(e) => setPrompt(e.target.value)} disabled={busy || !session.canChange} />
         <div className="row">

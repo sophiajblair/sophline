@@ -4,7 +4,7 @@
  *   npm run build && npm run admin:mock
  *   open http://localhost:8787/admin   (password: local-mock-password)
  *
- * Prompts containing "doorbell" edit the doorbell tooltip; "break" makes the build check fail;
+ * Prompts containing "study" edit the study buddy tooltip; "break" makes the build check fail;
  * "package.json" asks for a forbidden file; "nothing" returns no changes. Anything else edits the feed tooltip.
  */
 import { createHash, randomBytes } from "node:crypto";
@@ -267,16 +267,16 @@ function replyFor(request: string, files: string): MockReply {
       changes: [{ path: "package.json", action: "edit", edits: [{ find: '"private": true', replace: '"private": false' }], content: "" }],
     };
   }
-  if (/doorbell/i.test(request)) {
+  if (/study/i.test(request)) {
     return {
-      summary: "shortens the doorbell tooltip title.",
-      commit_message: "Shorten the doorbell tooltip title",
+      summary: "shortens the study buddy tooltip title.",
+      commit_message: "Shorten the study buddy tooltip title",
       notes: "",
       changes: [
         {
           path: "src/content/annotations.ts",
           action: "edit",
-          edits: [{ find: 'title: "not ‘sold’. worse in some ways: it’s all in-house.",', replace: 'title: "not ‘sold’. still all in-house.",' }],
+          edits: [{ find: 'title: "it answered the maths. it kept the feeling.",', replace: 'title: "it kept the feeling.",' }],
           content: "",
         },
       ],

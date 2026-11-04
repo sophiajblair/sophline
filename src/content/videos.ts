@@ -57,16 +57,6 @@ export const videos: VideoSlot[] = [
     webmPath: "videos/feed-motivational-ceo.webm",
   },
   {
-    id: "doorbell-porch",
-    scene: "Doorbell notification",
-    label: "front-door camera",
-    intendedContent: "A staged porch clip with a consenting performer or an empty porch. Avoid faces of passers-by and real addresses.",
-    suggestedLength: "5–8 seconds, seamless loop",
-    aspectRatio: "16:9",
-    filePath: "videos/doorbell-porch.mp4",
-    webmPath: "videos/doorbell-porch.webm",
-  },
-  {
     id: "ai-gadget-ad",
     scene: "Ben of the Week interlude",
     label: "fictional AI gadget ad",

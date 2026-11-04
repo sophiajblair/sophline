@@ -10,7 +10,7 @@ import { Mail } from "./apps/Mail";
 import { Notes } from "./apps/Notes";
 import { PhoneApp } from "./apps/PhoneApp";
 import { Photos } from "./apps/Photos";
-import { Porch } from "./apps/Porch";
+import { Study } from "./apps/Study";
 import { ReceiptsApp } from "./apps/ReceiptsApp";
 import { Settings } from "./apps/Settings";
 import { You } from "./apps/You";
@@ -33,7 +33,7 @@ const apps: Record<AppId, () => React.ReactElement> = {
   notes: Notes,
   loop: Loop,
   chats: Chats,
-  porch: Porch,
+  study: Study,
   mail: Mail,
   phone: PhoneApp,
   circle: Circle,

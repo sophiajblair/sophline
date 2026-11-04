@@ -4,4 +4,4 @@ Add Hannah’s licensed `.mp4` or `.webm` files here using the exact basenames d
 
 Supplied so far (each max 8 seconds, muted, with a `-poster.jpg`): `toothpaste-ad`, `booking-ad`, `feed-cat-opera`, `feed-flooded-kitchen`.
 
-Still waiting: `feed-motivational-ceo`, `doorbell-porch` and `ai-gadget-ad`.
+Still waiting: `feed-motivational-ceo` and `ai-gadget-ad`.

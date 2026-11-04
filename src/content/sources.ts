@@ -9,22 +9,6 @@ export type Source = {
 };
 
 export const sources: Source[] = [
-  { id: "ftc", title: "FTC says Ring employees illegally surveilled customers", site: "ftc.gov", date: "31 May 2023", href: "https://www.ftc.gov/news-events/news/press-releases/2023/05/ftc-says-ring-employees-illegally-surveilled-customers-failed-stop-hackers-taking-control-users", tag: "doorbell", extractOnly: true },
-  { id: "ftcc", title: "FTC complaint against Ring", site: "ftc.gov", href: "https://www.ftc.gov/system/files/ftc_gov/pdf/complaint_ring.pdf", tag: "doorbell", extractOnly: true },
-  { id: "ringpn", title: "Ring Privacy Notice", site: "ring.com", date: "updated 5 June 2026", href: "https://ring.com/privacy-notice", tag: "doorbell" },
-  { id: "rfa", title: "Ring sunsets Request for Assistance", site: "blog.ring.com", date: "24 Jan 2024", href: "https://blog.ring.com/about-ring/ring-announces-new-neighbors-app-features-sunsets-request-for-assistance-post/", tag: "doorbell" },
-  { id: "axon", title: "Ring announces plans to work with Axon", site: "blog.ring.com", date: "22 Apr 2025", href: "https://blog.ring.com/about-ring/ring-announces-plans-to-work-with-axon-to-bring-community-request-service-to-the-neighbors-app/", tag: "doorbell", extractOnly: true },
-  { id: "cr", title: "Ring launches Community Requests", site: "blog.ring.com", date: "4 Sep 2025", href: "https://blog.ring.com/about-ring/ring-launches-community-requests-a-new-way-to-help-your-community/", tag: "doorbell", extractOnly: true },
-  { id: "nbc", title: "Amazon no longer working with Flock after Super Bowl ad backlash", site: "nbcnews.com", date: "12 Feb 2026", href: "https://www.nbcnews.com/news/us-news/amazon-no-longer-working-police-tech-flock-safety-super-bowl-ad-rcna258855", tag: "doorbell", extractOnly: true },
-  { id: "flock", title: "Ring and Flock cancel partnership", site: "blog.ring.com", date: "12 Feb 2026", href: "https://blog.ring.com/about-ring/ring-and-flock-cancel-partnership/", tag: "doorbell", extractOnly: true },
-  { id: "verge", title: "Ring’s lost dog ad sparks surveillance backlash", site: "theverge.com", date: "Feb 2026", href: "https://www.theverge.com/tech/876866/ring-search-party-super-bowl-ad-online-backlash", tag: "doorbell", extractOnly: true },
-  { id: "sp", title: "Ring Help: Search Party", site: "ring.com", href: "https://ring.com/support/articles/pkhj7/search-party", tag: "doorbell" },
-  { id: "ff", title: "Ring Help: Familiar Faces", site: "ring.com", href: "https://ring.com/support/articles/z3yhg/familiar-faces", tag: "doorbell", extractOnly: true },
-  { id: "markey", title: "Amazon’s reply to Sen. Markey on Familiar Faces", site: "markey.senate.gov", date: "21 Nov 2025", href: "https://www.markey.senate.gov/imo/media/doc/amazon_markey_response_ring_frt_november_2025.pdf", tag: "doorbell", extractOnly: true },
-  { id: "ffsuit", title: "Ring sued over facial recognition feature", site: "reuters.com", date: "2 Jun 2026", href: "https://www.reuters.com/legal/government/amazons-ring-sued-over-facial-recognition-feature-latest-privacy-concern-2026-06-02/", tag: "doorbell", extractOnly: true },
-  { id: "eff", title: "Ring doorbell app packed with third-party trackers", site: "eff.org", date: "Jan 2020", href: "https://www.eff.org/deeplinks/2020/01/ring-doorbell-app-packed-third-party-trackers", tag: "doorbell", extractOnly: true },
-  { id: "ap22", title: "Amazon handed Ring footage to police without user consent", site: "apnews.com", date: "Jul 2022", href: "https://apnews.com/article/technology-edward-markey-congress-government-and-politics-244f59188ee3414495452c955c11b89b", tag: "doorbell", extractOnly: true },
-  { id: "icocctv", title: "ICO: Home CCTV systems", site: "ico.org.uk", href: "https://ico.org.uk/for-the-public/home-cctv-systems/", tag: "doorbell" },
   { id: "wapq", title: "WhatsApp: Answering your privacy questions", site: "whatsapp.com", href: "https://www.whatsapp.com/privacyquestions", tag: "messages & ads" },
   { id: "wae2e", title: "WhatsApp Help: About end-to-end encryption", site: "faq.whatsapp.com", href: "https://faq.whatsapp.com/820124435853543", tag: "messages & ads" },
   { id: "waads", title: "WhatsApp Ads: advertising built with privacy in mind", site: "whatsappbusiness.com", href: "https://whatsappbusiness.com/whatsapp-ads/privacy/", tag: "messages & ads" },

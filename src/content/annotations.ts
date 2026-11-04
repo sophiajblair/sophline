@@ -1,7 +1,7 @@
 export type TipId =
   | "feed"
   | "ben"
-  | "doorbell"
+  | "study"
   | "toothpaste"
   | "holiday"
   | "phishing"
@@ -33,12 +33,12 @@ export const annotations: Record<TipId, Annotation> = {
     body: "BENOFTHEWEEK tested products advertised with AI-made ads, so you do not have to. the source plan only verified the video metadata, chapters and auto-captions, so this site does not make claims about product safety.",
     sourceIds: ["ben", "bbg"],
   },
-  doorbell: {
-    eyebrow: "who can see the porch?",
-    title: "not ‘sold’. worse in some ways: it’s all in-house.",
-    body: "this clip is stored on servers owned by amazon, because amazon owns ring. ring says it doesn’t sell your personal information. the real questions are who can watch it, what it trains, and who can ask for it.",
-    detail: "in 2023, the FTC said overly broad employee and contractor access enabled serious privacy violations. US events and UK rules are labelled separately in the receipts.",
-    sourceIds: ["ringpn", "ftc", "ftcc", "ap22", "icocctv", "sp"],
+  study: {
+    eyebrow: "who is the homework helper telling?",
+    title: "it answered the maths. it kept the feeling.",
+    body: "AI tutors and homework chatbots are moving into schools, and 2026 reporting has questioned them, including an investigation that found faulty lesson plans and unhappy students. a chat is also data: what a child says about how they feel, and who can see it, is worth checking before they use one.",
+    detail: "this is a made-up app. none of its settings come from a real product, and we are not saying any real homework helper does this.",
+    sourceIds: ["alphacnn", "alpha404", "alphawbur"],
   },
   toothpaste: {
     eyebrow: "it didn’t need to listen",
@@ -92,7 +92,7 @@ export const annotations: Record<TipId, Annotation> = {
 
 export const guide = [
   { title: "feed", copy: "use ‘not interested’, keyword filters and AI-content topic controls where available.", ids: ["ttai", "ttads"] },
-  { title: "doorbell", copy: "limit audio and capture, delete old footage, check Search Party and encryption settings.", ids: ["sp", "ff", "icocctv"] },
+  { title: "homework bots", copy: "before a child uses an AI study helper, check what it saves: chat history, voice and mood notes. ask who can see it.", ids: ["alphacnn", "alpha404"] },
   { title: "messages", copy: "keep accounts unlinked if you do not want activity combined. business and AI chats differ from personal chats.", ids: ["wapq", "wae2e"] },
   { title: "scams", copy: "forward suspicious email to report@phishing.gov.uk, texts to 7726, and call back on a number you trust.", ids: ["govphish", "which"] },
   { title: "family safe word", copy: "agree a phrase offline. never share it digitally. use it and the call-back rule together.", ids: ["starling", "starlingsp", "ic3psa"] },

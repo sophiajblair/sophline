@@ -44,7 +44,6 @@ The single manifest is [`src/content/videos.ts`](src/content/videos.ts). It reco
 | `feed-cat-opera` | obviously synthetic cat opera | 6–10s, 9:16 |
 | `feed-flooded-kitchen` | impossible flooded/jelly kitchen | 6–10s, 9:16 |
 | `feed-motivational-ceo` | fictional synthetic hustle guru | 6–10s, 9:16 |
-| `doorbell-porch` | staged porch with consenting performer, or empty | 5–8s, 16:9 |
 | `ai-gadget-ad` | original ad for the fictional Everything Gadget | 6–10s, 9:16 |
 | `toothpaste-ad` | **supplied** (`toothpaste-ad.mp4` + `toothpaste-ad-poster.jpg`): the sponsored ad after “we need toothpaste” | 8s, 9:16 |
 
@@ -56,7 +55,7 @@ Recommended delivery:
 
 - H.264 MP4 (`yuv420p`, no audio) and/or VP9 WebM
 - muted-autoplay friendly, with no essential spoken information
-- 1080×1920 for vertical slots; 1280×720 for the porch slot
+- 1080×1920 for vertical slots
 - seamless loop, ideally under 2 MB per clip and no more than 4 MB
 - captions burned in when needed, with enough safe area for the overlaid UI
 
@@ -174,7 +173,7 @@ npm run build
 npm run admin:mock
 ```
 
-Open <http://localhost:8787/admin> and log in with the password `local-mock-password`. The script starts fake GitHub and Anthropic APIs in memory, so no real keys are used and nothing leaves your machine. Prompts that contain `doorbell`, `package.json` or `nothing` try the other paths. A prompt with `hint` returns a broken change first (a prop passed to `LockScreen` that its `Props` don't declare), and then a working fix when it is shown the build errors. A prompt with `break` stays broken through both fixes, and one with `stall` gets a check that never finishes. Run `node scripts/admin-check.mjs` to run the same check as the Action locally.
+Open <http://localhost:8787/admin> and log in with the password `local-mock-password`. The script starts fake GitHub and Anthropic APIs in memory, so no real keys are used and nothing leaves your machine. Prompts that contain `study`, `package.json` or `nothing` try the other paths. A prompt with `hint` returns a broken change first (a prop passed to `LockScreen` that its `Props` don't declare), and then a working fix when it is shown the build errors. A prompt with `break` stays broken through both fixes, and one with `stall` gets a check that never finishes. Run `node scripts/admin-check.mjs` to run the same check as the Action locally.
 
 ## Content notes
 
