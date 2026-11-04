@@ -1595,6 +1595,81 @@ a.app-icon {
   box-shadow: 3px 3px 0 #b8860b;
 }
 
+.my-notes {
+  margin-top: 26px;
+}
+.notes-hint {
+  margin: 0 0 10px;
+  font-family: var(--body-font);
+  font-size: 17px;
+  line-height: 1.4;
+  color: #444;
+}
+.note-form {
+  display: grid;
+  gap: 8px;
+}
+.note-form textarea {
+  width: 100%;
+  padding: 10px;
+  font-family: var(--body-font);
+  font-size: 19px;
+  line-height: 1.35;
+  color: #111;
+  background: #fffbea;
+  border: 2px solid #b8860b;
+  resize: none;
+}
+.note-add {
+  padding: 12px;
+  font-size: 18px;
+  color: #fff;
+  background: #b8860b;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0 #000;
+}
+.note-add:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+}
+.my-note-list {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.my-note-list li {
+  position: relative;
+  padding: 10px 40px 10px 12px;
+  background: #fff3b8;
+  border: 2px solid #e7c75b;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.25);
+}
+.my-note-list p {
+  margin: 0;
+  font-family: var(--body-font);
+  font-size: 19px;
+  line-height: 1.35;
+  color: #111;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.my-note-list small {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+  color: #8a6d00;
+}
+.my-note-list button {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  padding: 2px 8px;
+  font-size: 22px;
+  color: #8a6d00;
+}
+
 /* phone app */
 .voicemail {
   display: grid;

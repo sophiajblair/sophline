@@ -168,13 +168,13 @@ export function TipLayer({ tip, phoneRef, onClose }: Props) {
               ×
             </button>
             <p className="tip-eyebrow">
-              <span className="tip-flag">red flag</span> {annotation.eyebrow}
+              <span className="tip-flag">real case</span> {annotation.eyebrow}
             </p>
             <h2>{annotation.title}</h2>
             <p>{annotation.body}</p>
             {(annotation.detail || annotation.accuracy) && (
               <details className="tip-more">
-                <summary>{annotation.accuracy ? "more + accuracy note" : "more"}</summary>
+                <summary>{annotation.accuracy ? "what this means here + accuracy note" : "what this means here"}</summary>
                 {annotation.detail && <p className="tip-detail">{annotation.detail}</p>}
                 {annotation.accuracy && (
                   <p className="tip-accuracy">

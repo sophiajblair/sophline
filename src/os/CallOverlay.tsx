@@ -152,7 +152,7 @@ export function CallOverlay({ onDone }: Props) {
           <h2>{result[phase].title}</h2>
           <p>{result[phase].copy}</p>
           <button className="pixel-button" onClick={(event) => os.tip("call", event.currentTarget)}>
-            what just happened? ↗
+            see the real case ↗
           </button>
           <button className="pixel-button is-ghost" onClick={() => onDone(phase)}>
             put the phone down
