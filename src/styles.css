@@ -1585,26 +1585,36 @@ a.app-icon {
   outline-color: #111;
 }
 .notes-page {
-  padding: 14px 16px 18px;
+  padding: 14px 16px 20px;
 }
 .notes-date {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   color: #8a8a8a;
   text-align: center;
 }
 .notes-page h2 {
-  margin: 12px 0 4px;
-  font-size: 26px;
+  margin: 14px 0 8px;
+  font-size: 30px;
+  line-height: 1.15;
   font-weight: 700;
   color: #000;
 }
 .notes-who {
-  margin: 0 0 10px;
+  margin: 0 0 16px;
   font-family: var(--body-font);
-  font-size: 16px;
+  font-size: 19px;
   line-height: 1.45;
-  color: #333;
+  color: #222;
+}
+.notes-how {
+  margin: 0 0 4px;
+  padding-top: 12px;
+  font-size: 20px;
+  color: #b8860b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-top: 2px solid #e4e1d8;
 }
 .notes-list {
   list-style: none;
@@ -1613,13 +1623,14 @@ a.app-icon {
 }
 .notes-list button {
   display: flex;
-  gap: 10px;
-  align-items: baseline;
+  gap: 12px;
+  align-items: flex-start;
   width: 100%;
   text-align: left;
-  padding: 9px 0;
+  padding: 12px 0;
   font-family: var(--body-font);
-  font-size: 16px;
+  font-size: 20px;
+  font-weight: 600;
   line-height: 1.35;
   color: #111;
   border-bottom: 1px solid #e4e1d8;
@@ -1628,15 +1639,17 @@ a.app-icon {
   flex: none;
   display: grid;
   place-items: center;
-  width: 16px;
-  height: 16px;
+  width: 30px;
+  height: 30px;
+  font-family: var(--phone-font);
   font-style: normal;
-  font-size: 14px;
-  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  color: #b8860b;
   border: 2px solid #b8860b;
-  transform: translateY(2px);
 }
 .notes-list .is-on i {
+  color: #fff;
   background: #b8860b;
 }
 .notes-list .is-on span {
@@ -1645,9 +1658,9 @@ a.app-icon {
 }
 .notes-start {
   width: 100%;
-  margin-top: 16px;
-  padding: 11px;
-  font-size: 17px;
+  margin-top: 18px;
+  padding: 14px;
+  font-size: 20px;
   color: #fff;
   background: #111;
   border: 2px solid #000;
