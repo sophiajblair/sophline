@@ -35,15 +35,15 @@ erDiagram
 
 | Technique | Purpose | Result |
 |---|---|---|
-| Welch t-test | Superhost price premium | ≈ +9% (65 vs 60 € median), p < 0.001 |
-| ANOVA + Kruskal-Wallis | Price by room type | Medians: entire home 75 €, hotel 69 €, private 40 €, shared 24.5 €; p ≈ 0 |
+| Welch t-test | Superhost price premium | ≈ +12% (65 vs 59 € median), p < 0.001 |
+| ANOVA + Kruskal-Wallis | Price by room type | Medians: entire home 75 €, hotel 63 €, private 40 €, shared 24 €; p ≈ 0 |
 | Mann-Whitney | Low-cost vs full-service fares | 70 € vs 113 € median, p ≈ 0 |
 | Kruskal-Wallis | Seasonal flight prices | Summer 112 € vs spring 89 €, p < 0.001 |
-| Spearman correlation | Drivers of price | bedrooms +0.32, distance to centre −0.12, rating only +0.07 |
-| OLS log-price (robust SE), R² = 0.71 | Explain price | Superhost +10%, each km from centre −3.5%, each amenity +0.4%, price ∝ destination cost index (elasticity ≈ 1.0) |
+| Spearman correlation | Drivers of price | bedrooms +0.32, distance to centre −0.13, rating only +0.08 |
+| OLS log-price (robust SE), R² = 0.71 | Explain price | Superhost +10% (robust SE), each km from centre −3.5%, each amenity +0.4%, price ∝ destination cost index (elasticity ≈ 1.0) |
 | Random forest vs linear model | Predict price | RF R² 0.69 (CV 0.69, MAE ≈ 16 €) – **did not beat the linear model (0.71)**, so the simpler model is preferred |
 | K-means on destinations (k by silhouette, k=3, 0.34) | Segmentation | see §3 |
-| TF-IDF + NMF, complaint counting | Review text mining | Praise: location, cleanliness, host; complaints: misleading photos, slow host, overpriced |
+| TF-IDF + NMF, complaint counting | Review text mining | Praise: value, location, cleanliness, helpful host; top complaints: misleading photos, slow host replies, hard to find, dirty on arrival |
 | Planner function `plan(budget, month)` | Decision support | Returns best-value destinations for a budget/month/temperature band |
 
 **Figures:** `outputs/fig1…fig5*.png`. **Honest caveats on modelling:** the weak-ish silhouette (0.34) means segments are a useful simplification, not natural groups; Bali was excluded from clustering as a long-haul outlier; because the data is simulated, the fact that the regression recovers the built-in coefficients validates the *pipeline*, not the world.
@@ -64,11 +64,11 @@ erDiagram
 3. **Northern premium** – Amsterdam, Berlin, Edinburgh, Reykjavik, Copenhagen: ~83 €/night, cool (14 °C), cheap flights (71 €) but the dearest trips ≈ 487 €.
 
 **Recommendations**
-1. **Lead with total trip cost, not flight price.** Accommodation is 3–4× the fare for a 5-night stay and varies ~2.5× across cities (Bali/Marrakech/Istanbul ≈ 33–46 € vs Copenhagen/Reykjavik ≈ 114–115 €). Northern cities look cheap on flights but are the most expensive trips. *Action:* default search results to bundle cost via the `v_trip_cost` logic.
+1. **Lead with total trip cost, not flight price.** Accommodation is the bigger part of a 5-night bill (≈2× the fare in the sun-and-value segment, ≈6× in the northern one) and the median entire-home night varies ~3× across cities (Bali/Marrakech/Istanbul ≈ 34–47 € vs Copenhagen/Reykjavik ≈ 107–116 €). Northern cities look cheap on flights but are the most expensive trips. *Action:* default search results to bundle cost via the `v_trip_cost` logic.
 2. **Nudge travellers to the shoulder season.** For six Mediterranean cities a September trip costs ≈ 586 € vs 654 € in July (**≈10% saving**) with ~4 °C cooler weather (21.5 vs 25.7 °C) and lower occupancy (78% vs 87%). *Action:* "Save 10% – go in September" prompts and price-drop alerts for July searchers.
-3. **Coach booking timing.** Fares are U-shaped: cheapest at 46–60 days out (≈91 €), ≈+39% inside a week (127 €), ≈+68% beyond 150 days (153 €). *Action:* alert users when they enter the 45–60-day window; don't push "book now" a year ahead.
+3. **Coach booking timing.** Fares are U-shaped: cheapest at 46–60 days out (≈90 €), ≈+48% inside a week (133 €), ≈+81% beyond 150 days (163 €). *Action:* alert users when they enter the 45–60-day window; don't push "book now" a year ahead.
 4. **Steer budget users to low-cost carriers, but disclose extras.** LCC median fare is ~38% lower; full-service carriers are worth surfacing only where baggage/transfer needs dominate.
-5. **Rank listings by value, not stars.** Ratings barely relate to price (ρ = 0.07), so rating is a poor price signal. Distance to centre (−3.5%/km) and superhost status (+10%) are what the market charges for. *Action:* a "better than expected price" badge using predicted-vs-actual price gap (model MAE ≈ 16 €), and filters for "within 2 km of centre".
+5. **Rank listings by value, not stars.** Ratings barely relate to price (ρ = 0.08), so rating is a poor price signal. Distance to centre (−3.5%/km) and superhost status (+10–12%) are what the market charges for. *Action:* a "better than expected price" badge using predicted-vs-actual price gap (model MAE ≈ 16 €), and filters for "within 2 km of centre".
 6. **Product positioning:** target value-seekers with the *Sun-and-value* segment and a budget slider (`plan()` demo: €600 in June → Lisbon, Malaga, Marrakech, Istanbul, Tenerife; €500 in October → Marrakech, Tenerife, Malaga, Lisbon, Istanbul).
 
 **KPIs to track:** conversion on bundle vs flight-only search; share of searches shifted to shoulder months; average booking lead time vs the 45–60-day window; click-through on value badges.
