@@ -1,0 +1,285 @@
+{
+ "raw_listings": 6060,
+ "duplicates_removed": 60,
+ "missing_price": 150,
+ "outliers_removed": 42,
+ "clean_listings": 5808,
+ "clean_flights": 30000,
+ "price_summary": {
+  "count": 5808.0,
+  "mean": 67.3,
+  "std": 34.8,
+  "min": 7.0,
+  "25%": 41.0,
+  "50%": 60.0,
+  "75%": 87.0,
+  "max": 274.0
+ },
+ "cheapest_cities_night": {
+  "Bali": 34.0,
+  "Marrakech": 44.0,
+  "Istanbul": 47.0,
+  "Budapest": 55.0,
+  "Krakow": 56.0
+ },
+ "priciest_cities_night": {
+  "Vienna": 96.0,
+  "Amsterdam": 98.0,
+  "Paris": 104.0,
+  "Copenhagen": 107.0,
+  "Reykjavik": 116.0
+ },
+ "T1_superhost_premium": {
+  "superhost_median": 65.0,
+  "other_median": 59.0,
+  "pct_premium": 11.73539691484109,
+  "t": 6.740290904500676,
+  "p": 2.0152280293769063e-11
+ },
+ "T2_roomtype_anova": {
+  "F": 1125.3888613041615,
+  "p": 0.0,
+  "kruskal_H": 2049.632718183659,
+  "kruskal_p": 0.0,
+  "medians": {
+   "Entire home/apt": 75.0,
+   "Hotel room": 63.0,
+   "Private room": 40.0,
+   "Shared room": 24.0
+  }
+ },
+ "T3_lowcost_vs_full": {
+  "lcc_median": 70.31,
+  "full_median": 113.405,
+  "p": 0.0
+ },
+ "T4_season_flight_median": {
+  "Winter": 89.4,
+  "Spring": 88.5,
+  "Summer": 111.7,
+  "Autumn": 93.7
+ },
+ "T4_kruskal_p": 4.851467682883596e-272,
+ "T5_spearman_with_price": {
+  "rating": 0.083,
+  "amenities_cnt": 0.066,
+  "dist_centre_km": -0.134,
+  "n_reviews": 0.048,
+  "bedrooms": 0.319
+ },
+ "booking_window_median": {
+  "0-6": 133.2,
+  "7-14": 96.9,
+  "15-30": 92.5,
+  "31-45": 91.3,
+  "46-60": 89.8,
+  "61-90": 94.0,
+  "91-150": 109.6,
+  "150+": 162.8
+ },
+ "best_window": "46-60",
+ "OLS": {
+  "r2": 0.7147608583382509,
+  "n": 5808,
+  "coef_pct": {
+   "is_superhost": 10.169633865173445,
+   "dist_centre_km": -3.4982663039939577,
+   "amenities_cnt": 0.41379350174863827
+  },
+  "cost_elasticity": 0.9928341645927036,
+  "p_values": {
+   "is_superhost": 1.7597436597567902e-28,
+   "dist_centre_km": 1.3277002630905488e-107,
+   "amenities_cnt": 3.886238513535615e-18
+  }
+ },
+ "ML_price_model": {
+  "linear_r2": 0.7068835811081968,
+  "rf_r2": 0.6859940487697256,
+  "rf_mae_eur": 16.349837368932953,
+  "rf_cv5_r2": 0.6893190476263251
+ },
+ "rf_top_features": {
+  "cost_index": 0.342,
+  "room_type_Private room": 0.253,
+  "room_type_Shared room": 0.139,
+  "dist_centre_km": 0.077,
+  "rating": 0.046,
+  "amenities_cnt": 0.04
+ },
+ "deal_example": [
+  {
+   "city": "Paris",
+   "room_type": "Entire home/apt",
+   "price_night": 43.0,
+   "pred": 115.1,
+   "rating": 4.9
+  }
+ ],
+ "kmeans_k": 3,
+ "silhouette": {
+  "3": 0.338,
+  "4": 0.325,
+  "5": 0.284,
+  "6": 0.28
+ },
+ "cluster_profiles": {
+  "0": {
+   "night": 70.3,
+   "flight": 90.2,
+   "temp": 21.3,
+   "occ": 86.9,
+   "rating": 4.6,
+   "trip5": 441.7
+  },
+  "1": {
+   "night": 49.2,
+   "flight": 117.7,
+   "temp": 24.0,
+   "occ": 81.2,
+   "rating": 4.6,
+   "trip5": 363.8
+  },
+  "2": {
+   "night": 83.2,
+   "flight": 70.9,
+   "temp": 14.4,
+   "occ": 78.7,
+   "rating": 4.6,
+   "trip5": 486.9
+  }
+ },
+ "cluster_members": {
+  "0": [
+   "Barcelona",
+   "Rome",
+   "Paris",
+   "Prague",
+   "Vienna"
+  ],
+  "1": [
+   "Lisbon",
+   "Athens",
+   "Malaga",
+   "Dubrovnik",
+   "Budapest",
+   "Krakow",
+   "Tenerife",
+   "Marrakech",
+   "Istanbul"
+  ],
+  "2": [
+   "Amsterdam",
+   "Berlin",
+   "Edinburgh",
+   "Reykjavik",
+   "Copenhagen"
+  ]
+ },
+ "review_topics": {
+  "topic0": [
+   "great value",
+   "great value money",
+   "value money",
+   "helpful great value",
+   "view great value"
+  ],
+  "topic1": [
+   "quiet cosy",
+   "great location",
+   "spotless comfortable",
+   "easy check",
+   "host helpful"
+  ]
+ },
+ "top_complaints": {
+  "misleading photos": 23,
+  "host slow to reply": 23,
+  "hard to find": 21,
+  "dirty on arrival": 20
+ },
+ "stars_vs_price_corr": 0.08314909682749133,
+ "planner_demo_june_600": [
+  {
+   "city": "Lisbon",
+   "trip_cost": 547.0,
+   "avg_temp_c": 25.0,
+   "rainfall_mm": 33.0,
+   "occupancy_pct": 86.0
+  },
+  {
+   "city": "Malaga",
+   "trip_cost": 594.0,
+   "avg_temp_c": 26.0,
+   "rainfall_mm": 35.0,
+   "occupancy_pct": 80.0
+  },
+  {
+   "city": "Marrakech",
+   "trip_cost": 421.0,
+   "avg_temp_c": 29.0,
+   "rainfall_mm": 54.0,
+   "occupancy_pct": 88.0
+  },
+  {
+   "city": "Istanbul",
+   "trip_cost": 462.0,
+   "avg_temp_c": 23.0,
+   "rainfall_mm": 43.0,
+   "occupancy_pct": 86.0
+  },
+  {
+   "city": "Tenerife",
+   "trip_cost": 548.0,
+   "avg_temp_c": 24.0,
+   "rainfall_mm": 59.0,
+   "occupancy_pct": 78.0
+  }
+ ],
+ "planner_demo_oct_500": [
+  {
+   "city": "Marrakech",
+   "trip_cost": 348.0,
+   "avg_temp_c": 22.0,
+   "rainfall_mm": 70.0,
+   "occupancy_pct": 63.0
+  },
+  {
+   "city": "Tenerife",
+   "trip_cost": 480.0,
+   "avg_temp_c": 24.0,
+   "rainfall_mm": 81.0,
+   "occupancy_pct": 62.0
+  },
+  {
+   "city": "Malaga",
+   "trip_cost": 470.0,
+   "avg_temp_c": 18.0,
+   "rainfall_mm": 67.0,
+   "occupancy_pct": 56.0
+  },
+  {
+   "city": "Lisbon",
+   "trip_cost": 450.0,
+   "avg_temp_c": 17.0,
+   "rainfall_mm": 62.0,
+   "occupancy_pct": 59.0
+  },
+  {
+   "city": "Istanbul",
+   "trip_cost": 392.0,
+   "avg_temp_c": 16.0,
+   "rainfall_mm": 71.0,
+   "occupancy_pct": 61.0
+  }
+ ],
+ "shoulder_saving": {
+  "july": 654.0,
+  "september": 586.0,
+  "saving_pct": 10.4,
+  "sep_temp": 21.5,
+  "jul_temp": 25.7,
+  "sep_occ": 78.2,
+  "jul_occ": 86.8
+ }
+}
